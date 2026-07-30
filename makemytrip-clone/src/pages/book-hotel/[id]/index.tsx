@@ -112,8 +112,8 @@ const BookHotelPage = () => {
   };
 
   const totalPrice = hotel?.pricePerNight * quantity;
-  const totalTaxes = hotelData?.room.taxes * quantity;
-  const totalDiscounts = hotelData?.room.discountedPrice * quantity;
+  const totalTaxes = Math.round((hotel?.pricePerNight || 0) * 0.18) * quantity;
+  const totalDiscounts = Math.round((hotel?.pricePerNight || 0) * 0.10) * quantity;
   const grandTotal = totalPrice + totalTaxes - totalDiscounts;
   const handlebooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,14 +124,18 @@ const BookHotelPage = () => {
         quantity,
         grandTotal
       );
-      const updateuser = {
-        ...user,
-        bookings: [...user.bookings, data],
-      };
-      dispatch(setUser(updateuser));
-      setopem(false);
-      setQuantity(1);
-      router.push("/profile");
+      if (data) {
+        const updateuser = {
+          ...user,
+          bookings: [...user.bookings, data],
+        };
+        dispatch(setUser(updateuser));
+        setopem(false);
+        setQuantity(1);
+        router.push("/profile");
+      } else {
+        alert("Hotel booking failed. Please try again.");
+      }
     } catch (error) {
       console.log(error);
     }

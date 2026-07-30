@@ -214,7 +214,7 @@ const index = () => {
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-2xl font-bold mb-6">My Bookings</h2>
               <div className="space-y-6">
-                {user?.bookings.map((booking: any, index: any) => (
+                {user?.bookings?.filter((b: any) => b && b.bookingId).map((booking: any, index: any) => (
                   <div
                     key={index}
                     className="border rounded-lg p-4 hover:shadow-md transition-shadow"

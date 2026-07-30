@@ -74,27 +74,27 @@ const BookFlightPage = () => {
   }
   const flight = flights[0];
   const flightDetails = {
-    from: "Bengaluru",
-    to: "New Delhi",
-    date: "Thursday, Jan 16",
-    flightNo: "IX 2747",
-    aircraft: "Airbus A320",
-    airline: "Air India Express",
-    departureTime: "17:55",
-    arrivalTime: "20:55",
-    duration: "3h 0m",
-    departureTerminal: "Bengaluru International Airport, Terminal T2",
-    arrivalTerminal: "Indira Gandhi International Airport, Terminal T3",
+    from: flight?.from,
+    to: flight?.to,
+    date: new Date(flight?.departureTime).toLocaleDateString(),
+    flightNo: "FL-" + flight?.id?.substring(0, 4).toUpperCase(),
+    aircraft: "Boeing 737",
+    airline: flight?.flightName,
+    departureTime: new Date(flight?.departureTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+    arrivalTime: new Date(flight?.arrivalTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+    duration: "2h 30m", // Assuming fixed for now, or could compute difference
+    departureTerminal: `${flight?.from} Airport, Terminal 1`,
+    arrivalTerminal: `${flight?.to} Airport, Terminal 2`,
     cabinBaggage: "7 Kgs / Adult",
     checkInBaggage: "15 Kgs (1 piece only) / Adult",
   };
 
   const fareSummary = {
-    baseFare: 6124,
-    taxes: 1374,
+    baseFare: flight?.price || 0,
+    taxes: Math.round((flight?.price || 0) * 0.18),
     otherServices: 249,
     discounts: -250,
-    total: 7497,
+    total: (flight?.price || 0) + Math.round((flight?.price || 0) * 0.18) + 249 - 250,
   };
 
   const promoOffers = [
@@ -174,14 +174,18 @@ const BookFlightPage = () => {
         quantity,
         grandTotal
       );
-      const updateuser = {
-        ...user,
-        bookings: [...user.bookings, data],
-      };
-      dispatch(setUser(updateuser));
-      setopem(false);
-      setQuantity(1);
-      router.push("/profile");
+      if (data) {
+        const updateuser = {
+          ...user,
+          bookings: [...user.bookings, data],
+        };
+        dispatch(setUser(updateuser));
+        setopem(false);
+        setQuantity(1);
+        router.push("/profile");
+      } else {
+        alert("Booking failed. Please try again.");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -301,14 +305,15 @@ const BookFlightPage = () => {
     </DialogContent>
   );
   return (
-    <div className="min-h-screen bg-[#f4f7fa]">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 font-sans text-slate-800">
+      <div className="max-w-7xl mx-auto px-4 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-8">
             {/* Flight Details */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
+            <div className="bg-white rounded-2xl shadow-lg shadow-blue-900/5 border border-slate-100 overflow-hidden relative p-8">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+              <div className="flex flex-wrap justify-between items-start gap-4 mb-8">
                 <div>
                   <div className="flex items-center flex-wrap gap-4 mb-2">
                     <h2 className="text-lg font-bold flex items-center">
@@ -397,7 +402,7 @@ const BookFlightPage = () => {
             </div>
 
             {/* Cancellation Policy */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white rounded-2xl shadow-lg shadow-blue-900/5 border border-slate-100 p-8">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-lg font-bold flex items-center">
                   <AlertCircle className="w-5 h-5 mr-2 text-orange-500" />
@@ -427,7 +432,7 @@ const BookFlightPage = () => {
             </div>
 
             {/* Hotel Offers */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white rounded-2xl shadow-lg shadow-blue-900/5 border border-slate-100 p-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold flex items-center">
                   <Gift className="w-5 h-5 mr-2 text-red-500" />
@@ -485,7 +490,7 @@ const BookFlightPage = () => {
 
           {/* Fare Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-24">
+            <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 sticky top-24">
               <h2 className="text-lg font-bold mb-6 flex items-center">
                 <CreditCard className="w-5 h-5 mr-2 text-gray-600" />
                 Fare Summary
@@ -526,7 +531,7 @@ const BookFlightPage = () => {
               </div>
               <Dialog open={open} onOpenChange={setopem}>
                 <DialogTrigger asChild>
-                  <Button className="w-full bg-red-600 text-white">
+                  <Button className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold text-lg py-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5">
                     Book Now
                   </Button>
                 </DialogTrigger>
@@ -548,7 +553,7 @@ const BookFlightPage = () => {
               </Dialog>
               {/* Promo Codes */}
               <div className="mt-8">
-                <div className="bg-[#FFF8E7] p-6 rounded-xl">
+                <div className="bg-gradient-to-br from-orange-50 to-amber-50/50 border border-orange-100 p-6 rounded-2xl shadow-inner">
                   <h3 className="font-bold mb-4 flex items-center">
                     <Gift className="w-5 h-5 mr-2 text-yellow-600" />
                     PROMO CODES
@@ -563,9 +568,10 @@ const BookFlightPage = () => {
                   {promoOffers.map((offer, index) => (
                     <div
                       key={index}
-                      className="bg-white p-4 rounded-lg mb-3 shadow-sm"
+                      className="bg-white p-4 rounded-xl mb-3 shadow-sm border border-dashed border-orange-300 relative overflow-hidden group hover:border-orange-400 transition-colors"
                     >
-                      <div className="flex items-start gap-3">
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-4 bg-orange-50 rounded-r-full border-r border-y border-dashed border-orange-300"></div>
+                      <div className="flex items-start gap-3 pl-2">
                         <input
                           type="radio"
                           name="promo"

@@ -32,7 +32,13 @@ export default function Home() {
   const [hotel, sethotel] = useState<any[]>([]);
   const [loading, setloading] = useState(true);
   const [flight, setflight] = useState<any[]>([]);
+  const [maintenancePopup, setMaintenancePopup] = useState(false);
   const user = useSelector((state: any) => state.user.user);
+  
+  const handleMaintenanceClick = () => {
+    setMaintenancePopup(true);
+    setTimeout(() => setMaintenancePopup(false), 3000);
+  };
   const router = useRouter();
   const flightD = [
     { id: 1, from: "Delhi", to: "Mumbai", date: "2025-01-15", price: 5000 },
@@ -204,15 +210,22 @@ export default function Home() {
               active={bookingtype === "hotels"}
               onClick={() => setbookingtype("hotels")}
             />
-            <NavItem icon={<HomeIcon />} text="Homestays" />
-            <NavItem icon={<Umbrella />} text="Holiday" />
-            <NavItem icon={<Train />} text="Trains" />
-            <NavItem icon={<Bus />} text="Buses" />
-            <NavItem icon={<Car />} text="Cabs" />
-            <NavItem icon={<CreditCard />} text="Forex" />
-            <NavItem icon={<Shield />} text="Insurance" />
+            <NavItem icon={<HomeIcon />} text="Homestays" onClick={handleMaintenanceClick} />
+            <NavItem icon={<Umbrella />} text="Holiday" onClick={handleMaintenanceClick} />
+            <NavItem icon={<Train />} text="Trains" onClick={handleMaintenanceClick} />
+            <NavItem icon={<Bus />} text="Buses" onClick={handleMaintenanceClick} />
+            <NavItem icon={<Car />} text="Cabs" onClick={handleMaintenanceClick} />
+            <NavItem icon={<CreditCard />} text="Forex" onClick={handleMaintenanceClick} />
+            <NavItem icon={<Shield />} text="Insurance" onClick={handleMaintenanceClick} />
           </div>
         </nav>
+        
+        {maintenancePopup && (
+          <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl z-50 animate-in fade-in slide-in-from-bottom-5 duration-300 flex items-center space-x-2">
+            <span className="text-amber-400">🛠️</span>
+            <span className="font-medium text-sm">This feature is under construction. Check back soon!</span>
+          </div>
+        )}
 
         <div className="bg-white rounded-3xl shadow-2xl mx-auto max-w-5xl p-8 border border-gray-100">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -342,7 +355,10 @@ export default function Home() {
             <h2 className="text-3xl font-bold mb-8 text-gray-800">Best Offers</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {offers.map((offer, index) => (
-                <OfferCard key={index} {...offer} />
+                <OfferCard 
+                  key={index} 
+                  {...offer} 
+                />
               ))}
             </div>
           </section>
@@ -356,7 +372,10 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {collections.map((collection, index) => (
-                <CollectionCard key={index} {...collection} />
+                <CollectionCard 
+                  key={index} 
+                  {...collection} 
+                />
               ))}
             </div>
           </section>
@@ -370,7 +389,10 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {wonders.map((wonder, index) => (
-                <WonderCard key={index} {...wonder} />
+                <WonderCard 
+                  key={index} 
+                  {...wonder} 
+                />
               ))}
             </div>
           </section>
@@ -383,15 +405,25 @@ export default function Home() {
   );
 }
 const OfferCard = ({ title, description, imageUrl }: any) => {
+  const [showDetails, setShowDetails] = useState(false);
+
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300">
       <img src={imageUrl} alt={title} className="w-full h-48 object-cover" />
       <div className="p-4">
         <h3 className="font-semibold text-lg mb-2">{title}</h3>
         <p className="text-gray-600 text-sm">{description}</p>
-        <button className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-          Book Now
+        <button 
+          onClick={() => setShowDetails(!showDetails)}
+          className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+          {showDetails ? "Hide Details" : "Book Now"}
         </button>
+        {showDetails && (
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-100 rounded-lg text-sm text-gray-700 shadow-inner">
+            <p className="font-semibold text-blue-800 mb-1">🎉 Exclusive Offer Unlocked!</p>
+            <p>Use code <strong className="text-blue-600 font-mono">MMT2024</strong> at checkout to get an extra 10% off on this booking. Valid for a limited time only.</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -399,20 +431,25 @@ const OfferCard = ({ title, description, imageUrl }: any) => {
 
 const CollectionCard = ({ title, imageUrl, tag }: any) => {
   return (
-    <div className="relative group cursor-pointer overflow-hidden rounded-lg">
+    <div 
+      className="relative group overflow-hidden rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100/10"
+    >
       <img
         src={imageUrl}
         alt={title}
-        className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
+        className="w-full h-72 object-cover transition-transform duration-700 group-hover:scale-110"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70">
+      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/90 transition-opacity duration-300 group-hover:opacity-90">
         <div className="absolute top-4 left-4">
-          <span className="bg-white text-black text-sm font-semibold px-2 py-1 rounded">
+          <span className="bg-white/95 backdrop-blur-sm text-blue-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
             {tag}
           </span>
         </div>
-        <div className="absolute bottom-4 left-4 right-4">
-          <h3 className="text-white text-lg font-semibold">{title}</h3>
+        <div className="absolute bottom-4 left-4 right-4 transform transition-transform duration-300 group-hover:-translate-y-2">
+          <h3 className="text-white text-xl font-bold mb-1">{title}</h3>
+          <p className="text-blue-200 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center">
+            Explore Collection &rarr;
+          </p>
         </div>
       </div>
     </div>
@@ -453,15 +490,18 @@ const DownloadApp = () => {
 
 const WonderCard = ({ title, imageUrl }: any) => {
   return (
-    <div className="relative group cursor-pointer overflow-hidden rounded-lg">
+    <div 
+      className="relative group overflow-hidden rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+    >
       <img
         src={imageUrl}
         alt={title}
-        className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"
+        className="w-full h-72 object-cover transition-transform duration-700 group-hover:scale-105"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/70">
-        <div className="absolute bottom-4 left-4 right-4">
-          <h3 className="text-white text-lg font-semibold">{title}</h3>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent">
+        <div className="absolute bottom-6 left-6 right-6">
+          <h3 className="text-white text-lg font-bold leading-tight mb-2 group-hover:text-amber-300 transition-colors duration-300">{title}</h3>
+          <div className="w-0 h-0.5 bg-amber-400 group-hover:w-12 transition-all duration-300"></div>
         </div>
       </div>
     </div>
