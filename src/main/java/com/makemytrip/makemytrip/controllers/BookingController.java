@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import com.makemytrip.makemytrip.models.Users;
 import com.makemytrip.makemytrip.services.BookingService;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/booking")
 public class BookingController {
