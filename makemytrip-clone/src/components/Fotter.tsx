@@ -1,147 +1,106 @@
 import React from "react";
-import { Facebook, Twitter, Linkedin, Instagram } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { Github } from "lucide-react";
+import { AUTHOR, GITHUB_URL, SITE_NAME } from "@/lib/site";
+
+const FooterLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
+  <li>
+    <Link href={href} className="transition-colors hover:text-white">
+      {children}
+    </Link>
+  </li>
+);
+
 const Footer = () => {
+  const router = useRouter();
+  // The long marketing text only belongs on the landing page.
+  const showAbout = router.pathname === "/";
+
   return (
-    <footer className="bg-black text-gray-300 pt-12 pb-8">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Why MakeMyTrip Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <div>
-            <h3 className="text-xl font-bold mb-4">Why MakeMyTrip?</h3>
-            <p className="text-sm leading-relaxed">
-              Established in 2000, MakeMyTrip has since positioned itself as one
-              of the leading companies, providing great offers, competitive
-              airfares, exclusive discounts, and a seamless online booking
-              experience.
-            </p>
+    <footer className="bg-slate-950 pb-5 pt-8 text-xs text-slate-400">
+      <div className="mx-auto max-w-7xl px-4">
+        {showAbout && (
+          <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div>
+              <h3 className="mb-2 text-sm font-bold text-white">Why MakeMyTrip Clone?</h3>
+              <p className="leading-relaxed">
+                MakeMyTrip Clone is a full-stack learning project that brings flights, hotels, trains, buses, cabs,
+                holidays, forex and insurance together in one place, with real search, booking, cancellation and live
+                status, all backed by a Spring Boot and MongoDB API.
+              </p>
+            </div>
+            <div>
+              <h3 className="mb-2 text-sm font-bold text-white">Booking Flights with MakeMyTrip Clone</h3>
+              <p className="leading-relaxed">
+                Search flights between more than 60 cities in India and abroad, compare fares by time and price, apply
+                promo codes and see the full tax breakdown before you book. Every booking can be managed from My Trips.
+              </p>
+            </div>
+            <div>
+              <h3 className="mb-2 text-sm font-bold text-white">Domestic Flights with MakeMyTrip Clone</h3>
+              <p className="leading-relaxed">
+                Explore hundreds of domestic and international routes on the Routes page, then follow your flight, train
+                or bus with live status once it is booked.
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-xl font-bold mb-4">
-              Booking Flights with MakeMyTrip
-            </h3>
-            <p className="text-sm leading-relaxed">
-              Book your flights tickets with India's leading flight booking
-              company. Get best deals on flights, train tickets, buses, hotels
-              and holiday packages.
-            </p>
-          </div>
-          <div>
-            <h3 className="text-xl font-bold mb-4">
-              Domestic Flights with MakeMyTrip
-            </h3>
-            <p className="text-sm leading-relaxed">
-              MakeMyTrip is India's leading player for flight bookings. With the
-              cheapest fare guarantee, experience great value at the lowest
-              price.
-            </p>
-          </div>
-        </div>
+        )}
 
         {/* Quick Links */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
           <div>
-            <h4 className="font-semibold mb-3">ABOUT THE SITE</h4>
-            <ul className="text-sm space-y-2">
-              <li>
-                <a href="#" className="hover:text-white">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Investor Relations
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Careers
-                </a>
-              </li>
+            <h4 className="mb-2 font-semibold tracking-wide text-slate-200">ABOUT THE SITE</h4>
+            <ul className="space-y-1.5">
+              <FooterLink href="/info/about">About Us</FooterLink>
+              <FooterLink href="/info/investors">Investor Relations</FooterLink>
+              <FooterLink href="/info/careers">Careers</FooterLink>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-3">POPULAR HOTELS</h4>
-            <ul className="text-sm space-y-2">
-              <li>
-                <a href="#" className="hover:text-white">
-                  Hotels in Delhi
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Hotels in Mumbai
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Hotels in Goa
-                </a>
-              </li>
+            <h4 className="mb-2 font-semibold tracking-wide text-slate-200">POPULAR HOTELS</h4>
+            <ul className="space-y-1.5">
+              <FooterLink href="/?tab=hotels&city=Delhi">Hotels in Delhi</FooterLink>
+              <FooterLink href="/?tab=hotels&city=Mumbai">Hotels in Mumbai</FooterLink>
+              <FooterLink href="/?tab=hotels&city=Goa">Hotels in Goa</FooterLink>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-3">QUICK LINKS</h4>
-            <ul className="text-sm space-y-2">
-              <li>
-                <a href="#" className="hover:text-white">
-                  COVID-19 Update
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Flight Schedule
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Train Schedule
-                </a>
-              </li>
+            <h4 className="mb-2 font-semibold tracking-wide text-slate-200">QUICK LINKS</h4>
+            <ul className="space-y-1.5">
+              <FooterLink href="/info/travel-updates">COVID-19 Update</FooterLink>
+              <FooterLink href="/flight-status">Flight Schedule</FooterLink>
+              <FooterLink href="/?tab=trains">Train Schedule</FooterLink>
+              <FooterLink href="/routes">Routes &amp; Destinations</FooterLink>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-3">IMPORTANT LINKS</h4>
-            <ul className="text-sm space-y-2">
-              <li>
-                <a href="#" className="hover:text-white">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  Terms & Conditions
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white">
-                  User Agreement
-                </a>
-              </li>
+            <h4 className="mb-2 font-semibold tracking-wide text-slate-200">IMPORTANT LINKS</h4>
+            <ul className="space-y-1.5">
+              <FooterLink href="/info/privacy">Privacy Policy</FooterLink>
+              <FooterLink href="/info/terms">Terms &amp; Conditions</FooterLink>
+              <FooterLink href="/info/agreement">User Agreement</FooterLink>
             </ul>
           </div>
         </div>
 
-        {/* Social Links & Copyright */}
-        <div className="border-t border-gray-700 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex space-x-6 mb-4 md:mb-0">
-              <a href="#" className="hover:text-white">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-white">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-white">
-                <Linkedin className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-white">
-                <Facebook className="w-5 h-5" />
-              </a>
-            </div>
-            <p className="text-sm">
-              © 2024 MakeMyTrip PVT. LTD. All rights reserved
-            </p>
-          </div>
+        {/* Credits */}
+        <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t border-slate-800 pt-4 md:flex-row">
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="View the source code on GitHub"
+            className="flex items-center gap-2 hover:text-white"
+          >
+            <Github className="h-4 w-4" />
+            <span>View source on GitHub</span>
+          </a>
+          <p className="text-center md:text-right">
+            © {new Date().getFullYear()} {SITE_NAME} · Built by {AUTHOR}
+            <br />
+            An educational project. Not affiliated with MakeMyTrip. All flights, hotels and prices are demo data.
+          </p>
         </div>
       </div>
     </footer>
