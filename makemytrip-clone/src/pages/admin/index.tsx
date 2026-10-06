@@ -1,528 +1,531 @@
-"use client";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import Link from "next/link";
+import {
+  Building2,
+  Database,
+  IndianRupee,
+  LayoutDashboard,
+  Layers,
+  Loader2,
+  Plane,
+  RefreshCw,
+  Search,
+  Ticket,
+  Users as UsersIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useEffect, useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
-import { Textarea } from "@/components/ui/textarea";
-import FlightList from "@/components/Flights/Flightlist";
+import SignupDialog from "@/components/SignupDialog";
+import Seo from "@/components/Seo";
+import EntityManager, { Column, Field } from "@/components/admin/EntityManager";
 import {
   addflight,
   addhotel,
+  changeuserrole,
+  deleteflight,
+  deletehotel,
+  deletelisting,
   editflight,
   edithotel,
-  getuserbyemail,
+  getadminstats,
+  getallusers,
+  getflight,
+  gethotel,
+  getlistings,
+  loaddummydata,
+  savelisting,
 } from "@/api";
-import HotelList from "@/components/Hotel/Hotel";
-const mockFlights = [
-  {
-    _id: "1",
-    flightName: "AirOne 101",
-    from: "New York",
-    to: "London",
-    departureTime: "2023-07-01T08:00",
-    arrivalTime: "2023-07-01T20:00",
-    price: 500,
-    availableSeats: 150,
-  },
-  {
-    _id: "2",
-    flightName: "SkyHigh 202",
-    from: "Paris",
-    to: "Tokyo",
-    departureTime: "2023-07-02T10:00",
-    arrivalTime: "2023-07-03T06:00",
-    price: 800,
-    availableSeats: 200,
-  },
-  {
-    _id: "3",
-    flightName: "EagleWings 303",
-    from: "Los Angeles",
-    to: "Sydney",
-    departureTime: "2023-07-03T22:00",
-    arrivalTime: "2023-07-05T06:00",
-    price: 1200,
-    availableSeats: 180,
-  },
+import { errorMessage, formatDateTime, formatINR } from "@/lib/format";
+
+type Tab = "dashboard" | "flights" | "hotels" | "services" | "users";
+
+const NAV: { id: Tab; label: string; icon: React.ReactNode }[] = [
+  { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
+  { id: "flights", label: "Flights", icon: <Plane className="h-4 w-4" /> },
+  { id: "hotels", label: "Hotels", icon: <Building2 className="h-4 w-4" /> },
+  { id: "services", label: "Services", icon: <Layers className="h-4 w-4" /> },
+  { id: "users", label: "Users", icon: <UsersIcon className="h-4 w-4" /> },
 ];
 
-const mockHotels = [
-  {
-    _id: "1",
-    hotelName: "Luxury Palace",
-    location: "Paris, France",
-    pricePerNight: 300,
-    availableRooms: 50,
-    amenities: "Wi-Fi, Pool, Spa, Restaurant",
-  },
-  {
-    _id: "2",
-    hotelName: "Seaside Resort",
-    location: "Bali, Indonesia",
-    pricePerNight: 200,
-    availableRooms: 100,
-    amenities: "Beach Access, Wi-Fi, Restaurant, Water Sports",
-  },
-  {
-    _id: "3",
-    hotelName: "Mountain Lodge",
-    location: "Aspen, Colorado",
-    pricePerNight: 250,
-    availableRooms: 30,
-    amenities: "Ski-in/Ski-out, Fireplace, Hot Tub, Restaurant",
-  },
-];
-interface User {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  role: string;
-  phoneNumber: string;
-}
+const CATEGORIES = ["HOMESTAY", "HOLIDAY", "TRAIN", "BUS", "CAB", "FOREX", "INSURANCE"];
 
-function UserSearch() {
-  const [email, setEmail] = useState("");
-  const [user, setUser] = useState<User | null>(null);
-  const [error, setError] = useState<string | null>(null);
+const DemoBadge = ({ row }: { row: any }) =>
+  row.demo ? (
+    <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-slate-500">demo</span>
+  ) : null;
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setUser(null);
+// ---------------------------------------------------------------- dashboard
+
+const StatCard = ({ label, value, icon }: { label: string; value: React.ReactNode; icon: React.ReactNode }) => (
+  <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">{icon}</div>
+    <div className="text-2xl font-extrabold">{value}</div>
+    <div className="text-sm text-slate-500">{label}</div>
+  </div>
+);
+
+const Dashboard = () => {
+  const [stats, setStats] = useState<any>(null);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const load = useCallback(async () => {
     try {
-      const data = await getuserbyemail(email);
-      if (data) {
-        setUser(data);
-      } else {
-        setError("User not found");
-      }
-    } catch (err) {
-      setError("User not found");
+      setStats(await getadminstats());
+      setError("");
+    } catch (e) {
+      setError(errorMessage(e, "Could not load the dashboard."));
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const runSeed = async (reset: boolean) => {
+    if (reset && !window.confirm("Replace all demo flights, hotels and services with fresh demo data? Items you added yourself are kept.")) return;
+    setBusy(true);
+    setMessage("");
+    try {
+      const res = await loaddummydata(reset);
+      const parts = Object.entries(res)
+        .filter(([k]) => k !== "reset")
+        .map(([k, v]) => `${v} ${k}`);
+      setMessage(parts.length ? `Loaded ${parts.join(", ")}.` : "Demo data is already up to date.");
+      await load();
+    } catch (e) {
+      setMessage(errorMessage(e, "Could not load demo data."));
+    } finally {
+      setBusy(false);
     }
   };
 
+  if (error) return <p className="rounded-xl bg-red-50 p-4 text-red-700">{error}</p>;
+  if (!stats)
+    return (
+      <div className="flex justify-center py-20">
+        <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+      </div>
+    );
+
+  const byType: [string, number][] = Object.entries(stats.revenueByType || {}) as [string, number][];
+  const maxRevenue = Math.max(1, ...byType.map(([, v]) => v));
+
   return (
-    <div className="space-y-4">
-      <form onSubmit={handleSearch} className="flex gap-2">
-        <div className="flex-1">
-          <Label htmlFor="email" className="sr-only">
-            Email
-          </Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="Search user by email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard label="Revenue" value={formatINR(stats.revenue)} icon={<IndianRupee className="h-5 w-5" />} />
+        <StatCard label="Active bookings" value={stats.bookingsConfirmed} icon={<Ticket className="h-5 w-5" />} />
+        <StatCard
+          label={`Users (${stats.admins} admin)`}
+          value={stats.users}
+          icon={<UsersIcon className="h-5 w-5" />}
+        />
+        <StatCard label="Cancelled bookings" value={stats.bookingsCancelled} icon={<RefreshCw className="h-5 w-5" />} />
+        <StatCard label="Flights" value={stats.flights} icon={<Plane className="h-5 w-5" />} />
+        <StatCard label="Hotels" value={stats.hotels} icon={<Building2 className="h-5 w-5" />} />
+        <StatCard label="Other services" value={stats.listings} icon={<Layers className="h-5 w-5" />} />
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h3 className="mb-4 font-bold">Revenue by category</h3>
+          {byType.length === 0 ? (
+            <p className="text-sm text-slate-500">No bookings yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {byType.map(([type, value]) => (
+                <div key={type}>
+                  <div className="mb-1 flex justify-between text-sm">
+                    <span>{type}</span>
+                    <span className="font-semibold">{formatINR(value)}</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-slate-100">
+                    <div className="h-2 rounded-full bg-blue-600" style={{ width: `${(value / maxRevenue) * 100}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        <Button type="submit">Search</Button>
-      </form>
-      {error && (
-        <div className="text-red-500 font-semibold">{error}</div>
-      )}
-      {user && (
-        <div className="border p-4 rounded-md">
-          <h3 className="font-bold mb-2">User Details</h3>
-          <p>
-            <strong>Name:</strong> {user.firstName} {user.lastName}
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h3 className="mb-1 flex items-center gap-2 font-bold">
+            <Database className="h-4 w-4" /> Demo data
+          </h3>
+          <p className="mb-4 text-sm text-slate-500">
+            Fill the site with sample flights, hotels, trains, buses, cabs, homestays, holidays, forex and insurance. Items you add
+            yourself are never removed.
           </p>
-          <p>
-            <strong>Email:</strong> {user.email}
-          </p>
-          <p>
-            <strong>Role:</strong> {user.role}
-          </p>
-          <p>
-            <strong>Phone:</strong> {user.phoneNumber}
-          </p>
+          <div className="flex flex-wrap gap-3">
+            <Button disabled={busy} onClick={() => runSeed(false)} className="bg-blue-600 hover:bg-blue-700">
+              {busy && <Loader2 className="h-4 w-4 animate-spin" />} Load missing demo data
+            </Button>
+            <Button disabled={busy} variant="outline" onClick={() => runSeed(true)}>
+              Reset demo data
+            </Button>
+          </div>
+          {message && <p className="mt-3 text-sm text-slate-700">{message}</p>}
         </div>
-      )}
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h3 className="mb-4 font-bold">Recent bookings</h3>
+        {stats.recentBookings.length === 0 ? (
+          <p className="text-sm text-slate-500">No bookings yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[560px] text-left text-sm">
+              <thead>
+                <tr className="border-b text-xs uppercase tracking-wide text-slate-500">
+                  <th className="px-3 py-2">Reference</th>
+                  <th className="px-3 py-2">Booking</th>
+                  <th className="px-3 py-2">Customer</th>
+                  <th className="px-3 py-2">When</th>
+                  <th className="px-3 py-2 text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.recentBookings.map((b: any, i: number) => (
+                  <tr key={(b.reference || "") + i} className="border-b last:border-0">
+                    <td className="px-3 py-2 font-mono text-xs">{b.reference || "—"}</td>
+                    <td className="px-3 py-2">
+                      <div className="font-medium">{b.title}</div>
+                      <div className="text-xs text-slate-500">{b.type}</div>
+                    </td>
+                    <td className="px-3 py-2">
+                      <div>{b.customer}</div>
+                      <div className="text-xs text-slate-500">{b.email}</div>
+                    </td>
+                    <td className="px-3 py-2 text-slate-600">{formatDateTime(b.bookedAt)}</td>
+                    <td className="px-3 py-2 text-right font-semibold">{formatINR(b.totalPrice)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
-}
+};
 
-interface Hotel {
-  id?: string;
-  hotelName: string;
-  location: string;
-  pricePerNight: number;
-  availableRooms: number;
-  amenities: string;
-}
+// ---------------------------------------------------------------- users
 
-function AddEditHotel({ hotel, onSuccess }: { hotel: Hotel | null, onSuccess?: () => void }) {
-  const [formData, setFormData] = useState<Hotel>({
-    hotelName: "",
-    location: "",
-    pricePerNight: 0,
-    availableRooms: 0,
-    amenities: "",
-  });
+const UsersTab = ({ currentId }: { currentId: string }) => {
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [error, setError] = useState("");
+
+  const load = useCallback(async () => {
+    try {
+      setUsers(await getallusers());
+      setError("");
+    } catch (e) {
+      setError(errorMessage(e, "Could not load users."));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (hotel) {
-      setFormData(hotel);
-    } else {
-      setFormData({
-        hotelName: "",
-        location: "",
-        pricePerNight: 0,
-        availableRooms: 0,
-        amenities: "",
-      });
-    }
-  }, [hotel]);
+    load();
+  }, [load]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const shown = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return users.filter((u) => !q || `${u.firstName} ${u.lastName} ${u.email}`.toLowerCase().includes(q));
+  }, [users, query]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (hotel) {
-      await edithotel(
-        hotel.id,
-        formData.hotelName,
-        formData.location,
-        formData.pricePerNight,
-        formData.availableRooms,
-        formData.amenities
-      );
-      if (onSuccess) onSuccess();
-      return;
+  const toggleRole = async (u: any) => {
+    const next = u.role === "ADMIN" ? "USER" : "ADMIN";
+    if (!window.confirm(`Make ${u.email} ${next === "ADMIN" ? "an administrator" : "a customer"}?`)) return;
+    try {
+      await changeuserrole(u.id, next);
+      await load();
+    } catch (e) {
+      setError(errorMessage(e, "Could not change the role."));
     }
-    await addhotel(
-      formData.hotelName,
-      formData.location,
-      formData.pricePerNight,
-      formData.availableRooms,
-      formData.amenities
-    );
-    if (!hotel) {
-      setFormData({
-        hotelName: "",
-        location: "",
-        pricePerNight: 0,
-        availableRooms: 0,
-        amenities: "",
-      });
-    }
-    if (onSuccess) onSuccess();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="text-lg font-semibold mb-2">
-        {hotel ? "Edit Hotel" : "Add New Hotel"}
-      </h3>
-      <div>
-        <Label htmlFor="hotelName">Hotel Name</Label>
-        <Input
-          id="hotelName"
-          name="hotelName"
-          value={formData.hotelName}
-          onChange={handleChange}
-          required
-        />
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="border-b p-5">
+        <h2 className="text-lg font-bold">User Management</h2>
+        <p className="text-sm text-slate-500">Search for users by name or email and manage their role.</p>
       </div>
-      <div>
-        <Label htmlFor="location">Location</Label>
-        <Input
-          id="location"
-          name="location"
-          value={formData.location}
-          onChange={handleChange}
-          required
-        />
+      <div className="p-5 pb-0">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search user by name or email"
+            className="w-full rounded-lg border border-slate-200 py-2 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          />
+        </div>
+        {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       </div>
-      <div>
-        <Label htmlFor="pricePerNight">Price Per Night</Label>
-        <Input
-          id="pricePerNight"
-          name="pricePerNight"
-          type="number"
-          value={formData.pricePerNight}
-          onChange={handleChange}
-          required
-        />
+      <div className="overflow-x-auto p-5">
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+          </div>
+        ) : (
+          <table className="w-full min-w-[640px] text-left text-sm">
+            <thead>
+              <tr className="border-b text-xs uppercase tracking-wide text-slate-500">
+                <th className="px-3 py-2">Name</th>
+                <th className="px-3 py-2">Email</th>
+                <th className="px-3 py-2">Phone</th>
+                <th className="px-3 py-2">Role</th>
+                <th className="px-3 py-2">Bookings</th>
+                <th className="px-3 py-2 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {shown.map((u) => (
+                <tr key={u.id} className="border-b last:border-0 hover:bg-slate-50">
+                  <td className="px-3 py-2.5 font-medium">
+                    {u.firstName} {u.lastName}
+                  </td>
+                  <td className="px-3 py-2.5">{u.email}</td>
+                  <td className="px-3 py-2.5">{u.phoneNumber || "—"}</td>
+                  <td className="px-3 py-2.5">
+                    <span
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                        u.role === "ADMIN" ? "bg-purple-100 text-purple-700" : "bg-slate-100 text-slate-600"
+                      }`}
+                    >
+                      {u.role === "ADMIN" ? "Admin" : "Customer"}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2.5">{(u.bookings || []).length}</td>
+                  <td className="px-3 py-2.5 text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      disabled={u.id === currentId}
+                      title={u.id === currentId ? "You cannot change your own role" : undefined}
+                      onClick={() => toggleRole(u)}
+                    >
+                      {u.role === "ADMIN" ? "Make customer" : "Make admin"}
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+              {shown.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="py-10 text-center text-slate-500">
+                    No users found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
-      <div>
-        <Label htmlFor="availableRooms">Available Rooms</Label>
-        <Input
-          id="availableRooms"
-          name="availableRooms"
-          type="number"
-          value={formData.availableRooms}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="amenities">Amenities</Label>
-        <Textarea
-          id="amenities"
-          name="amenities"
-          value={formData.amenities}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <Button type="submit">{hotel ? "Update Hotel" : "Add Hotel"}</Button>
-    </form>
+    </div>
   );
-}
+};
 
-interface Flight {
-  id?: string;
-  flightName: string;
-  from: string;
-  to: string;
-  departureTime: string;
-  arrivalTime: string;
-  price: number;
-  availableSeats: number;
-}
+// ---------------------------------------------------------------- managers
 
-function AddEditFlight({ flight, onSuccess }: { flight: Flight | null, onSuccess?: () => void }) {
-  const [formData, setFormData] = useState<Flight>({
-    flightName: "",
-    from: "",
-    to: "",
-    departureTime: "",
-    arrivalTime: "",
-    price: 0,
-    availableSeats: 0,
-  });
+const flightFields: Field[] = [
+  { key: "flightName", label: "Flight name", type: "text", required: true, placeholder: "IndiGo 6E-201" },
+  { key: "price", label: "Price (₹ per seat)", type: "number", required: true },
+  { key: "from", label: "From", type: "text", required: true },
+  { key: "to", label: "To", type: "text", required: true },
+  { key: "departureTime", label: "Departure time", type: "datetime-local", required: true },
+  { key: "arrivalTime", label: "Arrival time", type: "datetime-local", required: true },
+  { key: "availableSeats", label: "Available seats", type: "number", required: true },
+];
 
-  useEffect(() => {
-    if (flight) {
-      setFormData(flight);
-    } else {
-      setFormData({
-        flightName: "",
-        from: "",
-        to: "",
-        departureTime: "",
-        arrivalTime: "",
-        price: 0,
-        availableSeats: 0,
-      });
-    }
-  }, [flight]);
+const flightColumns: Column[] = [
+  { header: "Flight", render: (r) => (<><span className="font-medium">{r.flightName}</span><DemoBadge row={r} /></>) },
+  { header: "Route", render: (r) => `${r.from} → ${r.to}` },
+  { header: "Departure", render: (r) => formatDateTime(r.departureTime) },
+  { header: "Price", render: (r) => formatINR(r.price) },
+  { header: "Seats", render: (r) => r.availableSeats },
+];
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+const hotelFields: Field[] = [
+  { key: "hotelName", label: "Hotel name", type: "text", required: true },
+  { key: "location", label: "Location (city)", type: "text", required: true },
+  { key: "pricePerNight", label: "Price per night (₹)", type: "number", required: true },
+  { key: "availableRooms", label: "Available rooms", type: "number", required: true },
+  { key: "rating", label: "Rating (0-5)", type: "number" },
+  { key: "imageUrl", label: "Image URL", type: "text", placeholder: "https://..." },
+  { key: "amenities", label: "Amenities", type: "textarea", required: true, help: "Separate with commas, e.g. Wi-Fi, Pool, Spa" },
+  { key: "description", label: "Description", type: "textarea" },
+];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would typically send this data to your backend
-    console.log("Submitting flight data:", formData);
-    if (flight) {
-      await editflight(
-        flight?.id,
-        formData.flightName,
-        formData.from,
-        formData.to,
-        formData.departureTime,
-        formData.arrivalTime,
-        formData.price,
-        formData.availableSeats
-      );
-      if (onSuccess) onSuccess();
-      return;
-    }
-    await addflight(
-      formData.flightName,
-      formData.from,
-      formData.to,
-      formData.departureTime,
-      formData.arrivalTime,
-      formData.price,
-      formData.availableSeats
-    );
-    if (!flight) {
-      setFormData({
-        flightName: "",
-        from: "",
-        to: "",
-        departureTime: "",
-        arrivalTime: "",
-        price: 0,
-        availableSeats: 0,
-      });
-    }
-    if (onSuccess) onSuccess();
-  };
+const hotelColumns: Column[] = [
+  { header: "Hotel", render: (r) => (<><span className="font-medium">{r.hotelName}</span><DemoBadge row={r} /></>) },
+  { header: "Location", render: (r) => r.location },
+  { header: "Price / night", render: (r) => formatINR(r.pricePerNight) },
+  { header: "Rooms", render: (r) => r.availableRooms },
+  { header: "Rating", render: (r) => (r.rating ? Number(r.rating).toFixed(1) : "—") },
+];
 
+const listingFields: Field[] = [
+  { key: "category", label: "Category", type: "select", options: CATEGORIES, required: true },
+  { key: "name", label: "Name", type: "text", required: true },
+  { key: "provider", label: "Provider / operator", type: "text" },
+  { key: "type", label: "Class / type / plan", type: "text", placeholder: "AC 3 Tier, SUV, Gold..." },
+  { key: "price", label: "Price (₹)", type: "number", required: true },
+  { key: "unit", label: "Price unit", type: "text", placeholder: "per night, per person..." },
+  { key: "available", label: "Available units", type: "number", required: true, help: "Use -1 for unlimited (forex, insurance)." },
+  { key: "from", label: "From", type: "text", help: "Trains, buses and cabs" },
+  { key: "to", label: "To", type: "text", help: "Trains, buses and cabs" },
+  { key: "location", label: "Location / region", type: "text", help: "City for homestays, destination for holidays, Domestic/International for insurance" },
+  { key: "departureTime", label: "Departure time", type: "text", placeholder: "16:55" },
+  { key: "arrivalTime", label: "Arrival time", type: "text", placeholder: "08:35 +1" },
+  { key: "duration", label: "Duration", type: "text", placeholder: "5h 30m / 4 Nights / 5 Days" },
+  { key: "rating", label: "Rating (0-5)", type: "number" },
+  { key: "imageUrl", label: "Image URL", type: "text", full: true },
+  { key: "features", label: "Features / inclusions", type: "textarea", help: "Separate with commas" },
+  { key: "description", label: "Description", type: "textarea" },
+];
+
+const ServicesManager = () => {
+  const [category, setCategory] = useState("ALL");
+  const load = useCallback(() => getlistings(), []);
+  const filter = useCallback((r: any) => category === "ALL" || r.category === category, [category]);
+  const columns: Column[] = [
+    { header: "Name", render: (r) => (<><span className="font-medium">{r.name}</span><DemoBadge row={r} /></>) },
+    { header: "Category", render: (r) => r.category },
+    { header: "Route / place", render: (r) => (r.from && r.to ? `${r.from} → ${r.to}` : r.location || "—") },
+    { header: "Type", render: (r) => r.type || "—" },
+    { header: "Price", render: (r) => formatINR(r.price) },
+    { header: "Left", render: (r) => (r.available < 0 ? "∞" : r.available) },
+  ];
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="text-lg font-semibold mb-2">
-        {flight ? "Edit Flight" : "Add New Flight"}
-      </h3>
-      <div>
-        <Label htmlFor="flightName">Flight Name</Label>
-        <Input
-          id="flightName"
-          name="flightName"
-          value={formData.flightName}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="from">From</Label>
-        <Input
-          id="from"
-          name="from"
-          value={formData.from}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="to">To</Label>
-        <Input
-          id="to"
-          name="to"
-          value={formData.to}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="departureTime">Departure Time</Label>
-        <Input
-          id="departureTime"
-          name="departureTime"
-          type="datetime-local"
-          value={formData.departureTime}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="arrivalTime">Arrival Time</Label>
-        <Input
-          id="arrivalTime"
-          name="arrivalTime"
-          type="datetime-local"
-          value={formData.arrivalTime}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="price">Price</Label>
-        <Input
-          id="price"
-          name="price"
-          type="number"
-          value={formData.price}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="availableSeats">Available Seats</Label>
-        <Input
-          id="availableSeats"
-          name="availableSeats"
-          type="number"
-          value={formData.availableSeats}
-          onChange={handleChange}
-          required
-        />
-      </div>
-      <Button type="submit">{flight ? "Update Flight" : "Add Flight"}</Button>
-    </form>
+    <EntityManager
+      title="Manage Services"
+      noun="Service"
+      description="Homestays, holidays, trains, buses, cabs, forex and insurance."
+      load={load}
+      save={savelisting}
+      remove={deletelisting}
+      fields={listingFields}
+      columns={columns}
+      blank={() => ({
+        category: category === "ALL" ? "HOMESTAY" : category,
+        name: "",
+        price: 0,
+        available: 10,
+        unit: "",
+      })}
+      searchText={(r) => `${r.name} ${r.from || ""} ${r.to || ""} ${r.location || ""} ${r.provider || ""} ${r.type || ""}`}
+      filter={filter}
+      toolbar={
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
+        >
+          <option value="ALL">All categories</option>
+          {CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c.charAt(0) + c.slice(1).toLowerCase()}
+            </option>
+          ))}
+        </select>
+      }
+    />
   );
-}
+};
+
+// ---------------------------------------------------------------- page
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState("flights");
-  const [selectedFlight, setSelectedFlight] = useState(null);
-  const [selectedHotel, setSelectedHotel] = useState(null);
-  const [refreshFlight, setRefreshFlight] = useState(0);
-  const [refreshHotel, setRefreshHotel] = useState(0);
+  const user = useSelector((state: any) => state.user.user);
+  const ready = useSelector((state: any) => state.user.ready);
+  const [tab, setTab] = useState<Tab>("dashboard");
+
+  const loadFlights = useCallback(() => getflight(), []);
+  const loadHotels = useCallback(() => gethotel(), []);
+  const saveFlight = useCallback((f: any) => (f.id ? editflight(f.id, f) : addflight(f)), []);
+  const saveHotel = useCallback((h: any) => (h.id ? edithotel(h.id, h) : addhotel(h)), []);
+
+  if (!ready) return <Seo title="Admin Dashboard" path="/admin" noindex />;
+
+  if (!user || user.role !== "ADMIN") {
+    return (
+      <div className="mx-auto max-w-md px-4 py-24 text-center">
+        <Seo title="Admin Dashboard" path="/admin" noindex />
+        <h1 className="text-2xl font-bold">Admins only</h1>
+        <p className="mt-2 text-slate-600">
+          {user ? "Your account does not have access to the admin dashboard." : "Please log in with an administrator account."}
+        </p>
+        <div className="mt-6 flex justify-center gap-3">
+          {!user && (
+            <SignupDialog trigger={<Button className="bg-blue-600 text-white hover:bg-blue-700">Log in</Button>} />
+          )}
+          <Link href="/" className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-slate-50">
+            Back to home
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto p-4 bg-white max-w-full">
-      <h1 className="text-3xl font-bold mb-6 ">Admin Dashboard</h1>
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3  text-black">
-          <TabsTrigger value="flights">Flights</TabsTrigger>
-          <TabsTrigger value="hotels">Hotels</TabsTrigger>
-          <TabsTrigger value="users">Users</TabsTrigger>
-        </TabsList>
-        <TabsContent value="flights">
-          <Card>
-            <CardHeader>
-              <CardTitle>Manage Flights</CardTitle>
-              <CardDescription>
-                Add, edit, or remove flights from the system.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <FlightList key={refreshFlight} onSelect={setSelectedFlight} />
-                <AddEditFlight flight={selectedFlight} onSuccess={() => { setRefreshFlight(prev => prev + 1); setSelectedFlight(null); }} />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="hotels">
-          <Card>
-            <CardHeader>
-              <CardTitle>Manage Hotels</CardTitle>
-              <CardDescription>
-                Add, edit, or remove hotels from the system.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <HotelList key={refreshHotel} onSelect={setSelectedHotel} />
-                <AddEditHotel hotel={selectedHotel} onSuccess={() => { setRefreshHotel(prev => prev + 1); setSelectedHotel(null); }} />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="users">
-          <Card>
-            <CardHeader>
-              <CardTitle>User Management</CardTitle>
-              <CardDescription>Search for users by email.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <UserSearch />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+    <div className="mx-auto max-w-7xl px-4 py-8">
+      <Seo title="Admin Dashboard" path="/admin" noindex />
+      <h1 className="mb-6 text-3xl font-bold">Admin Dashboard</h1>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_1fr]">
+        <nav className="flex gap-2 overflow-x-auto lg:flex-col">
+          {NAV.map((n) => (
+            <button
+              key={n.id}
+              onClick={() => setTab(n.id)}
+              className={`flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-medium transition-colors ${
+                tab === n.id ? "bg-slate-900 text-white shadow" : "bg-white text-slate-600 hover:bg-slate-100"
+              }`}
+            >
+              {n.icon}
+              {n.label}
+            </button>
+          ))}
+        </nav>
+        <div className="min-w-0">
+          {tab === "dashboard" && <Dashboard />}
+          {tab === "flights" && (
+            <EntityManager
+              title="Manage Flights"
+              noun="Flight"
+              description="Add, edit, or remove flights from the system."
+              load={loadFlights}
+              save={saveFlight}
+              remove={deleteflight}
+              fields={flightFields}
+              columns={flightColumns}
+              blank={() => ({ flightName: "", from: "", to: "", departureTime: "", arrivalTime: "", price: 0, availableSeats: 100 })}
+              searchText={(r) => `${r.flightName} ${r.from} ${r.to}`}
+            />
+          )}
+          {tab === "hotels" && (
+            <EntityManager
+              title="Manage Hotels"
+              noun="Hotel"
+              description="Add, edit, or remove hotels from the system."
+              load={loadHotels}
+              save={saveHotel}
+              remove={deletehotel}
+              fields={hotelFields}
+              columns={hotelColumns}
+              blank={() => ({ hotelName: "", location: "", pricePerNight: 0, availableRooms: 10, amenities: "", rating: 4, imageUrl: "", description: "" })}
+              searchText={(r) => `${r.hotelName} ${r.location}`}
+            />
+          )}
+          {tab === "services" && <ServicesManager />}
+          {tab === "users" && <UsersTab currentId={user.id} />}
+        </div>
+      </div>
     </div>
   );
 }
