@@ -1,0 +1,133 @@
+/** Which state and country each place we serve belongs to (used for grouping and for friendly search). */
+export type Place = { state: string; country: string };
+
+const IN = "India";
+
+export const PLACES: Record<string, Place> = {
+  // India
+  delhi: { state: "Delhi", country: IN },
+  mumbai: { state: "Maharashtra", country: IN },
+  pune: { state: "Maharashtra", country: IN },
+  bengaluru: { state: "Karnataka", country: IN },
+  mysuru: { state: "Karnataka", country: IN },
+  coorg: { state: "Karnataka", country: IN },
+  chennai: { state: "Tamil Nadu", country: IN },
+  ooty: { state: "Tamil Nadu", country: IN },
+  pondicherry: { state: "Puducherry", country: IN },
+  hyderabad: { state: "Telangana", country: IN },
+  warangal: { state: "Telangana", country: IN },
+  kolkata: { state: "West Bengal", country: IN },
+  darjeeling: { state: "West Bengal", country: IN },
+  bhubaneswar: { state: "Odisha", country: IN },
+  goa: { state: "Goa", country: IN },
+  jaipur: { state: "Rajasthan", country: IN },
+  udaipur: { state: "Rajasthan", country: IN },
+  rajasthan: { state: "Rajasthan", country: IN },
+  agra: { state: "Uttar Pradesh", country: IN },
+  chandigarh: { state: "Chandigarh", country: IN },
+  shimla: { state: "Himachal Pradesh", country: IN },
+  manali: { state: "Himachal Pradesh", country: IN },
+  himachal: { state: "Himachal Pradesh", country: IN },
+  rishikesh: { state: "Uttarakhand", country: IN },
+  munnar: { state: "Kerala", country: IN },
+  alleppey: { state: "Kerala", country: IN },
+  kerala: { state: "Kerala", country: IN },
+  ahmedabad: { state: "Gujarat", country: IN },
+  saputara: { state: "Gujarat", country: IN },
+  kashmir: { state: "Jammu & Kashmir", country: IN },
+  andaman: { state: "Andaman & Nicobar", country: IN },
+  lucknow: { state: "Uttar Pradesh", country: IN },
+  varanasi: { state: "Uttar Pradesh", country: IN },
+  kochi: { state: "Kerala", country: IN },
+  thiruvananthapuram: { state: "Kerala", country: IN },
+  visakhapatnam: { state: "Andhra Pradesh", country: IN },
+  indore: { state: "Madhya Pradesh", country: IN },
+  bhopal: { state: "Madhya Pradesh", country: IN },
+  nagpur: { state: "Maharashtra", country: IN },
+  surat: { state: "Gujarat", country: IN },
+  amritsar: { state: "Punjab", country: IN },
+  patna: { state: "Bihar", country: IN },
+  guwahati: { state: "Assam", country: IN },
+  coimbatore: { state: "Tamil Nadu", country: IN },
+  madurai: { state: "Tamil Nadu", country: IN },
+  mangaluru: { state: "Karnataka", country: IN },
+  ranchi: { state: "Jharkhand", country: IN },
+  jodhpur: { state: "Rajasthan", country: IN },
+  raipur: { state: "Chhattisgarh", country: IN },
+  dehradun: { state: "Uttarakhand", country: IN },
+  srinagar: { state: "Jammu & Kashmir", country: IN },
+  leh: { state: "Ladakh", country: IN },
+  ladakh: { state: "Ladakh", country: IN },
+  "port blair": { state: "Andaman & Nicobar", country: IN },
+  "abu dhabi": { state: "Abu Dhabi", country: "United Arab Emirates" },
+  "san francisco": { state: "California", country: "United States" },
+  "los angeles": { state: "California", country: "United States" },
+  honolulu: { state: "Hawaii", country: "United States" },
+  muscat: { state: "Muscat", country: "Oman" },
+  male: { state: "Kaafu Atoll", country: "Maldives" },
+  istanbul: { state: "Istanbul", country: "Turkey" },
+  // International
+  dubai: { state: "Dubai", country: "United Arab Emirates" },
+  london: { state: "England", country: "United Kingdom" },
+  singapore: { state: "Singapore", country: "Singapore" },
+  bangkok: { state: "Bangkok", country: "Thailand" },
+  thailand: { state: "Thailand", country: "Thailand" },
+  bali: { state: "Bali", country: "Indonesia" },
+  "new york": { state: "New York", country: "United States" },
+  paris: { state: "Île-de-France", country: "France" },
+  tokyo: { state: "Tokyo", country: "Japan" },
+  kathmandu: { state: "Bagmati", country: "Nepal" },
+  "kuala lumpur": { state: "Kuala Lumpur", country: "Malaysia" },
+  doha: { state: "Doha", country: "Qatar" },
+  colombo: { state: "Western Province", country: "Sri Lanka" },
+  dhaka: { state: "Dhaka", country: "Bangladesh" },
+  "hong kong": { state: "Hong Kong", country: "Hong Kong" },
+  sydney: { state: "New South Wales", country: "Australia" },
+  toronto: { state: "Ontario", country: "Canada" },
+  frankfurt: { state: "Hesse", country: "Germany" },
+};
+
+/** Common alternative spellings people type. */
+const ALIASES: Record<string, string> = {
+  bangalore: "bengaluru",
+  bombay: "mumbai",
+  calcutta: "kolkata",
+  madras: "chennai",
+  "new delhi": "delhi",
+  mysore: "mysuru",
+  puducherry: "pondicherry",
+  pondy: "pondicherry",
+  nyc: "new york",
+  "new york city": "new york",
+  ny: "new york",
+  uk: "london",
+  uae: "dubai",
+  trivandrum: "thiruvananthapuram",
+  vizag: "visakhapatnam",
+  banaras: "varanasi",
+  benares: "varanasi",
+  cochin: "kochi",
+  mangalore: "mangaluru",
+  hawaii: "honolulu",
+  maldives: "male",
+  "la": "los angeles",
+  sf: "san francisco",
+  ladakh: "leh",
+  "andaman": "port blair",
+  hongkong: "hong kong",
+  kl: "kuala lumpur",
+  "sri lanka": "colombo",
+  alappuzha: "alleppey",
+};
+
+const clean = (s?: string) => (s || "").trim().toLowerCase();
+
+/** Maps an alias such as "Bangalore" to the name used in our data ("bengaluru"). */
+export const canonicalCity = (input?: string): string => {
+  const c = clean(input);
+  return ALIASES[c] || c;
+};
+
+export const placeOf = (city?: string): Place => PLACES[canonicalCity(city)] || { state: "Other", country: "Other" };
+
+export const isDomestic = (city?: string): boolean => placeOf(city).country === IN;

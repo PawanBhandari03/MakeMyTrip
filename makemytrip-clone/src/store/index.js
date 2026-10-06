@@ -1,13 +1,19 @@
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 
-
 const saveusertolocalstorage = (user) => {
-  if (typeof window !== "undefined" && localStorage) {
-    localStorage.setItem("user", JSON.stringify(user));
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      localStorage.setItem("user", JSON.stringify(user));
+    }
+  } catch (e) {
+    // storage can be unavailable (private mode); the app still works for this session
   }
 };
+
 const initialState = {
   user: null,
+  // true once the saved login (if any) has been read from localStorage
+  ready: false,
 };
 
 const userSlice = createSlice({
@@ -20,14 +26,19 @@ const userSlice = createSlice({
     },
     clearUser: (state) => {
       state.user = null;
-      if (typeof window !== "undefined" && localStorage) {
-        localStorage.removeItem("user");
-      }
+      try {
+        if (typeof window !== "undefined" && window.localStorage) {
+          localStorage.removeItem("user");
+        }
+      } catch (e) {}
+    },
+    markReady: (state) => {
+      state.ready = true;
     },
   },
 });
 
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser, clearUser, markReady } = userSlice.actions;
 
 const store = configureStore({
   reducer: {

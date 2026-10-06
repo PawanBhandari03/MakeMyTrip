@@ -1,6 +1,6 @@
 import React from "react";
 import SignupDialog from "./SignupDialog";
-import { LogOut, Plane, User } from "lucide-react";
+import { Globe2, LayoutDashboard, LogOut, Plane, Radio, Ticket, User } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   DropdownMenu,
@@ -13,54 +13,92 @@ import {
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { clearUser } from "@/store";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import Link from "next/link";
+
 const Navbar = () => {
   const dispatch = useDispatch();
   const user = useSelector((state: any) => state.user.user);
+  const ready = useSelector((state: any) => state.user.ready);
   const router = useRouter();
   const logout = () => {
     dispatch(clearUser());
+    router.push("/");
   };
   return (
-    <header className="bg-white/90 backdrop-blur-md shadow-sm border-b border-gray-100 py-2 sticky top-0 z-50 transition-all">
-      <div className="container mx-auto px-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center space-x-2 cursor-pointer transition-transform hover:scale-105">
-          <div className="bg-gradient-to-br from-red-500 to-red-600 p-1.5 rounded shadow-sm">
-            <Plane className="w-5 h-5 text-white" />
+    <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+        <Link href="/" className="flex items-center gap-2 transition-transform hover:scale-[1.02]">
+          <div className="rounded-lg bg-gradient-to-br from-red-500 to-red-600 p-1.5 shadow-sm">
+            <Plane className="h-5 w-5 text-white" />
           </div>
-          <span className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-800 tracking-tight">MakeMyTrip</span>
+          <span className="bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-xl font-extrabold tracking-tight text-transparent">
+            MakeMyTrip
+          </span>
+          <span className="ml-1 rounded-md bg-slate-900 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+            Clone
+          </span>
         </Link>
-        <div className="flex items-center space-x-4">
-          {user ? (
+        <nav className="flex items-center gap-2 sm:gap-4">
+          <Link
+            href="/routes"
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-slate-100 ${
+              router.pathname === "/routes" ? "text-red-600" : "text-slate-700"
+            }`}
+          >
+            <Globe2 className="h-4 w-4" />
+            <span className="hidden sm:inline">Routes</span>
+          </Link>
+          <Link
+            href="/flight-status"
+            className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-slate-100 ${
+              router.pathname === "/flight-status" ? "text-red-600" : "text-slate-700"
+            }`}
+          >
+            <Radio className="h-4 w-4" />
+            <span className="hidden sm:inline">Live Flight Status</span>
+          </Link>
+          {!ready ? null : user ? (
             <>
+              <Link
+                href="/profile"
+                className={`hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-slate-100 sm:flex ${
+                  router.pathname === "/profile" ? "text-red-600" : "text-slate-700"
+                }`}
+              >
+                <Ticket className="h-4 w-4" />
+                My Trips
+              </Link>
               {user.role === "ADMIN" && (
-                <Button variant="default" onClick={() => router.push("/admin")}>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="bg-slate-900 hover:bg-slate-800"
+                  onClick={() => router.push("/admin")}
+                >
+                  <LayoutDashboard className="h-4 w-4" />
                   ADMIN
                 </Button>
               )}
-
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="relative h-8 w-8 rounded-full"
-                  >
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>
-                        {user?.firstName?.charAt(0)}
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full p-0" aria-label="Account menu">
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback className="bg-blue-600 font-semibold text-white">
+                        {user?.firstName?.charAt(0)?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuContent className="w-60 bg-white" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        {user?.firstName}
+                        {user?.firstName} {user?.lastName}
                       </p>
-                      <p className="text-xs leading-none text-muted-foreground">
-                        {user?.email}
+                      <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                      <p className="pt-1 text-[11px] font-semibold uppercase tracking-wide text-blue-600">
+                        {user?.role === "ADMIN" ? "Administrator" : "Customer"}
                       </p>
                     </div>
                   </DropdownMenuLabel>
@@ -68,6 +106,10 @@ const Navbar = () => {
                   <DropdownMenuItem onClick={() => router.push("/profile")}>
                     <User className="mr-2 h-4 w-4" />
                     <span>Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push("/profile#trips")}>
+                    <Ticket className="mr-2 h-4 w-4" />
+                    <span>My Trips</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => logout()}>
                     <LogOut className="mr-2 h-4 w-4" />
@@ -79,16 +121,13 @@ const Navbar = () => {
           ) : (
             <SignupDialog
               trigger={
-                <Button
-                  variant="outline"
-                  className="bg-blue-600  text-white hover:bg-blue-700"
-                >
-                  Sign Up
+                <Button className="bg-blue-600 text-white shadow-sm hover:bg-blue-700">
+                  Login / Sign Up
                 </Button>
               }
             />
           )}
-        </div>
+        </nav>
       </div>
     </header>
   );

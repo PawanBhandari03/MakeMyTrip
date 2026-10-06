@@ -1,14 +1,14 @@
 import axios from "axios";
 
-const BACKEND_URL = "http://localhost:8080";
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
 
 export const login = async (email, password) => {
   try {
-    const url = `${BACKEND_URL}/user/login?email=${email}&password=${password}`;
-    const res = await axios.post(url);
-    const data = res.data;
-    console.log(data);
-    return data;
+    const res = await axios.post(`${BACKEND_URL}/user/login`, null, {
+      params: { email, password },
+    });
+    return res.data;
   } catch (error) {
     throw error;
   }
@@ -39,7 +39,9 @@ export const signup = async (
 
 export const getuserbyemail = async (email) => {
   try {
-    const res = await axios.get(`${BACKEND_URL}/user/email?email=${email}`);
+    const res = await axios.get(`${BACKEND_URL}/user/email`, {
+      params: { email },
+    });
     const data = res.data;
     return data;
   } catch (error) {
@@ -55,15 +57,15 @@ export const editprofile = async (
   phoneNumber
 ) => {
   try {
-    const res = await axios.post(`${BACKEND_URL}/user/edit?id=${id}`, {
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-    });
-    const data = res.data;
-    return data;
-  } catch (error) {}
+    const res = await axios.post(
+      `${BACKEND_URL}/user/edit`,
+      { firstName, lastName, email, phoneNumber },
+      { params: { id } }
+    );
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
 };
 export const getflight = async () => {
   try {
@@ -71,61 +73,19 @@ export const getflight = async () => {
     const data = res.data;
     return data;
   } catch (error) {
-    console.log(data);
+    console.log(error);
+    return [];
   }
 };
 
-export const addflight = async (
-  flightName,
-  from,
-  to,
-  departureTime,
-  arrivalTime,
-  price,
-  availableSeats
-) => {
-  try {
-    const res = await axios.post(`${BACKEND_URL}/admin/flight`, {
-      flightName,
-      from,
-      to,
-      departureTime,
-      arrivalTime,
-      price,
-      availableSeats,
-    });
-    const data = res.data;
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
+export const addflight = async (flight) => {
+  const res = await axios.post(`${BACKEND_URL}/admin/flight`, flight);
+  return res.data;
 };
 
-export const editflight = async (
-  id,
-  flightName,
-  from,
-  to,
-  departureTime,
-  arrivalTime,
-  price,
-  availableSeats
-) => {
-  try {
-    const res = await axios.put(`${BACKEND_URL}/admin/flight/${id}`, {
-      flightName,
-      from,
-      to,
-      departureTime,
-      arrivalTime,
-      price,
-      availableSeats,
-    });
-    const data = res.data;
-    return data;
-  } catch (error) {
-    console.log(error);
-  }
+export const editflight = async (id, flight) => {
+  const res = await axios.put(`${BACKEND_URL}/admin/flight/${id}`, flight);
+  return res.data;
 };
 
 export const gethotel = async () => {
@@ -134,73 +94,177 @@ export const gethotel = async () => {
     const data = res.data;
     return data;
   } catch (error) {
-    console.log(data);
+    console.log(error);
+    return [];
   }
 };
 
-export const addhotel = async (
-  hotelName,
-  location,
-  pricePerNight,
-  availableRooms,
-  amenities
-) => {
+export const addhotel = async (hotel) => {
+  const res = await axios.post(`${BACKEND_URL}/admin/hotel`, hotel);
+  return res.data;
+};
+
+export const edithotel = async (id, hotel) => {
+  const res = await axios.put(`${BACKEND_URL}/admin/hotel/${id}`, hotel);
+  return res.data;
+};
+
+export const getflightstatus = async (flightNumber) => {
   try {
-    const res = await axios.post(`${BACKEND_URL}/admin/hotel`, {
-      hotelName,
-      location,
-      pricePerNight,
-      availableRooms,
-      amenities,
+    const res = await axios.get(`${BACKEND_URL}/flight-status/${flightNumber}`);
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+};
+
+// ---------------------------------------------------------------- listings, pricing, bookings
+
+export const getflightbyid = async (id) => {
+  const res = await axios.get(`${BACKEND_URL}/flight/${id}`);
+  return res.data;
+};
+
+export const gethotelbyid = async (id) => {
+  const res = await axios.get(`${BACKEND_URL}/hotel/${id}`);
+  return res.data;
+};
+
+/** category: HOMESTAY | HOLIDAY | TRAIN | BUS | CAB | FOREX | INSURANCE (omit for all). */
+export const getlistings = async (category) => {
+  try {
+    const res = await axios.get(`${BACKEND_URL}/listing`, {
+      params: category ? { category } : {},
     });
-    const data = res.data;
-    return data;
+    return res.data;
   } catch (error) {
     console.log(error);
+    return [];
   }
 };
 
-export const edithotel = async (
-  id,
-  hotelName,
-  location,
-  pricePerNight,
-  availableRooms,
-  amenities
-) => {
+export const getlistingbyid = async (id) => {
+  const res = await axios.get(`${BACKEND_URL}/listing/${id}`);
+  return res.data;
+};
+
+export const getquote = async (category, itemId, quantity, nights, promo) => {
+  const res = await axios.get(`${BACKEND_URL}/pricing/quote`, {
+    params: { category, itemId, quantity, nights, promo: promo || undefined },
+  });
+  return res.data;
+};
+
+export const getpromos = async (category) => {
   try {
-    const res = await axios.put(`${BACKEND_URL}/admin/hotel/${id}`, {
-      hotelName,
-      location,
-      pricePerNight,
-      availableRooms,
-      amenities,
+    const res = await axios.get(`${BACKEND_URL}/promos`, {
+      params: category ? { category } : {},
     });
-    const data = res.data;
-    return data;
+    return res.data;
   } catch (error) {
-    console.log(error);
+    return [];
   }
 };
 
-export const handleflightbooking = async (userId, flightId, seats, price) => {
+export const createbooking = async ({
+  userId,
+  category,
+  itemId,
+  quantity = 1,
+  nights = 1,
+  promo,
+  travelDate,
+}) => {
+  const res = await axios.post(`${BACKEND_URL}/booking`, null, {
+    params: {
+      userId,
+      category,
+      itemId,
+      quantity,
+      nights,
+      promo: promo || undefined,
+      travelDate: travelDate || undefined,
+    },
+  });
+  return res.data;
+};
+
+export const cancelbooking = async (userId, reference) => {
+  const res = await axios.post(`${BACKEND_URL}/booking/cancel`, null, {
+    params: { userId, reference },
+  });
+  return res.data;
+};
+
+// ---------------------------------------------------------------- admin
+
+export const getallusers = async () => {
+  const res = await axios.get(`${BACKEND_URL}/admin/users`);
+  return res.data;
+};
+
+export const changeuserrole = async (id, role) => {
+  const res = await axios.put(`${BACKEND_URL}/admin/user/${id}/role`, null, {
+    params: { role },
+  });
+  return res.data;
+};
+
+export const getadminstats = async () => {
+  const res = await axios.get(`${BACKEND_URL}/admin/stats`);
+  return res.data;
+};
+
+export const deleteflight = async (id) => {
+  await axios.delete(`${BACKEND_URL}/admin/flight/${id}`);
+};
+
+export const deletehotel = async (id) => {
+  await axios.delete(`${BACKEND_URL}/admin/hotel/${id}`);
+};
+
+export const savelisting = async (listing) => {
+  if (listing.id) {
+    const res = await axios.put(`${BACKEND_URL}/admin/listing/${listing.id}`, listing);
+    return res.data;
+  }
+  const res = await axios.post(`${BACKEND_URL}/admin/listing`, listing);
+  return res.data;
+};
+
+export const deletelisting = async (id) => {
+  await axios.delete(`${BACKEND_URL}/admin/listing/${id}`);
+};
+
+export const loaddummydata = async (reset = false) => {
+  const res = await axios.post(`${BACKEND_URL}/admin/seed`, null, {
+    params: { reset },
+  });
+  return res.data;
+};
+
+/** The next flights about to depart (used as suggestions on the live status page). */
+export const getupcomingflightstatus = async () => {
   try {
-    const url = `${BACKEND_URL}/booking/flight?userId=${userId}&flightId=${flightId}&seats=${seats}&price=${price}`;
-    const res = await axios.post(url);
-    const data = res.data;
-    return data;
+    const res = await axios.get(`${BACKEND_URL}/flight-status/upcoming`);
+    return res.data;
   } catch (error) {
-    console.log(error);
+    return [];
   }
 };
 
-export const handlehotelbooking = async (userId, hotelId, rooms, price) => {
+/** Live status of a booked flight, train or bus (null when the category has no live status). */
+export const getbookingstatus = async (category, itemId, travelDate) => {
   try {
-    const url = `${BACKEND_URL}/booking/hotel?userId=${userId}&hotelId=${hotelId}&rooms=${rooms}&price=${price}`;
-    const res = await axios.post(url);
-    const data = res.data;
-    return data;
+    const res = await axios.get(`${BACKEND_URL}/status/booking`, {
+      params: { category, itemId, travelDate: travelDate || undefined },
+    });
+    return res.data;
   } catch (error) {
-    console.log(error);
+    if (axios.isAxiosError(error) && error.response?.status === 404) return null;
+    throw error;
   }
 };

@@ -1,12 +1,28 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import React, { useState, useEffect, useRef } from "react";
+import { ChevronDown } from "lucide-react";
 
+type Option = { value: string; label: string };
 
-export function SearchSelect({ options, placeholder, value, onChange, icon, subtitle }: any) {
+/**
+ * A search box with a dropdown of suggestions. The user can pick a suggestion or type freely;
+ * `value` is always the current text, so the parent can use it directly as a filter.
+ */
+export function SearchSelect({
+  options,
+  placeholder,
+  value,
+  onChange,
+  icon,
+  subtitle,
+}: {
+  options: Option[];
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+  icon?: React.ReactNode;
+  subtitle?: string;
+}) {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -15,58 +31,78 @@ export function SearchSelect({ options, placeholder, value, onChange, icon, subt
         setIsOpen(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredOptions = options.filter((option:any) =>
-    option.label.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const term = value.trim().toLowerCase();
+  const filtered = options.filter((o) => o.label.toLowerCase().includes(term)).slice(0, 50);
+
+  const pick = (v: string) => {
+    onChange(v);
+    setIsOpen(false);
+  };
 
   return (
-    <div ref={wrapperRef} className="relative">
+    <div ref={wrapperRef} className="relative h-full">
       <div
-        className="border border-gray-200 rounded-xl p-3 hover:border-blue-500 transition-colors cursor-pointer h-full bg-gray-50 hover:bg-white"
-        onClick={() => setIsOpen(!isOpen)}
+        className={`h-full rounded-xl border p-3 transition-colors bg-white ${
+          isOpen ? "border-blue-500 ring-2 ring-blue-100" : "border-slate-200 hover:border-blue-400"
+        }`}
       >
-        <div className="flex items-center space-x-3">
-          {icon}
-          <div className="flex-1 min-w-0">
-            <div className="text-sm text-gray-500 truncate">{placeholder}</div>
-            <Input
+        <div className="flex items-center gap-3">
+          <span className="text-slate-400 shrink-0">{icon}</span>
+          <div className="min-w-0 flex-1">
+            <div className="text-xs font-medium uppercase tracking-wide text-slate-500">{placeholder}</div>
+            <input
               type="text"
-              value={value || searchTerm}
+              value={value}
               onChange={(e) => {
-                setSearchTerm(e.target.value);
-                onChange('');
+                onChange(e.target.value);
+                setIsOpen(true);
               }}
-              className="font-semibold w-full bg-transparent border-none p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+              onFocus={() => setIsOpen(true)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && isOpen && filtered.length > 0) {
+                  e.preventDefault();
+                  pick(filtered[0].value);
+                } else if (e.key === "Escape") {
+                  setIsOpen(false);
+                }
+              }}
+              className="w-full bg-transparent text-lg font-semibold text-slate-900 outline-none placeholder:font-normal placeholder:text-slate-300"
               placeholder={placeholder}
+              autoComplete="off"
             />
-            <div className="text-xs text-gray-400 truncate">{subtitle}</div>
+            <div className="truncate text-xs text-slate-400">{subtitle}</div>
           </div>
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-label="Show suggestions"
+            className="text-slate-400 hover:text-slate-600"
+            onClick={() => setIsOpen((o) => !o)}
+          >
+            <ChevronDown className="h-4 w-4" />
+          </button>
         </div>
       </div>
       {isOpen && (
-        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg">
-          <ScrollArea className="h-64">
-            {filteredOptions.map((option:any) => (
-              <Button
-                key={option.value}
-                className="w-full justify-start font-normal"
-                variant="ghost"
-                onClick={() => {
-                  onChange(option.value);
-                  setSearchTerm('');
-                  setIsOpen(false);
-                }}
+        <div className="absolute z-30 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-slate-200 bg-white py-1 shadow-xl">
+          {filtered.length === 0 ? (
+            <div className="px-4 py-3 text-sm text-slate-500">No matching places</div>
+          ) : (
+            filtered.map((o) => (
+              <button
+                key={o.value}
+                type="button"
+                className="block w-full px-4 py-2 text-left text-sm hover:bg-blue-50"
+                onClick={() => pick(o.value)}
               >
-                {option.label}
-              </Button>
-            ))}
-          </ScrollArea>
+                {o.label}
+              </button>
+            ))
+          )}
         </div>
       )}
     </div>
