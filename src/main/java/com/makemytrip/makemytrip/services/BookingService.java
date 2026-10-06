@@ -41,6 +41,8 @@ public class BookingService {
     private PricingService pricingService;
     @Autowired
     private MongoTemplate mongoTemplate;
+    @Autowired
+    private FlightTrackingService flightTrackingService;
 
     private final SecureRandom random = new SecureRandom();
 
@@ -87,6 +89,10 @@ public class BookingService {
         } catch (RuntimeException e) {
             releaseStock(cat, itemId, quantity);
             throw e;
+        }
+        if ("FLIGHT".equals(cat)) {
+            // follow the flight automatically, so delay and gate notifications reach the traveller
+            flightTrackingService.trackBooked(userId, itemId);
         }
         return booking;
     }

@@ -3,12 +3,14 @@ package com.makemytrip.makemytrip.models;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "flight_status")
 public class FlightStatus {
     @Id
     private String id;
+    @Indexed(unique = true)
     private String flightNumber;
     private String flightName;
     private String status; // On Time, Boarding, Delayed, Cancelled, Landed
@@ -27,6 +29,22 @@ public class FlightStatus {
     /** true when generated from a row of the flight collection (see FlightStatusService#syncFromFlights). */
     @Getter @Setter
     private boolean derived;
+    @Getter @Setter
+    private String flightId;
+    /** ISO date-times in India time. The "estimated" ones include the current delay. */
+    @Getter @Setter
+    private String scheduledArrival;
+    @Getter @Setter
+    private String estimatedDeparture;
+    @Getter @Setter
+    private String estimatedArrival;
+    @Getter @Setter
+    private int delayMinutes;
+    /** SCHEDULED, BOARDING, DEPARTED, LANDED or CANCELLED. */
+    @Getter @Setter
+    private String phase;
+    @Getter @Setter
+    private String updatedAt;
 
     public FlightStatus() {
     }

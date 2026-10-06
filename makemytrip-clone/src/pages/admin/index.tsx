@@ -9,6 +9,7 @@ import {
   Layers,
   Loader2,
   Plane,
+  Radio,
   RefreshCw,
   Search,
   Ticket,
@@ -18,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import SignupDialog from "@/components/SignupDialog";
 import Seo from "@/components/Seo";
 import EntityManager, { Column, Field } from "@/components/admin/EntityManager";
+import FlightOps from "@/components/admin/FlightOps";
 import {
   addflight,
   addhotel,
@@ -37,11 +39,12 @@ import {
 } from "@/api";
 import { errorMessage, formatDateTime, formatINR } from "@/lib/format";
 
-type Tab = "dashboard" | "flights" | "hotels" | "services" | "users";
+type Tab = "dashboard" | "flights" | "flightops" | "hotels" | "services" | "users";
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
   { id: "flights", label: "Flights", icon: <Plane className="h-4 w-4" /> },
+  { id: "flightops", label: "Flight Ops", icon: <Radio className="h-4 w-4" /> },
   { id: "hotels", label: "Hotels", icon: <Building2 className="h-4 w-4" /> },
   { id: "services", label: "Services", icon: <Layers className="h-4 w-4" /> },
   { id: "users", label: "Users", icon: <UsersIcon className="h-4 w-4" /> },
@@ -444,7 +447,17 @@ const ServicesManager = () => {
 export default function AdminDashboard() {
   const user = useSelector((state: any) => state.user.user);
   const ready = useSelector((state: any) => state.user.ready);
-  const [tab, setTab] = useState<Tab>("dashboard");
+  const [tab, setTabState] = useState<Tab>("dashboard");
+
+  // Tabs can be opened directly, for example /admin#flightops
+  useEffect(() => {
+    const h = window.location.hash.replace("#", "") as Tab;
+    if (NAV.some((n) => n.id === h)) setTabState(h);
+  }, []);
+  const setTab = (t: Tab) => {
+    setTabState(t);
+    window.history.replaceState(null, "", `#${t}`);
+  };
 
   const loadFlights = useCallback(() => getflight(), []);
   const loadHotels = useCallback(() => gethotel(), []);
@@ -508,6 +521,7 @@ export default function AdminDashboard() {
               searchText={(r) => `${r.flightName} ${r.from} ${r.to}`}
             />
           )}
+          {tab === "flightops" && <FlightOps />}
           {tab === "hotels" && (
             <EntityManager
               title="Manage Hotels"

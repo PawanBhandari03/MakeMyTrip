@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { Loader2, RefreshCw, Radio } from "lucide-react";
 import { getbookingstatus } from "@/api";
 
@@ -83,6 +84,15 @@ const LiveStatus = ({ booking }: { booking: any }) => {
             <div className={`h-1.5 rounded-full transition-all ${tone.bar}`} style={{ width: `${info.progress}%` }} />
           </div>
           <div className="mt-1 text-right text-[11px] text-slate-500">{info.progress}% of the journey done</div>
+        </div>
+      )}
+
+      {info.flightNumber && (
+        <div className="mt-2 text-xs">
+          <Link href={`/tracker?flight=${info.flightNumber}`} className="font-semibold text-blue-600 hover:underline">
+            See every update in My Flights
+          </Link>
+          <span className="text-slate-500"> · you are notified automatically of delays and gate changes</span>
         </div>
       )}
 

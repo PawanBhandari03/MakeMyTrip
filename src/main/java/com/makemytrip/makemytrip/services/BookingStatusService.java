@@ -41,10 +41,14 @@ public class BookingStatusService {
     private FlightStatusRepository flightStatusRepository;
     @Autowired
     private ListingRepository listingRepository;
+    @Autowired
+    private FlightStatusService flightStatusService;
 
     @Data
     public static class StatusInfo {
         private String category;
+        /** Set for flights, e.g. 6E126. */
+        private String flightNumber;
         private String title;
         /** SCHEDULED, BOARDING, IN_TRANSIT, ARRIVED, DELAYED or CANCELLED. */
         private String state;
@@ -74,7 +78,60 @@ public class BookingStatusService {
 
     // ------------------------------------------------------------------ flights
 
+    /** Live status from the airline feed (the same record My Flights shows); falls back to the timetable alone. */
     private StatusInfo flightStatus(String itemId) {
+        Flight f = flightRepository.findById(itemId).orElse(null);
+        if (f == null) return null;
+        FlightStatus fs = flightStatusService.getFlightStatusByNumber(FlightStatusService.flightNumberOf(f)).orElse(null);
+        if (fs == null || fs.getEstimatedDeparture() == null) return scheduledFlightStatus(itemId);
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime estDep = LocalDateTime.parse(fs.getEstimatedDeparture(), ISO);
+        LocalDateTime estArr = LocalDateTime.parse(fs.getEstimatedArrival(), ISO);
+        LocalDateTime schedDep = LocalDateTime.parse(fs.getScheduledDeparture(), ISO);
+        int delay = Math.max(0, fs.getDelayMinutes());
+
+        StatusInfo s = new StatusInfo();
+        s.setFlightNumber(fs.getFlightNumber());
+        s.setTitle(f.getFlightName() + " · " + f.getFrom() + " → " + f.getTo());
+        s.setDeparture(fs.getEstimatedDeparture());
+        s.setArrival(fs.getEstimatedArrival());
+        s.setDelayMinutes(delay);
+        s.getDetails().put("Departs", estDep.format(CLOCK));
+        s.getDetails().put("Arrives", estArr.format(CLOCK));
+        if (fs.getGate() != null && !fs.getGate().isBlank()) s.getDetails().put("Gate", fs.getGate());
+        if (fs.getTerminal() != null && !fs.getTerminal().isBlank()) s.getDetails().put("Terminal", fs.getTerminal());
+
+        switch (fs.getPhase() == null ? "SCHEDULED" : fs.getPhase()) {
+            case "CANCELLED" -> {
+                if (fs.getDelayReason() != null && !fs.getDelayReason().isBlank()) s.getDetails().put("Reason", fs.getDelayReason());
+                return finish(s, "CANCELLED", "Cancelled", "bad", 0, 0);
+            }
+            case "LANDED" -> {
+                return finish(s, "ARRIVED", "Landed", "good", 100, delay);
+            }
+            case "DEPARTED" -> {
+                s.getDetails().put("Arrives in", humanize(Duration.between(now, estArr)));
+                String label = delay > 0 ? "In the air, " + FlightEventService.delayText(delay) + " late" : "In the air";
+                return finish(s, "IN_TRANSIT", label, delay > 0 ? "warn" : "info", progress(estDep, estArr, now), delay);
+            }
+            case "BOARDING" -> {
+                s.getDetails().put("Departs in", humanize(Duration.between(now, estDep)));
+                return finish(s, "BOARDING", delay > 0 ? "Boarding · " + FlightEventService.delayText(delay) + " late" : "Boarding", delay > 0 ? "warn" : "good", 0, delay);
+            }
+            default -> {
+                s.getDetails().put("Departs in", humanize(Duration.between(now, estDep)));
+                if (delay > 0) {
+                    s.getDetails().put("Scheduled", schedDep.format(CLOCK));
+                    if (fs.getDelayReason() != null && !fs.getDelayReason().isBlank()) s.getDetails().put("Reason", fs.getDelayReason());
+                    return finish(s, "DELAYED", "Delayed by " + FlightEventService.delayText(delay), "warn", 0, delay);
+                }
+                return finish(s, "SCHEDULED", "On time", "good", 0, 0);
+            }
+        }
+    }
+
+    private StatusInfo scheduledFlightStatus(String itemId) {
         Flight f = flightRepository.findById(itemId).orElse(null);
         if (f == null) return null;
         LocalDateTime now = LocalDateTime.now();

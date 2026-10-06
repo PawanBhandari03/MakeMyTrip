@@ -268,3 +268,56 @@ export const getbookingstatus = async (category, itemId, travelDate) => {
     throw error;
   }
 };
+
+// ---------------------------------------------------------------- flight tracking and notifications
+
+export const getnotifications = async (userId) => {
+  const res = await axios.get(`${BACKEND_URL}/notifications`, { params: { userId } });
+  return res.data;
+};
+
+/** Marks one notification read, or all of them when no id is given. */
+export const marknotificationsread = async (userId, id) => {
+  await axios.post(`${BACKEND_URL}/notifications/read`, null, {
+    params: { userId, id: id || undefined },
+  });
+};
+
+export const gettrackedflights = async (userId) => {
+  const res = await axios.get(`${BACKEND_URL}/tracking`, { params: { userId } });
+  return res.data;
+};
+
+/** One flight with its timeline, and whether this user follows it (null if the flight is unknown). */
+export const gettrackedflight = async (userId, flightNumber) => {
+  try {
+    const res = await axios.get(`${BACKEND_URL}/tracking/flight`, {
+      params: { userId: userId || undefined, flightNumber },
+    });
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) return null;
+    throw error;
+  }
+};
+
+export const trackflight = async (userId, flightNumber) => {
+  const res = await axios.post(`${BACKEND_URL}/tracking`, null, { params: { userId, flightNumber } });
+  return res.data;
+};
+
+export const untrackflight = async (userId, flightNumber) => {
+  await axios.delete(`${BACKEND_URL}/tracking`, { params: { userId, flightNumber } });
+};
+
+/** Mock airline feed: flights about to depart, for the operator console. */
+export const getflightoperations = async () => {
+  const res = await axios.get(`${BACKEND_URL}/mock-api/flights/board`);
+  return res.data;
+};
+
+/** Mock airline feed: trigger a delay, gate change, boarding call or cancellation. */
+export const operateflight = async (flightNumber, body) => {
+  const res = await axios.post(`${BACKEND_URL}/mock-api/flights/${flightNumber}/events`, body);
+  return res.data;
+};

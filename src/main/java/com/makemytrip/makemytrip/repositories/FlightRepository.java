@@ -8,4 +8,5 @@ public interface FlightRepository  extends MongoRepository<Flight,String>{
     void deleteByDemoTrue();
     Flight findFirstByDemoTrueOrderByDepartureTimeDesc();
     java.util.List<Flight> findByDepartureTimeBetween(String from, String to);
+    java.util.List<Flight> findByFlightNameEndingWith(String suffix);
 }

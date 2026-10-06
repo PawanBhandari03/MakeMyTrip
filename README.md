@@ -47,6 +47,36 @@ Trains, buses and cabs run only inside India; international travel is by flight,
 The network is built in `services/TravelNetwork.java`: add a row to `CITY_ROWS` and the new city automatically gets flights,
 trains, buses, cabs and hotels. Search understands common spellings (Bangalore, Bombay, Calcutta, Hawaii...).
 
+## Live flight status, tracking and notifications
+
+Every flight in the next three days has a live status record that moves on its own, like a real airline feed:
+
+- **Lifecycle:** scheduled → boarding (40 minutes before departure) → departed → landed, driven by the clock.
+- **Operational events:** delays are announced, get longer or shorter, gates change and a few flights are cancelled. Each change
+  carries a reason and the revised departure and estimated arrival time.
+- **Timeline:** every change is stored and shown as the flight's list of updates.
+- **Follow flights:** on **My Flights** (`/tracker`) a customer can follow several flights at once and watch estimated arrival times
+  update live. Flights are followed automatically when they are booked.
+- **Notifications:** followers get a bell notification, an on-screen pop-up and (if allowed) a browser notification for delays,
+  revised times, gate changes, boarding, departure, landing and cancellation. The page checks every 8 seconds.
+- **Public search:** `/flight-status?flight=6E-126` works without logging in and offers a "Follow this flight" button.
+
+**Trying it out.** Log in as `user` / `user123`, follow a flight, then open **Admin → Flight Ops** (log in as `admin` / `admin123`
+in another browser window) and press **+1h**, **Change gate** or **Cancel flight** on that flight. The notification arrives within
+a few seconds. The same actions are available through the mock airline API:
+
+```
+curl -X POST localhost:8080/mock-api/flights/6E126/events -H "Content-Type: application/json" \
+  -d '{"type":"DELAY","minutes":60,"reason":"Weather conditions"}'
+```
+
+`type` is one of `DELAY`, `ADD_DELAY`, `CLEAR_DELAY`, `GATE_CHANGE`, `BOARDING`, `CANCEL`. Other endpoints:
+`GET /mock-api/flights/board`, `GET /mock-api/flights/{no}`, `GET /mock-api/flights/{no}/events`, `GET|POST|DELETE /tracking`,
+`GET /notifications`, `POST /notifications/read`.
+
+The backend runs on India time (`Asia/Kolkata`) so flight times and "now" agree even when the host runs in UTC, as on Render.
+After deploying, press **Reset demo data** once in the admin dashboard so flights are generated for the current day.
+
 ## Adding data
 
 **From the admin page (easiest)** – log in as admin → *ADMIN* → Flights / Hotels / Services → **Add**.

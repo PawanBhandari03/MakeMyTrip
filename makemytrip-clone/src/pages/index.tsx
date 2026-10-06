@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { formatDate, isoDay, nightsBetween } from "@/lib/format";
+import { formatDate, isoDay, nightsBetween, nowLocalIso } from "@/lib/format";
 import { canonicalCity } from "@/lib/places";
 import Seo from "@/components/Seo";
 import { AUTHOR, DEFAULT_DESCRIPTION, GITHUB_URL, SITE_NAME, SITE_URL } from "@/lib/site";
@@ -327,7 +327,7 @@ export default function Home() {
   const nights = nightsBetween((a || form).checkIn, (a || form).checkOut);
 
   const results: any[] | null = useMemo(() => {
-    const now = new Date().toISOString().slice(0, 16);
+    const now = nowLocalIso();
     let list: any[] | null = null;
     switch (tab) {
       case "flights": {
@@ -378,7 +378,7 @@ export default function Home() {
   // Flights: if nothing on the chosen date, offer the next departures on the same route
   const flightAlternatives = useMemo(() => {
     if (tab !== "flights" || !a || (results && results.length > 0)) return [];
-    const now = new Date().toISOString().slice(0, 16);
+    const now = nowLocalIso();
     return flights
       .filter((f) => (f.departureTime || "") >= now && matches(f.from, a.from) && matches(f.to, a.to))
       .sort((x, y) => (x.departureTime || "").localeCompare(y.departureTime || ""))
@@ -388,7 +388,7 @@ export default function Home() {
   // Every day on which the searched route actually flies
   const flightDates = useMemo(() => {
     if (tab !== "flights" || !a) return [];
-    const now = new Date().toISOString().slice(0, 16);
+    const now = nowLocalIso();
     const days = flights
       .filter((f) => (f.departureTime || "") >= now && matches(f.from, a.from) && matches(f.to, a.to))
       .map((f) => (f.departureTime || "").slice(0, 10));

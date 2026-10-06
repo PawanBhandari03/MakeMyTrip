@@ -76,3 +76,40 @@ export const CATEGORY_LABELS: Record<string, string> = {
   FOREX: "Forex",
   INSURANCE: "Insurance",
 };
+
+/** The current local date and time as "yyyy-mm-ddThh:mm", the same shape flight times are stored in. */
+export const nowLocalIso = (): string => {
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+};
+
+/** "1h 30m", "45 min" for a number of minutes. */
+export const delayText = (minutes: number): string => {
+  const m = Math.max(0, Math.round(minutes));
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60);
+  const r = m % 60;
+  return r === 0 ? `${h}h` : `${h}h ${r}m`;
+};
+
+/** "in 2h 05m" / "45 min ago" style text for a number of minutes from now (negative = in the past). */
+export const relativeMinutes = (minutes: number): string => {
+  const m = Math.round(minutes);
+  if (Math.abs(m) < 1) return "now";
+  const text = Math.abs(m) >= 60 ? `${Math.floor(Math.abs(m) / 60)}h ${String(Math.abs(m) % 60).padStart(2, "0")}m` : `${Math.abs(m)} min`;
+  return m > 0 ? `in ${text}` : `${text} ago`;
+};
+
+/** "just now", "5 min ago", "2h ago", or a date, for an ISO timestamp. */
+export const timeAgo = (iso?: string | null): string => {
+  if (!iso) return "";
+  const t = new Date(iso).getTime();
+  if (isNaN(t)) return "";
+  const s = Math.max(0, Math.round((Date.now() - t) / 1000));
+  if (s < 10) return "just now";
+  if (s < 60) return `${s}s ago`;
+  if (s < 3600) return `${Math.floor(s / 60)} min ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return formatDate(iso);
+};
