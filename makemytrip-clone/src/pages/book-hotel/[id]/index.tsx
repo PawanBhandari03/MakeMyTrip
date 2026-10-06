@@ -1,470 +1,257 @@
 import { useRouter } from "next/router";
+import Link from "next/link";
 import {
-  Star,
-  MapPin,
-  School as Pool,
-  UtensilsCrossed,
-  Wine,
-  Power,
+  Bus,
+  Check,
   ChevronRight,
-  Camera,
-  Image,
-  CreditCard,
-  Ticket,
-  Plane,
-  Home,
+  Coffee,
+  Dumbbell,
+  MapPin,
+  Power,
+  Sparkles,
+  Star,
+  UtensilsCrossed,
+  Waves,
+  Wifi,
+  Wine,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { gethotel, handlehotelbooking } from "@/api";
-interface Hotel {
-  id: string; // Unique identifier for the hotel
-  hotelName: string; // Name of the hotel
-  location: string; // Location of the hotel
-  pricePerNight: number; // Price per night
-  availableRooms: number; // Number of available rooms
-  amenities: string; // Amenities provided (comma-separated string or change to string[])
-}
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useDispatch, useSelector } from "react-redux";
-import SignupDialog from "@/components/SignupDialog";
+import { useCallback, useEffect, useState } from "react";
+import { gethotelbyid } from "@/api";
 import Loader from "@/components/Loader";
-import { setUser } from "@/store";
+import SmartImage from "@/components/SmartImage";
+import BookingPanel from "@/components/BookingPanel";
+import Seo from "@/components/Seo";
+import { formatINR, isoDay, nightsBetween } from "@/lib/format";
+
+const amenityIcon = (name: string) => {
+  const n = name.toLowerCase();
+  if (n.includes("wi-fi") || n.includes("wifi")) return <Wifi className="h-5 w-5" />;
+  if (n.includes("pool") || n.includes("beach") || n.includes("water")) return <Waves className="h-5 w-5" />;
+  if (n.includes("restaurant") || n.includes("dining") || n.includes("meals") || n.includes("kitchen")) return <UtensilsCrossed className="h-5 w-5" />;
+  if (n.includes("bar")) return <Wine className="h-5 w-5" />;
+  if (n.includes("gym")) return <Dumbbell className="h-5 w-5" />;
+  if (n.includes("spa")) return <Sparkles className="h-5 w-5" />;
+  if (n.includes("breakfast")) return <Coffee className="h-5 w-5" />;
+  if (n.includes("shuttle")) return <Bus className="h-5 w-5" />;
+  if (n.includes("power")) return <Power className="h-5 w-5" />;
+  return <Check className="h-5 w-5" />;
+};
+
+const ratingLabel = (r: number) => (r >= 4.5 ? "Excellent" : r >= 4 ? "Very Good" : r >= 3.5 ? "Good" : "Average");
+
 const BookHotelPage = () => {
-  const [quantity, setQuantity] = useState(1);
   const router = useRouter();
-  const { id } = router.query; // Access the hotel ID from the URL
-  const [hotels, sethotels] = useState<Hotel[]>([]);
+  const { id, rooms, checkIn, checkOut } = router.query;
+  const [hotel, setHotel] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const user = useSelector((state: any) => state.user.user);
-  const [open, setopem] = useState(false);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    const fetchhotels = async () => {
-      try {
-        const data = await gethotel();
-        const filteredData = data.filter((hotel: any) => hotel.id === id);
-        sethotels(filteredData);
-      } catch (error) {
-        console.error("Error fetching flights:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchhotels();
-  }, []);
+  const [notFound, setNotFound] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [nights, setNights] = useState(1);
+  const [stayDate, setStayDate] = useState(isoDay(1));
 
-  if (loading) {
-    return <Loader />;
-  }
-  const hotel = hotels[0];
-  const hotelData = {
-    name: "Magnum Resorts- Near Candolim Beach",
-    rating: 3,
-    maxRating: 5,
-    propertyPhotos: 91,
-    guestPhotos: 386,
-    description:
-      "One of the best hotels in North Goa, operating since 2001 catering to international and domestic individual and group travelers.",
-    amenities: [
-      { icon: <Pool className="w-5 h-5" />, name: "Swimming Pool" },
-      { icon: <UtensilsCrossed className="w-5 h-5" />, name: "Restaurant" },
-      { icon: <Wine className="w-5 h-5" />, name: "Bar" },
-      { icon: <Power className="w-5 h-5" />, name: "Power Backup" },
-    ],
-    room: {
-      type: "Standard Room",
-      capacity: "Fits 2 Adults",
-      features: [
-        "No meals included",
-        "10% off on food & beverage services",
-        "Complimentary welcome drinks on arrival",
-        "Non-Refundable",
-      ],
-      originalPrice: 8999,
-      discountedPrice: 664,
-      taxes: 527,
-    },
-    location: {
-      area: "Candolim",
-      distance: "7 minutes walk to Candolim Beach",
-    },
-    reviews: {
-      rating: 3.8,
-      count: 784,
-      text: "Very Good",
-    },
-  };
-  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const value = Number.parseInt(e.target.value);
-    setQuantity(
-      isNaN(value) ? 1 : Math.max(1, Math.min(value, hotel.availableRooms))
-    );
-  };
-
-  const totalPrice = hotel?.pricePerNight * quantity;
-  const totalTaxes = Math.round((hotel?.pricePerNight || 0) * 0.18) * quantity;
-  const totalDiscounts = Math.round((hotel?.pricePerNight || 0) * 0.10) * quantity;
-  const grandTotal = totalPrice + totalTaxes - totalDiscounts;
-  const handlebooking = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const load = useCallback(async () => {
+    if (!id) return;
     try {
-      const data = await handlehotelbooking(
-        user?.id,
-        hotel?.id,
-        quantity,
-        grandTotal
-      );
-      if (data) {
-        const updateuser = {
-          ...user,
-          bookings: [...user.bookings, data],
-        };
-        dispatch(setUser(updateuser));
-        setopem(false);
-        setQuantity(1);
-        router.push("/profile");
-      } else {
-        alert("Hotel booking failed. Please try again.");
-      }
+      setHotel(await gethotelbyid(String(id)));
+      setNotFound(false);
     } catch (error) {
-      console.log(error);
+      setNotFound(true);
+    } finally {
+      setLoading(false);
     }
-  };
-  const HotelContent = () => (
-    <DialogContent className="sm:max-w-[600px] bg-white">
-      <DialogHeader>
-        <DialogTitle className="text-2xl font-bold flex items-center">
-          <Home className="w-6 h-6 mr-2" />
-          Hotel Booking Details
-        </DialogTitle>
-      </DialogHeader>
-      <div className="grid gap-6 mt-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Hotel Name */}
-          <div className="space-y-2">
-            <Label htmlFor="hotelName" className="flex items-center">
-              <MapPin className="w-4 h-4 mr-2" />
-              Hotel Name
-            </Label>
-            <Input id="hotelName" value={hotel.hotelName} readOnly />
-          </div>
+  }, [id]);
 
-          {/* Location */}
-          <div className="space-y-2">
-            <Label htmlFor="location" className="flex items-center">
-              <MapPin className="w-4 h-4 mr-2" />
-              Location
-            </Label>
-            <Input id="location" value={hotel.location} readOnly />
-          </div>
-          {/* Price Per Night */}
-          <div className="space-y-2">
-            <Label htmlFor="pricePerNight" className="flex items-center">
-              <Ticket className="w-4 h-4 mr-2" />
-              Price Per Night
-            </Label>
-            <Input
-              id="pricePerNight"
-              value={`₹ ${hotel.pricePerNight}`}
-              readOnly
-            />
-          </div>
+  useEffect(() => {
+    load();
+  }, [load]);
 
-          {/* Available Rooms */}
-          <div className="space-y-2">
-            <Label htmlFor="availableRooms" className="flex items-center">
-              <Ticket className="w-4 h-4 mr-2" />
-              Available Rooms
-            </Label>
-            <Input id="availableRooms" value={hotel.availableRooms} readOnly />
-          </div>
+  // Defaults coming from the search form on the home page
+  useEffect(() => {
+    const r = parseInt(String(rooms || ""), 10);
+    if (!isNaN(r) && r > 0) setQuantity(r);
+    if (typeof checkIn === "string" && checkIn) {
+      setStayDate(checkIn);
+      if (typeof checkOut === "string" && checkOut) setNights(nightsBetween(checkIn, checkOut));
+    }
+  }, [rooms, checkIn, checkOut]);
 
-          {/* Number of Rooms to Book */}
-          <div className="space-y-2">
-            <Label htmlFor="quantity" className="flex items-center">
-              <Ticket className="w-4 h-4 mr-2" />
-              Number of Rooms to Book
-            </Label>
-            <Input
-              id="quantity"
-              type="number"
-              min="1"
-              max={hotel.availableRooms}
-              value={quantity}
-              onChange={handleQuantityChange}
-            />
-          </div>
-        </div>
-        <div className="bg-gray-100 rounded-lg p-4">
-          <h3 className="text-lg font-bold mb-4 flex items-center">
-            <CreditCard className="w-5 h-5 mr-2" />
-            Fare Summary
-          </h3>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Base Fare</span>
-              <span className="font-medium">
-                ₹ {totalPrice.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Taxes and Extracharges</span>
-              <span className="font-medium">
-                ₹ {totalTaxes.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between items-center text-green-600">
-              <span className="font-medium">Discounts</span>
-              <span className="font-medium">
-                - ₹ {Math.abs(totalDiscounts).toLocaleString()}
-              </span>
-            </div>
-            <div className="border-t pt-2 mt-2">
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-lg">Total Amount</span>
-                <span className="font-bold text-lg">
-                  ₹ {grandTotal.toLocaleString()}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+  if (loading) return <Loader />;
+  if (notFound || !hotel) {
+    return (
+      <div className="mx-auto max-w-xl px-4 py-24 text-center">
+        <h1 className="text-2xl font-bold">Hotel not found</h1>
+        <p className="mt-2 text-slate-600">This hotel may have been removed.</p>
+        <Link href="/?tab=hotels" className="mt-6 inline-block rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white">
+          Search hotels
+        </Link>
       </div>
-      <Button className="w-full mt-4" onClick={handlebooking}>Proceed to Payment</Button>
-    </DialogContent>
-  );
+    );
+  }
+
+  const amenities: string[] = (hotel.amenities || "")
+    .split(",")
+    .map((a: string) => a.trim())
+    .filter(Boolean);
+  const rating = Number(hotel.rating || 0);
+  const fullStars = Math.round(rating);
+  const perNightWithTax = Math.round(hotel.pricePerNight * (hotel.pricePerNight <= 7500 ? 1.12 : 1.18));
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-slate-50">
+      <Seo title={`${hotel.hotelName}, ${hotel.location}`} path={`/book-hotel/${hotel.id}`} noindex />
       {/* Breadcrumb */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-3">
+      <div className="border-b bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-3">
           <div className="flex items-center space-x-2 text-sm">
-            <a href="/" className="text-blue-500">
+            <Link href="/" className="text-blue-600 hover:underline">
               Home
-            </a>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-            <a href="/" className="text-blue-500">
-              {hotel?.location}
-            </a>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-600">{hotel?.hotelName}</span>
+            </Link>
+            <ChevronRight className="h-4 w-4 text-slate-400" />
+            <Link href={`/?tab=hotels&city=${encodeURIComponent(hotel.location)}`} className="text-blue-600 hover:underline">
+              {hotel.location}
+            </Link>
+            <ChevronRight className="h-4 w-4 text-slate-400" />
+            <span className="text-slate-600">{hotel.hotelName}</span>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Hotel Title & Rating */}
             <div className="mb-6">
-              <h1 className="text-2xl font-bold mb-2">{hotel.hotelName}</h1>
-              <div className="flex items-center space-x-1">
-                {[...Array(hotelData.rating)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-5 h-5 text-yellow-400 fill-current"
-                  />
-                ))}
-                {[...Array(hotelData.maxRating - hotelData.rating)].map(
-                  (_, i) => (
-                    <Star key={i} className="w-5 h-5 text-gray-300" />
-                  )
-                )}
+              <h1 className="mb-2 text-3xl font-extrabold tracking-tight">{hotel.hotelName}</h1>
+              <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
+                <div className="flex items-center space-x-1">
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <Star
+                      key={i}
+                      className={`h-5 w-5 ${i < fullStars ? "fill-current text-yellow-400" : "text-slate-300"}`}
+                    />
+                  ))}
+                </div>
+                <span className="flex items-center">
+                  <MapPin className="mr-1 h-4 w-4" />
+                  {hotel.location}
+                </span>
               </div>
             </div>
 
             {/* Image Gallery */}
-            <div className="grid grid-cols-3 gap-4 mb-8">
-              <div className="col-span-2 relative group cursor-pointer">
-                <img
-                  src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800"
-                  alt="Hotel Main"
-                  className="w-full h-80 object-cover rounded-lg"
-                />
-                <div className="absolute bottom-4 left-4 bg-white/90 px-3 py-1 rounded-full flex items-center space-x-1">
-                  <Camera className="w-4 h-4" />
-                  <span className="text-sm">
-                    +{hotelData.propertyPhotos} Property Photos
-                  </span>
-                </div>
+            <div className="mb-8 grid grid-cols-3 gap-4">
+              <div className="col-span-2 overflow-hidden rounded-xl">
+                <SmartImage src={hotel.imageUrl} alt={hotel.hotelName} className="h-80 w-full object-cover" />
               </div>
               <div className="space-y-4">
-                <div className="relative group cursor-pointer">
-                  <img
-                    src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800"
-                    alt="Hotel Room"
-                    className="w-full h-[152px] object-cover rounded-lg"
-                  />
-                </div>
-                <div className="relative group cursor-pointer">
-                  <img
-                    src="https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=800"
-                    alt="Hotel Amenity"
-                    className="w-full h-[152px] object-cover rounded-lg"
-                  />
-                  <div className="absolute bottom-4 left-4 bg-white/90 px-3 py-1 rounded-full flex items-center space-x-1">
-                    <Image className="w-4 h-4" />
-                    <span className="text-sm">
-                      +{hotelData.guestPhotos} Guest Photos
-                    </span>
-                  </div>
-                </div>
+                <SmartImage
+                  src="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80"
+                  alt="Room"
+                  className="h-[152px] w-full rounded-xl object-cover"
+                />
+                <SmartImage
+                  src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=800&q=80"
+                  alt="Pool"
+                  className="h-[152px] w-full rounded-xl object-cover"
+                />
               </div>
             </div>
 
             {/* Description */}
-            <p className="text-gray-600 mb-6">
-              {hotelData.description}
-              <button className="text-blue-500 ml-2">Read more</button>
+            <p className="mb-8 leading-relaxed text-slate-600">
+              {hotel.description || `${hotel.hotelName} offers comfortable rooms and warm hospitality in ${hotel.location}.`}
             </p>
 
             {/* Amenities */}
             <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">Amenities</h2>
-              <div className="flex flex-wrap gap-6">
-                {hotelData.amenities.map((amenity, index) => (
+              <h2 className="mb-4 text-xl font-semibold">Amenities</h2>
+              <div className="flex flex-wrap gap-3">
+                {amenities.length === 0 && <span className="text-slate-500">No amenities listed.</span>}
+                {amenities.map((a) => (
                   <div
-                    key={index}
-                    className="flex items-center space-x-2 text-gray-600"
+                    key={a}
+                    className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
                   >
-                    {amenity.icon}
-                    <span>{amenity.name}</span>
+                    {amenityIcon(a)}
+                    <span>{a}</span>
                   </div>
                 ))}
-                <button className="text-blue-500">+ 31 Amenities</button>
               </div>
             </div>
           </div>
 
           {/* Booking Card */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-xl font-semibold mb-4">
-                {hotelData.room.type}
-              </h3>
-              <p className="text-gray-600 mb-4">{hotelData.room.capacity}</p>
-
-              <ul className="space-y-3 mb-6">
-                {hotelData.room.features.map((feature, index) => (
-                  <li key={index} className="flex items-start space-x-2">
-                    <span className="text-gray-400">•</span>
-                    <span className="text-gray-600">{feature}</span>
-                  </li>
-                ))}
+          <div className="space-y-6 lg:col-span-1">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/60">
+              <h3 className="mb-1 text-xl font-semibold">Standard Room</h3>
+              <p className="mb-4 text-slate-600">Fits 2 Adults</p>
+              <ul className="mb-4 space-y-2 text-sm text-slate-600">
+                <li>• Complimentary welcome drink on arrival</li>
+                <li>• Free cancellation up to 24 hours before check-in</li>
+                <li>• 10% off on food &amp; beverage services</li>
               </ul>
-              <div className="mb-6">
-                {/* Price Per Night */}
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-800 font-semibold">
-                    Price Per Night:
-                  </span>
-                  <span className="text-lg font-medium text-gray-800">
-                    ₹ {totalPrice}
-                  </span>
-                </div>
-
-                {/* Available Rooms */}
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-gray-800 font-semibold">
-                    Available Rooms:
-                  </span>
-                  <span className="text-lg font-medium text-gray-800">
-                    {hotel.availableRooms}
-                  </span>
-                </div>
-
-                {/* Amenities */}
-                <div>
-                  <h4 className="text-gray-800 font-semibold mb-2">
-                    Amenities:
-                  </h4>
-                  <p className="text-gray-600">{hotel.amenities}</p>
-                </div>
-              </div>
-              <div className="space-y-2 mb-6">
+              <div className="space-y-2 border-t pt-4 text-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500 line-through">
-                    ₹ {totalPrice}
-                  </span>
-                  <span className="text-gray-500">Per Night:</span>
+                  <span className="font-semibold text-slate-800">Price Per Night:</span>
+                  <span className="text-lg font-semibold">{formatINR(hotel.pricePerNight)}</span>
                 </div>
-                <div className="flex items-center justify-between text-2xl font-bold">
-                  <span>₹ {grandTotal}</span>
-                  <span className="text-sm text-gray-500 font-normal">
-                    + ₹ {totalTaxes} taxes & fees
-                  </span>
+                <div className="flex items-center justify-between text-slate-500">
+                  <span>incl. taxes</span>
+                  <span>{formatINR(perNightWithTax)}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-slate-800">Available Rooms:</span>
+                  <span className="text-lg font-semibold">{hotel.availableRooms}</span>
                 </div>
               </div>
-              <Dialog open={open} onOpenChange={setopem}>
-                <DialogTrigger asChild>
-                  <button className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors mb-3">
-                    BOOK THIS NOW
-                  </button>
-                </DialogTrigger>
-                {user ? (
-                  <HotelContent />
-                ) : (
-                  <DialogContent className="bg-white">
-                    <DialogHeader>
-                      <DialogTitle>Login Required</DialogTitle>
-                    </DialogHeader>
-                    <p>Please log in to continue with your booking.</p>
-                    <SignupDialog
-                      trigger={
-                        <Button className="w-full">Log In / Sign Up</Button>
-                      }
-                    />
-                  </DialogContent>
-                )}
-              </Dialog>
-
-              <button className="w-full text-blue-500 text-center">
-                14 More Options
-              </button>
             </div>
 
+            <BookingPanel
+              category="HOTEL"
+              itemId={hotel.id}
+              quantity={quantity}
+              setQuantity={setQuantity}
+              quantityLabel="Rooms"
+              maxQuantity={Math.min(20, hotel.availableRooms)}
+              nights={nights}
+              setNights={setNights}
+              travelDate={stayDate}
+              setTravelDate={setStayDate}
+              travelDateLabel="Check-in date"
+              minDate={isoDay(0)}
+              soldOut={hotel.availableRooms < 1}
+              onBooked={load}
+            />
+
             {/* Rating Card */}
-            <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-4">
-                  <div className="bg-blue-500 text-white text-2xl font-bold w-16 h-16 rounded-lg flex items-center justify-center">
-                    {hotelData.reviews.rating}
-                  </div>
-                  <div>
-                    <div className="font-semibold text-lg">
-                      {hotelData.reviews.text}
-                    </div>
-                    <div className="text-gray-500">
-                      ({hotelData.reviews.count} ratings)
-                    </div>
-                  </div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <div className="flex items-center space-x-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-blue-600 text-2xl font-bold text-white">
+                  {rating ? rating.toFixed(1) : "–"}
                 </div>
-                <a href="#" className="text-blue-500">
-                  All Reviews
-                </a>
+                <div>
+                  <div className="text-lg font-semibold">{rating ? ratingLabel(rating) : "Not rated yet"}</div>
+                  <div className="text-slate-500">Guest rating</div>
+                </div>
               </div>
             </div>
 
             {/* Location Card */}
-            <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-semibold text-lg mb-1">
-                    {hotel.location}
-                  </h3>
+                  <h3 className="mb-1 text-lg font-semibold">{hotel.location}</h3>
+                  <p className="text-sm text-slate-500">{hotel.hotelName}</p>
                 </div>
-                <button className="text-blue-500">See on Map</button>
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.hotelName + " " + hotel.location)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-blue-600 hover:underline"
+                >
+                  See on Map
+                </a>
               </div>
             </div>
           </div>

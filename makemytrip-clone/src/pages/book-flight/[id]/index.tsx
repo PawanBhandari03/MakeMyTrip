@@ -1,598 +1,285 @@
 import { useRouter } from "next/router";
-
+import Link from "next/link";
 import {
-  Plane,
-  Luggage,
-  Clock,
-  Calendar,
-  MapPin,
-  Gift,
-  CreditCard,
   AlertCircle,
-  ChevronRight,
-  Star,
-  Info,
   ArrowRight,
+  Calendar,
+  Clock,
+  Gift,
+  Info,
+  Luggage,
+  MapPin,
+  Plane,
+  Star,
 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { getflight, handleflightbooking } from "@/api";
-import { useDispatch, useSelector } from "react-redux";
-interface Flight {
-  id: string; // Unique identifier for the flight
-  flightName: string; // Name of the flight
-  from: string; // Departure location
-  to: string; // Arrival location
-  departureTime: string; // Departure time (ISO 8601 string recommended)
-  arrivalTime: string; // Arrival time (ISO 8601 string recommended)
-  price: number; // Price of the flight
-  availableSeats: number; // Number of available seats
-}
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Users, Ticket } from "lucide-react";
-import SignupDialog from "@/components/SignupDialog";
+import { useCallback, useEffect, useState } from "react";
+import { getflightbyid, gethotel } from "@/api";
 import Loader from "@/components/Loader";
-import { setUser } from "@/store";
+import SmartImage from "@/components/SmartImage";
+import BookingPanel from "@/components/BookingPanel";
+import Seo from "@/components/Seo";
+import { durationBetween, formatDateTime, formatINR, formatTime, formatDate } from "@/lib/format";
+
+interface Flight {
+  id: string;
+  flightName: string;
+  from: string;
+  to: string;
+  departureTime: string;
+  arrivalTime: string;
+  price: number;
+  availableSeats: number;
+}
+
+const code = (city: string) => (city || "").replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase();
+
 const BookFlightPage = () => {
   const router = useRouter();
-  const { id } = router.query;
-  const [flights, setFlights] = useState<Flight[]>([]);
+  const { id, qty } = router.query;
+  const [flight, setFlight] = useState<Flight | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [hotels, setHotels] = useState<any[]>([]);
   const [quantity, setQuantity] = useState(1);
-  const [open, setopem] = useState(false);
-  const user = useSelector((state: any) => state.user.user);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    const fetchFlights = async () => {
-      try {
-        const data = await getflight();
-        const filteredData = data.filter((flight: any) => flight.id === id);
-        setFlights(filteredData);
-        console.log(filteredData);
-      } catch (error) {
-        console.error("Error fetching flights:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchFlights();
-  }, [id, user]);
 
-  if (loading) {
-    return <Loader />;
-  }
-  if (flights.length === 0) {
-    return <div>No flight data available for this ID.</div>;
-  }
-  const flight = flights[0];
-  const flightDetails = {
-    from: flight?.from,
-    to: flight?.to,
-    date: new Date(flight?.departureTime).toLocaleDateString(),
-    flightNo: "FL-" + flight?.id?.substring(0, 4).toUpperCase(),
-    aircraft: "Boeing 737",
-    airline: flight?.flightName,
-    departureTime: new Date(flight?.departureTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-    arrivalTime: new Date(flight?.arrivalTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-    duration: "2h 30m", // Assuming fixed for now, or could compute difference
-    departureTerminal: `${flight?.from} Airport, Terminal 1`,
-    arrivalTerminal: `${flight?.to} Airport, Terminal 2`,
-    cabinBaggage: "7 Kgs / Adult",
-    checkInBaggage: "15 Kgs (1 piece only) / Adult",
-  };
-
-  const fareSummary = {
-    baseFare: flight?.price || 0,
-    taxes: Math.round((flight?.price || 0) * 0.18),
-    otherServices: 249,
-    discounts: -250,
-    total: (flight?.price || 0) + Math.round((flight?.price || 0) * 0.18) + 249 - 250,
-  };
-
-  const promoOffers = [
-    {
-      code: "MMTSECURE",
-      description:
-        "Get an instant discount of ₹299 on your flight booking and Trip Secure with this coupon!",
-      amount: 299,
-    },
-    {
-      code: "SPECIALUPI",
-      description:
-        "Use this code and get ₹362 instant discount on payments via UPI only!",
-      amount: 362,
-    },
-  ];
-
-  const hotels = [
-    {
-      name: "Hotel Park Tree",
-      rating: 4,
-      price: 9000,
-      image:
-        "https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=800",
-      location: "Near Airport, New Delhi",
-    },
-    {
-      name: "Lemon Tree Premier",
-      rating: 4,
-      price: 43875,
-      image:
-        "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800",
-      location: "Connaught Place, New Delhi",
-    },
-    {
-      name: "Hotel Kian",
-      rating: 4,
-      price: 1968,
-      image:
-        "https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=800",
-      location: "Karol Bagh, New Delhi",
-    },
-  ];
-  const formatDate = (dateString: string): string => {
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    const date = new Date(dateString);
-    return date.toLocaleString("en-US", options);
-  };
-
-  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const value = Number.parseInt(e.target.value);
-    setQuantity(
-      isNaN(value) ? 1 : Math.max(1, Math.min(value, flight.availableSeats))
-    );
-  };
-
-  const totalPrice = flight?.price * quantity;
-  const totalTaxes = fareSummary?.taxes * quantity;
-  const totalOtherServices = fareSummary?.otherServices * quantity;
-  const totalDiscounts = fareSummary?.discounts * quantity;
-  const grandTotal =
-    totalPrice + totalTaxes + totalOtherServices - totalDiscounts;
-
-  const handlebooking = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const load = useCallback(async () => {
+    if (!id) return;
     try {
-      const data = await handleflightbooking(
-        user?.id,
-        flight?.id,
-        quantity,
-        grandTotal
-      );
-      if (data) {
-        const updateuser = {
-          ...user,
-          bookings: [...user.bookings, data],
-        };
-        dispatch(setUser(updateuser));
-        setopem(false);
-        setQuantity(1);
-        router.push("/profile");
-      } else {
-        alert("Booking failed. Please try again.");
-      }
+      const data = await getflightbyid(String(id));
+      setFlight(data);
+      setNotFound(false);
     } catch (error) {
-      console.log(error);
+      setNotFound(true);
+    } finally {
+      setLoading(false);
     }
-  };
-  const BookingContent = () => (
-    <DialogContent className="sm:max-w-[600px] bg-white">
-      <DialogHeader>
-        <DialogTitle className="text-2xl font-bold flex items-center">
-          <Plane className="w-6 h-6 mr-2" />
-          Flight Booking Details
-        </DialogTitle>
-      </DialogHeader>
-      <div className="grid gap-6 mt-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="flightName" className="flex items-center">
-              <Plane className="w-4 h-4 mr-2" />
-              Flight Name
-            </Label>
-            <Input id="flightName" value={flight?.flightName} readOnly />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="from" className="flex items-center">
-              <MapPin className="w-4 h-4 mr-2" />
-              From
-            </Label>
-            <Input id="from" value={flight?.from} readOnly />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="to" className="flex items-center">
-              <MapPin className="w-4 h-4 mr-2" />
-              To
-            </Label>
-            <Input id="to" value={flight?.to} readOnly />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="departureTime" className="flex items-center">
-              <Calendar className="w-4 h-4 mr-2" />
-              Departure Time
-            </Label>
-            <Input
-              id="departureTime"
-              value={new Date(flight.departureTime).toLocaleString()}
-              readOnly
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="arrivalTime" className="flex items-center">
-              <Clock className="w-4 h-4 mr-2" />
-              Arrival Time
-            </Label>
-            <Input
-              id="arrivalTime"
-              value={new Date(flight.arrivalTime).toLocaleString()}
-              readOnly
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="quantity" className="flex items-center">
-              <Ticket className="w-4 h-4 mr-2" />
-              Number of Tickets
-            </Label>
-            <Input
-              id="quantity"
-              type="number"
-              min="1"
-              max={flight.availableSeats}
-              value={quantity}
-              onChange={handleQuantityChange}
-            />
-          </div>
-        </div>
-        <div className="bg-gray-100 rounded-lg p-4">
-          <h3 className="text-lg font-bold mb-4 flex items-center">
-            <CreditCard className="w-5 h-5 mr-2" />
-            Fare Summary
-          </h3>
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Base Fare</span>
-              <span className="font-medium">
-                ₹ {totalPrice.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Taxes and Surcharges</span>
-              <span className="font-medium">
-                ₹ {totalTaxes.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Other Services</span>
-              <span className="font-medium">
-                ₹ {totalOtherServices.toLocaleString()}
-              </span>
-            </div>
-            <div className="flex justify-between items-center text-green-600">
-              <span className="font-medium">Discounts</span>
-              <span className="font-medium">
-                - ₹ {Math.abs(totalDiscounts).toLocaleString()}
-              </span>
-            </div>
-            <div className="border-t pt-2 mt-2">
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-lg">Total Amount</span>
-                <span className="font-bold text-lg">
-                  ₹ {grandTotal.toLocaleString()}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+  }, [id]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  useEffect(() => {
+    const n = parseInt(String(qty || ""), 10);
+    if (!isNaN(n) && n > 0) setQuantity(n);
+  }, [qty]);
+
+  useEffect(() => {
+    if (!flight) return;
+    gethotel().then((all: any[]) => {
+      const inCity = (all || []).filter((h) => h.location?.toLowerCase() === flight.to?.toLowerCase());
+      setHotels(inCity.slice(0, 3));
+    });
+  }, [flight?.to]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (loading) return <Loader />;
+  if (notFound || !flight) {
+    return (
+      <div className="mx-auto max-w-xl px-4 py-24 text-center">
+        <h1 className="text-2xl font-bold">Flight not found</h1>
+        <p className="mt-2 text-slate-600">This flight may have been removed.</p>
+        <Link href="/" className="mt-6 inline-block rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white">
+          Search flights
+        </Link>
       </div>
-      <Button className="w-full mt-4" onClick={handlebooking}>
-        Proceed to Payment
-      </Button>
-    </DialogContent>
-  );
+    );
+  }
+
+  const duration = durationBetween(flight.departureTime, flight.arrivalTime);
+  const flightNo = flight.flightName.split(" ").slice(-1)[0];
+  const airline = flight.flightName.replace(flightNo, "").trim() || flight.flightName;
+  const cancellationFee = Math.round(flight.price * 0.1);
+  const dep = new Date(flight.departureTime);
+  const freeUntil = new Date(dep.getTime() - 24 * 3600 * 1000);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 font-sans text-slate-800">
-      <div className="max-w-7xl mx-auto px-4 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+      <Seo title={`${flight.from} to ${flight.to} flight, ${flight.flightName}`} path={`/book-flight/${flight.id}`} noindex />
+      <div className="mx-auto max-w-7xl px-4 py-10">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="space-y-8 lg:col-span-2">
             {/* Flight Details */}
-            <div className="bg-white rounded-2xl shadow-lg shadow-blue-900/5 border border-slate-100 overflow-hidden relative p-8">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
-              <div className="flex flex-wrap justify-between items-start gap-4 mb-8">
+            <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-blue-900/5">
+              <div className="absolute left-0 top-0 h-1.5 w-full bg-gradient-to-r from-blue-600 to-indigo-600" />
+              <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <div className="flex items-center flex-wrap gap-4 mb-2">
-                    <h2 className="text-lg font-bold flex items-center">
-                      <span>{flight?.from}</span>
-                      <ArrowRight className="w-5 h-5 mx-2" />
-                      <span>{flight?.to}</span>
+                  <div className="mb-2 flex flex-wrap items-center gap-4">
+                    <h2 className="flex items-center text-lg font-bold">
+                      <span>{flight.from}</span>
+                      <ArrowRight className="mx-2 h-5 w-5" />
+                      <span>{flight.to}</span>
                     </h2>
-                    <span className="bg-green-100 text-green-600 text-xs px-3 py-1 rounded-full font-medium">
+                    <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
                       CANCELLATION FEES APPLY
                     </span>
                   </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Calendar className="w-4 h-4 mr-2" />
+                  <div className="flex items-center text-sm text-slate-600">
+                    <Calendar className="mr-2 h-4 w-4" />
                     <span>{formatDate(flight.departureTime)}</span>
                     <span className="mx-2">•</span>
-                    <Clock className="w-4 h-4 mr-2" />
-                    <span>Non Stop - {flightDetails.duration}</span>
+                    <Clock className="mr-2 h-4 w-4" />
+                    <span>Non Stop - {duration}</span>
                   </div>
                 </div>
-                <button className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center">
-                  <Info className="w-4 h-4 mr-1" />
+                <Link href="/info/terms" className="flex items-center text-sm font-medium text-blue-600 hover:text-blue-700">
+                  <Info className="mr-1 h-4 w-4" />
                   View Fare Rules
-                </button>
+                </Link>
               </div>
 
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Plane className="w-6 h-6 text-blue-600" />
+              <div className="mb-6 flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+                  <Plane className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <div className="font-semibold">{flight.flightName}</div>
-                  <div className="text-sm text-gray-600">
-                    {flightDetails.flightNo} • {flightDetails.aircraft}
-                  </div>
+                  <div className="font-semibold">{airline}</div>
+                  <div className="text-sm text-slate-600">{flightNo} • Airbus A320</div>
                 </div>
                 <div className="ml-auto text-sm">
-                  <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full">
-                    Economy
-                  </span>
-                  <span className="ml-2 text-gray-600">MMTSPECIAL</span>
+                  <span className="rounded-full bg-blue-50 px-3 py-1 text-blue-600">Economy</span>
+                  <span className="ml-2 text-slate-500">{flight.availableSeats} seats left</span>
                 </div>
               </div>
 
-              <div className="flex flex-wrap md:flex-nowrap justify-between items-start gap-6 border-t pt-6">
+              <div className="flex flex-wrap items-start justify-between gap-6 border-t pt-6 md:flex-nowrap">
                 <div>
-                  <div className="text-2xl font-bold">
-                    {formatDate(flight.departureTime)}
-                  </div>
-                  <div className="text-sm text-gray-600 mt-1 flex items-start">
-                    <MapPin className="w-4 h-4 mr-1 flex-shrink-0 mt-0.5" />
-                    {flight.from} International Airport, Terminal T2
+                  <div className="text-3xl font-bold">{formatTime(flight.departureTime)}</div>
+                  <div className="text-sm text-slate-500">{formatDate(flight.departureTime)}</div>
+                  <div className="mt-1 flex items-start text-sm text-slate-600">
+                    <MapPin className="mr-1 mt-0.5 h-4 w-4 shrink-0" />
+                    {flight.from} International Airport, Terminal 2
                   </div>
                 </div>
-                <div className="text-center flex-shrink-0">
-                  <div className="text-sm text-gray-600 mb-1">
-                    {flightDetails.duration}
-                  </div>
-                  <div className="w-32 h-0.5 bg-gray-300 relative my-2">
-                    <div className="absolute -top-2 right-0 w-4 h-4 rounded-full bg-gray-300 flex items-center justify-center">
-                      <Plane className="w-3 h-3 text-gray-600" />
+                <div className="shrink-0 text-center">
+                  <div className="mb-1 text-sm text-slate-600">{duration}</div>
+                  <div className="relative my-2 h-0.5 w-32 bg-slate-300">
+                    <div className="absolute -top-2 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-slate-300">
+                      <Plane className="h-3 w-3 text-slate-600" />
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500">Non-stop</div>
+                  <div className="text-xs text-slate-500">Non-stop</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold">
-                    {formatDate(flight.arrivalTime)}
-                  </div>
-                  <div className="text-sm text-gray-600 mt-1 flex items-start justify-end">
-                    <MapPin className="w-4 h-4 mr-1 flex-shrink-0 mt-0.5" />
-                    {flight.to} International Airport, Terminal T3
+                  <div className="text-3xl font-bold">{formatTime(flight.arrivalTime)}</div>
+                  <div className="text-sm text-slate-500">{formatDate(flight.arrivalTime)}</div>
+                  <div className="mt-1 flex items-start justify-end text-sm text-slate-600">
+                    <MapPin className="mr-1 mt-0.5 h-4 w-4 shrink-0" />
+                    {flight.to} International Airport, Terminal 3
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-6 mt-6 text-sm text-gray-600">
+              <div className="mt-6 flex flex-wrap gap-6 text-sm text-slate-600">
                 <div className="flex items-center">
-                  <Luggage className="w-5 h-5 mr-2 text-gray-500" />
-                  <span>Cabin Baggage: {flightDetails.cabinBaggage}</span>
+                  <Luggage className="mr-2 h-5 w-5 text-slate-500" />
+                  <span>Cabin Baggage: 7 Kgs / Adult</span>
                 </div>
                 <div className="flex items-center">
-                  <Luggage className="w-5 h-5 mr-2 text-gray-500" />
-                  <span>Check-in Baggage: {flightDetails.checkInBaggage}</span>
+                  <Luggage className="mr-2 h-5 w-5 text-slate-500" />
+                  <span>Check-in Baggage: 15 Kgs (1 piece only) / Adult</span>
                 </div>
               </div>
             </div>
 
             {/* Cancellation Policy */}
-            <div className="bg-white rounded-2xl shadow-lg shadow-blue-900/5 border border-slate-100 p-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-lg font-bold flex items-center">
-                  <AlertCircle className="w-5 h-5 mr-2 text-orange-500" />
-                  Cancellation & Date Change Policy
+            <div className="rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-blue-900/5">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="flex items-center text-lg font-bold">
+                  <AlertCircle className="mr-2 h-5 w-5 text-orange-500" />
+                  Cancellation &amp; Date Change Policy
                 </h2>
-                <button className="text-blue-600 text-sm font-medium hover:text-blue-700">
+                <Link href="/info/terms" className="text-sm font-medium text-blue-600 hover:text-blue-700">
                   View Policy
-                </button>
+                </Link>
               </div>
-              <div className="bg-gray-50 p-6 rounded-xl">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Plane className="w-5 h-5 text-blue-600" />
+              <div className="rounded-xl bg-slate-50 p-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                      <Plane className="h-5 w-5 text-blue-600" />
                     </div>
-                    <span className="font-semibold">BLR-DEL</span>
+                    <span className="font-semibold">
+                      {code(flight.from)}-{code(flight.to)}
+                    </span>
                   </div>
-                  <div className="font-bold text-lg">₹ 4,300</div>
+                  <div className="text-lg font-bold">{formatINR(cancellationFee)} per seat</div>
                 </div>
-                <div className="h-2.5 bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 rounded-full"></div>
-                <div className="flex justify-between mt-2 text-xs text-gray-600">
+                <div className="h-2.5 rounded-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" />
+                <div className="mt-2 flex justify-between text-xs text-slate-600">
                   <span>Now</span>
-                  <span>16 Jan, 15:55</span>
-                  <span>16 Jan, 17:55</span>
+                  <span>{formatDateTime(freeUntil.toISOString())}</span>
+                  <span>{formatDateTime(flight.departureTime)}</span>
                 </div>
+                <p className="mt-4 text-sm text-slate-600">
+                  Cancel before {formatDateTime(freeUntil.toISOString())} and only the {formatINR(cancellationFee)}{" "}
+                  airline fee applies. After that the fare is non-refundable.
+                </p>
               </div>
             </div>
 
             {/* Hotel Offers */}
-            <div className="bg-white rounded-2xl shadow-lg shadow-blue-900/5 border border-slate-100 p-8">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold flex items-center">
-                  <Gift className="w-5 h-5 mr-2 text-red-500" />
-                  Book a Flight & unlock these offers
-                </h2>
-                <span className="bg-red-100 text-red-600 text-xs px-3 py-1 rounded-full font-medium">
-                  Flyer Exclusive Deal
-                </span>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {hotels.map((hotel, index) => (
-                  <div
-                    key={index}
-                    className="bg-white border rounded-xl overflow-hidden hover:shadow-md transition-shadow"
-                  >
-                    <div className="relative">
-                      <img
-                        src={hotel.image}
-                        alt={hotel.name}
-                        className="w-full h-48 object-cover"
-                      />
-                      <div className="absolute top-3 right-3 bg-white px-2 py-1 rounded-full text-xs font-medium">
-                        Best Seller
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-lg mb-1">
-                        {hotel.name}
-                      </h3>
-                      <div className="flex items-center text-sm text-gray-600 mb-2">
-                        <MapPin className="w-4 h-4 mr-1" />
-                        {hotel.location}
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-yellow-400">
-                          {[...Array(hotel.rating)].map((_, i) => (
-                            <Star key={i} className="w-4 h-4 fill-current" />
-                          ))}
+            {hotels.length > 0 && (
+              <div className="rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-blue-900/5">
+                <div className="mb-6 flex items-center justify-between">
+                  <h2 className="flex items-center text-lg font-bold">
+                    <Gift className="mr-2 h-5 w-5 text-red-500" />
+                    Book a Flight &amp; unlock these offers
+                  </h2>
+                  <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-600">
+                    Flyer Exclusive Deal
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  {hotels.map((hotel) => (
+                    <Link
+                      key={hotel.id}
+                      href={`/book-hotel/${hotel.id}`}
+                      className="overflow-hidden rounded-xl border bg-white transition-shadow hover:shadow-md"
+                    >
+                      <div className="relative">
+                        <SmartImage src={hotel.imageUrl} alt={hotel.hotelName} className="h-44 w-full object-cover" />
+                        <div className="absolute right-3 top-3 rounded-full bg-white px-2 py-1 text-xs font-medium">
+                          Best Seller
                         </div>
-                        <div className="text-right">
-                          <div className="text-xs text-gray-500">
-                            Starting from
+                      </div>
+                      <div className="p-4">
+                        <h3 className="mb-1 text-base font-semibold">{hotel.hotelName}</h3>
+                        <div className="mb-2 flex items-center text-sm text-slate-600">
+                          <MapPin className="mr-1 h-4 w-4" />
+                          {hotel.location}
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center text-sm text-yellow-500">
+                            <Star className="mr-1 h-4 w-4 fill-current" />
+                            {hotel.rating ? hotel.rating.toFixed(1) : "New"}
                           </div>
-                          <div className="font-bold text-lg">
-                            ₹ {hotel.price.toLocaleString()}
+                          <div className="text-right">
+                            <div className="text-xs text-slate-500">Starting from</div>
+                            <div className="text-lg font-bold">{formatINR(hotel.pricePerNight)}</div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Fare Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 sticky top-24">
-              <h2 className="text-lg font-bold mb-6 flex items-center">
-                <CreditCard className="w-5 h-5 mr-2 text-gray-600" />
-                Fare Summary
-              </h2>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Base Fare</span>
-                  <span className="font-medium">
-                    ₹ {totalPrice.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Taxes and Surcharges</span>
-                  <span className="font-medium">
-                    ₹ {totalTaxes.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">Other Services</span>
-                  <span className="font-medium">
-                    ₹ {totalOtherServices.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-green-600">
-                  <span className="font-medium">Discounts</span>
-                  <span className="font-medium">
-                    - ₹ {Math.abs(totalDiscounts).toLocaleString()}
-                  </span>
-                </div>
-                <div className="border-t pt-2 mt-2">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-lg">Total Amount</span>
-                    <span className="font-bold text-lg">
-                      ₹ {grandTotal.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <Dialog open={open} onOpenChange={setopem}>
-                <DialogTrigger asChild>
-                  <Button className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold text-lg py-6 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5">
-                    Book Now
-                  </Button>
-                </DialogTrigger>
-                {user ? (
-                  <BookingContent />
-                ) : (
-                  <DialogContent className="bg-white">
-                    <DialogHeader>
-                      <DialogTitle>Login Required</DialogTitle>
-                    </DialogHeader>
-                    <p>Please log in to continue with your booking.</p>
-                    <SignupDialog
-                      trigger={
-                        <Button className="w-full">Log In / Sign Up</Button>
-                      }
-                    />
-                  </DialogContent>
-                )}
-              </Dialog>
-              {/* Promo Codes */}
-              <div className="mt-8">
-                <div className="bg-gradient-to-br from-orange-50 to-amber-50/50 border border-orange-100 p-6 rounded-2xl shadow-inner">
-                  <h3 className="font-bold mb-4 flex items-center">
-                    <Gift className="w-5 h-5 mr-2 text-yellow-600" />
-                    PROMO CODES
-                  </h3>
-                  <div className="relative mb-4">
-                    <input
-                      type="text"
-                      placeholder="Enter promo code here"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-                    />
-                  </div>
-                  {promoOffers.map((offer, index) => (
-                    <div
-                      key={index}
-                      className="bg-white p-4 rounded-xl mb-3 shadow-sm border border-dashed border-orange-300 relative overflow-hidden group hover:border-orange-400 transition-colors"
-                    >
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-4 bg-orange-50 rounded-r-full border-r border-y border-dashed border-orange-300"></div>
-                      <div className="flex items-start gap-3 pl-2">
-                        <input
-                          type="radio"
-                          name="promo"
-                          className="mt-1.5 h-4 w-4 text-red-600 focus:ring-red-500"
-                        />
-                        <div>
-                          <div className="font-semibold text-red-600">
-                            {offer.code}
-                          </div>
-                          <p className="text-sm text-gray-600 mt-1">
-                            {offer.description}
-                          </p>
-                          <button className="text-blue-600 text-sm font-medium mt-2 hover:text-blue-700">
-                            Terms & Conditions
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            <div className="sticky top-24">
+              <BookingPanel
+                category="FLIGHT"
+                itemId={flight.id}
+                quantity={quantity}
+                setQuantity={setQuantity}
+                quantityLabel="Tickets"
+                maxQuantity={Math.min(20, flight.availableSeats)}
+                soldOut={flight.availableSeats < 1}
+                onBooked={load}
+              />
             </div>
           </div>
         </div>
