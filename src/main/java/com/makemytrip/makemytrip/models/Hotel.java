@@ -1,4 +1,6 @@
 package com.makemytrip.makemytrip.models;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,6 +13,14 @@ public class Hotel {
     private double pricePerNight;
     private int availableRooms;
     private String amenities;
+    @Getter @Setter
+    private String imageUrl;
+    @Getter @Setter
+    private double rating;
+    @Getter @Setter
+    private String description;
+    @Getter @Setter
+    private boolean demo;
     // Getters and Setters
     public String getId() {
         return _id;

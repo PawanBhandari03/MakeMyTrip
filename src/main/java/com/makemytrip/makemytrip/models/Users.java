@@ -1,4 +1,5 @@
 package com.makemytrip.makemytrip.models;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -36,8 +37,10 @@ public class Users {
     public String getPhoneNumber() {
         return phoneNumber;
     }
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     public String getPassword() {return password;}
     public String getEmail() {return email;}
+    public void setEmail(String email) {this.email = email;}
     public String getRole() {return role;}
     public void setPassword(String password) {this.password = password;}
     public void setRole(String role) {this.role = role;}
@@ -45,52 +48,24 @@ public class Users {
     public void setBookings(List<Booking> bookings){this.bookings=bookings;}
 
 
+    @lombok.Getter
+    @lombok.Setter
     public static class Booking{
         private String type;
+        /** Id of the flight / hotel / listing that was booked. */
         private String bookingId;
+        /** Human friendly reference shown to the customer, e.g. MMT7K2Q9XA. */
+        private String reference;
+        private String title;
+        private String category;
+        /** CONFIRMED or CANCELLED. */
+        private String status;
         private String date;
+        private String bookedAt;
+        private String travelDate;
         private int quantity;
+        private int nights;
+        private double discount;
         private double totalPrice;
-
-        // Getters and Setters
-        public String getType() {
-            return type;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public String getBookingId() {
-            return bookingId;
-        }
-
-        public void setBookingId(String bookingId) {
-            this.bookingId = bookingId;
-        }
-
-        public String getDate() {
-            return date;
-        }
-
-        public void setDate(String date) {
-            this.date = date;
-        }
-
-        public int getQuantity() {
-            return quantity;
-        }
-
-        public void setQuantity(int quantity) {
-            this.quantity = quantity;
-        }
-
-        public double getTotalPrice() {
-            return totalPrice;
-        }
-
-        public void setTotalPrice(double totalPrice) {
-            this.totalPrice = totalPrice;
-        }
     }
 }

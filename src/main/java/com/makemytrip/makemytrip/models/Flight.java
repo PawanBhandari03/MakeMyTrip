@@ -1,4 +1,6 @@
 package com.makemytrip.makemytrip.models;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,6 +15,9 @@ public class Flight {
     private String arrivalTime;
     private double price;
     private int availableSeats;
+    /** true for rows created by the dummy-data loader; only those are removed on reload. */
+    @Getter @Setter
+    private boolean demo;
 
     // Getters and Setters
 
