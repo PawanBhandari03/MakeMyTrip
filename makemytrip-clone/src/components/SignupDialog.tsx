@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -21,30 +22,29 @@ const SignupDialog = ({trigger}:any) => {
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [open, setopem] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const dispatch = useDispatch();
+  const [error, setError] = useState("");
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSignup) {
-      try {
-        const signin = await signup(
-          firstName,
-          lastName,
-          email,
-          phoneNumber,
-          password
-        );
-        dispatch(setUser(signin));
-      } catch (error) {
-        console.log(error);
-      }
-    } else {
-      try {
-        const data = await login(email, password);
-        dispatch(setUser(data));
-        setopem(false);
-        clearform();
-      } catch (error) {
-        console.log(error);
+    setError("");
+    if (isSignup && !/^\d{10}$/.test(phoneNumber)) {
+      setError("Phone number must be exactly 10 digits.");
+      return;
+    }
+    try {
+      const data = isSignup
+        ? await signup(firstName, lastName, email, phoneNumber, password)
+        : await login(email, password);
+      dispatch(setUser(data));
+      setopem(false);
+      clearform();
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (!isSignup && status === 401) {
+        setError("Invalid email or password.");
+      } else {
+        setError(err?.response?.data?.message || "Something went wrong. Please try again.");
       }
     }
   };
@@ -54,6 +54,7 @@ const SignupDialog = ({trigger}:any) => {
     setEmail("");
     setPassword("");
     setPhoneNumber("");
+    setShowPassword(false);
   };
   return (
     <Dialog open={open} onOpenChange={setopem}>
@@ -95,10 +96,11 @@ const SignupDialog = ({trigger}:any) => {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{isSignup ? "Email" : "Email or username"}</Label>
             <Input
               id="email"
-              type="email"
+              type={isSignup ? "email" : "text"}
+              autoComplete={isSignup ? "email" : "username"}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -106,13 +108,24 @@ const SignupDialog = ({trigger}:any) => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="pr-10"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-slate-500 hover:text-slate-800"
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
           </div>
           {isSignup && (
             <div className="space-y-2">
@@ -120,12 +133,39 @@ const SignupDialog = ({trigger}:any) => {
               <Input
                 id="phoneNumber"
                 type="tel"
+                inputMode="numeric"
+                maxLength={10}
+                pattern="[0-9]{10}"
+                title="Enter a 10-digit phone number"
+                placeholder="10-digit mobile number"
                 value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
+                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, "").slice(0, 10))}
                 required
               />
             </div>
           )}
+          {!isSignup && (
+            <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-3 text-xs text-slate-600">
+              <div className="mb-1.5 font-semibold text-slate-700">Demo logins (click to fill)</div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setEmail("admin"); setPassword("admin123"); }}
+                  className="rounded-md border border-slate-200 bg-white px-2.5 py-1 font-mono hover:border-blue-400"
+                >
+                  admin / admin123
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setEmail("user"); setPassword("user123"); }}
+                  className="rounded-md border border-slate-200 bg-white px-2.5 py-1 font-mono hover:border-blue-400"
+                >
+                  user / user123
+                </button>
+              </div>
+            </div>
+          )}
+          {error && <p className="text-sm text-red-600">{error}</p>}
           <Button
             type="submit"
             className="w-full bg-blue-600 text-white"
@@ -141,7 +181,7 @@ const SignupDialog = ({trigger}:any) => {
               <Button
                 variant="link"
                 className="p-0 text-blue-600"
-                onClick={() => setIsSignup(false)}
+                onClick={() => { setIsSignup(false); setError(""); }}
               >
                 Login
               </Button>
@@ -152,7 +192,7 @@ const SignupDialog = ({trigger}:any) => {
               <Button
                 variant="link"
                 className="p-0 text-blue-600"
-                onClick={() => setIsSignup(true)}
+                onClick={() => { setIsSignup(true); setError(""); }}
               >
                 Sign Up
               </Button>
