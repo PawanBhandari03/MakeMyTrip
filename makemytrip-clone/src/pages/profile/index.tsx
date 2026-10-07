@@ -26,6 +26,7 @@ import { clearUser, setUser } from "@/store";
 import { cancelbooking, editprofile } from "@/api";
 import SignupDialog from "@/components/SignupDialog";
 import LiveStatus from "@/components/LiveStatus";
+import PriceFreezeList from "@/components/PriceFreezeList";
 import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -394,6 +395,7 @@ const Profile = () => {
                 </div>
               )}
             </div>
+            <PriceFreezeList />
           </div>
         </div>
       </div>

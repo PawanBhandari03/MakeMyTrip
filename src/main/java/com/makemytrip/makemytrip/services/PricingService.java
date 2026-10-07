@@ -1,22 +1,27 @@
 package com.makemytrip.makemytrip.services;
 
-import com.makemytrip.makemytrip.models.Flight;
-import com.makemytrip.makemytrip.models.Hotel;
-import com.makemytrip.makemytrip.models.Listing;
-import com.makemytrip.makemytrip.repositories.FlightRepository;
-import com.makemytrip.makemytrip.repositories.HotelRepository;
-import com.makemytrip.makemytrip.repositories.ListingRepository;
+import com.makemytrip.makemytrip.models.PriceFreeze;
+import com.makemytrip.makemytrip.repositories.PriceFreezeRepository;
+import com.makemytrip.makemytrip.services.DynamicPricingService.Adjustment;
+import com.makemytrip.makemytrip.services.DynamicPricingService.Item;
+import com.makemytrip.makemytrip.services.DynamicPricingService.Result;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * Single source of truth for prices. The browser asks for a quote and the booking endpoints
- * recompute the same quote, so the amount charged can never be tampered with from the client.
+ * Single source of truth for what something costs. The price per unit comes from the dynamic pricing engine,
+ * then taxes, fees, a promo code and any price-freeze credit are applied. The browser asks for a quote to show
+ * the price, and the booking endpoints recompute the same quote, so the amount charged can never be tampered with.
  */
 @Service
 public class PricingService {
@@ -25,18 +30,28 @@ public class PricingService {
             "FLIGHT", "HOTEL", "HOMESTAY", "HOLIDAY", "TRAIN", "BUS", "CAB", "FOREX", "INSURANCE");
 
     @Autowired
-    private FlightRepository flightRepository;
+    private DynamicPricingService dynamicPricing;
     @Autowired
-    private HotelRepository hotelRepository;
-    @Autowired
-    private ListingRepository listingRepository;
+    private PriceFreezeRepository freezeRepository;
 
     @Data
     public static class Quote {
         private String category;
         private String itemId;
         private String itemName;
+        /** Price per seat, night or ticket right now (or the frozen price if that is lower). */
         private double unitPrice;
+        /** The fare the admin set, before any adjustment. */
+        private double baseUnitPrice;
+        /** What the engine charges per unit right now, ignoring any freeze. */
+        private double currentUnitPrice;
+        private double previousUnitPrice;
+        private double adjustmentPct;
+        private String trend;
+        private List<Adjustment> adjustments = new ArrayList<>();
+        private List<String> tags = new ArrayList<>();
+        private String travelDate;
+        private String quotedAt;
         private int quantity;
         private int nights;
         private double base;
@@ -47,6 +62,11 @@ public class PricingService {
         private String promoCode;
         private boolean promoApplied;
         private String promoMessage;
+        private boolean frozen;
+        private String freezeId;
+        private double freezeCredit;
+        private double freezeSavings;
+        private String freezeMessage;
     }
 
     @Data
@@ -78,7 +98,26 @@ public class PricingService {
         return PROMOS.stream().filter(p -> p.getCategories().contains(c)).toList();
     }
 
+    public static LocalDate parseDate(String text) {
+        if (text == null || text.length() < 10) return null;
+        try {
+            return LocalDate.parse(text.substring(0, 10));
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
     public Quote quote(String category, String itemId, int quantity, int nights, String promoCode) {
+        return quote(category, itemId, quantity, nights, promoCode, null, null, null);
+    }
+
+    /**
+     * @param travelDate  travel or check-in date (yyyy-MM-dd); flights use their own departure date
+     * @param userId      needed only to apply a price freeze
+     * @param freezeId    a price freeze to apply, if any
+     */
+    public Quote quote(String category, String itemId, int quantity, int nights, String promoCode,
+                       String travelDate, String userId, String freezeId) {
         String cat = category == null ? "" : category.toUpperCase(Locale.ROOT);
         if (!CATEGORIES.contains(cat)) throw new RuntimeException("Unknown category: " + category);
         int maxQty = cat.equals("FOREX") ? 100000 : 20;
@@ -86,37 +125,53 @@ public class PricingService {
         boolean perNight = cat.equals("HOTEL") || cat.equals("HOMESTAY");
         int n = perNight ? Math.max(1, Math.min(nights, 30)) : 1;
 
+        Item item = dynamicPricing.resolve(cat, itemId, parseDate(travelDate))
+                .orElseThrow(() -> new RuntimeException(switch (cat) {
+                    case "FLIGHT" -> "Flight not found";
+                    case "HOTEL" -> "Hotel not found";
+                    default -> "Item not found";
+                }));
+        Result price = dynamicPricing.price(item);
+
         Quote q = new Quote();
         q.setCategory(cat);
         q.setItemId(itemId);
+        q.setItemName(item.getName());
         q.setQuantity(quantity);
         q.setNights(n);
+        q.setBaseUnitPrice(price.getBasePrice());
+        q.setCurrentUnitPrice(price.getPrice());
+        q.setPreviousUnitPrice(price.getPreviousPrice());
+        q.setAdjustmentPct(price.getAdjustmentPct());
+        q.setAdjustments(price.getAdjustments());
+        q.setTags(price.getTags());
+        q.setTrend(price.getTrend());
+        q.setTravelDate(price.getTravelDate());
+        q.setQuotedAt(LocalDateTime.now(DynamicPricingService.ZONE).withNano(0).toString());
 
-        switch (cat) {
-            case "FLIGHT" -> {
-                Flight f = flightRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Flight not found"));
-                q.setItemName(f.getFlightName() + " · " + f.getFrom() + " → " + f.getTo());
-                q.setUnitPrice(f.getPrice());
-            }
-            case "HOTEL" -> {
-                Hotel h = hotelRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Hotel not found"));
-                q.setItemName(h.gethotelName());
-                q.setUnitPrice(h.getPricePerNight());
-            }
-            default -> {
-                Listing l = listingRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
-                if (!cat.equals(l.getCategory())) throw new RuntimeException("Item does not belong to " + cat);
-                q.setItemName(l.getName());
-                q.setUnitPrice(l.getPrice());
+        double unit = price.getPrice();
+        double credit = 0;
+        if (freezeId != null && !freezeId.isBlank()) {
+            PriceFreeze fz = freezeRepository.findById(freezeId).orElse(null);
+            String problem = freezeProblem(fz, userId, cat, itemId, price.getTravelDate(), quantity);
+            if (problem == null) {
+                unit = Math.min(fz.getUnitPrice(), price.getPrice());
+                credit = fz.getFee();
+                q.setFrozen(true);
+                q.setFreezeId(fz.getId());
+                q.setFreezeSavings(Math.max(0, price.getPrice() - unit) * quantity * n);
+            } else {
+                q.setFreezeMessage(problem);
             }
         }
+        q.setUnitPrice(unit);
 
-        double base = q.getUnitPrice() * quantity * n;
+        double base = unit * quantity * n;
         double taxes;
         double fees = 0;
         switch (cat) {
             case "FLIGHT" -> { taxes = base * 0.12; fees = 249; }
-            case "HOTEL", "HOMESTAY" -> taxes = base * (q.getUnitPrice() <= 7500 ? 0.12 : 0.18);
+            case "HOTEL", "HOMESTAY" -> taxes = base * (unit <= 7500 ? 0.12 : 0.18);
             case "TRAIN" -> { taxes = base * 0.05; fees = 35; }
             case "BUS" -> { taxes = base * 0.05; fees = 20; }
             case "FOREX" -> taxes = base * 0.005;
@@ -131,8 +186,34 @@ public class PricingService {
             q.setPromoCode(promoCode.trim().toUpperCase(Locale.ROOT));
             applyPromo(q);
         }
-        q.setTotal(q.getBase() + q.getTaxes() + q.getFees() - q.getDiscount());
+        double beforeCredit = q.getBase() + q.getTaxes() + q.getFees() - q.getDiscount();
+        double applied = Math.min(credit, Math.max(0, beforeCredit));
+        q.setFreezeCredit(applied);
+        q.setTotal(beforeCredit - applied);
         return q;
+    }
+
+    /** Why a freeze cannot be used for this booking, or null when it can. */
+    private String freezeProblem(PriceFreeze fz, String userId, String cat, String itemId, String travelDate, int quantity) {
+        if (fz == null) return "That price freeze could not be found.";
+        if (userId == null || !userId.equals(fz.getUserId())) return "That price freeze belongs to a different account.";
+        if ("USED".equals(fz.getStatus())) return "That price freeze has already been used for a booking.";
+        if (fz.getExpiresAt() != null && LocalDateTime.parse(fz.getExpiresAt()).isBefore(LocalDateTime.now(DynamicPricingService.ZONE))) {
+            return "Your price freeze has expired, so today's price applies.";
+        }
+        if (!cat.equals(fz.getCategory()) || !itemId.equals(fz.getItemId())) return "That price freeze is for a different booking.";
+        if (!cat.equals("FLIGHT") && fz.getTravelDate() != null && !fz.getTravelDate().equals(travelDate)) {
+            return "That price freeze is for " + fz.getTravelDate() + ", not the date you picked.";
+        }
+        if (quantity > fz.getQuantity()) return "Your freeze covers up to " + fz.getQuantity() + " " + (fz.getQuantity() == 1 ? "unit" : "units") + ".";
+        return null;
+    }
+
+    /** Current prices for several items at once, for search results that update live. */
+    public Map<String, Result> prices(String category, List<String> ids, String date) {
+        Map<String, Result> out = new HashMap<>();
+        dynamicPricing.resolveAll(category, ids, parseDate(date)).forEach((id, item) -> out.put(id, dynamicPricing.price(item)));
+        return out;
     }
 
     private void applyPromo(Quote q) {

@@ -64,6 +64,7 @@ public class AdminController {
     public Flight addflight(@RequestBody Flight flight){
         flight.setId(null);
         flight.setDemo(false);
+        if (flight.getCapacity() < flight.getAvailableSeats()) flight.setCapacity(flight.getAvailableSeats());
         return flightRepository.save(flight);
     }
 
@@ -73,6 +74,7 @@ public class AdminController {
             return ResponseEntity.notFound().build();
         }
         updatedFlight.setId(id);
+        if (updatedFlight.getCapacity() < updatedFlight.getAvailableSeats()) updatedFlight.setCapacity(updatedFlight.getAvailableSeats());
         return ResponseEntity.ok(flightRepository.save(updatedFlight));
     }
 
@@ -90,6 +92,7 @@ public class AdminController {
     public Hotel addhotel(@RequestBody Hotel hotel){
         hotel.setId(null);
         hotel.setDemo(false);
+        if (hotel.getCapacity() < hotel.getAvailableRooms()) hotel.setCapacity(hotel.getAvailableRooms());
         return hotelRepository.save(hotel);
     }
 
@@ -99,6 +102,7 @@ public class AdminController {
             return ResponseEntity.notFound().build();
         }
         updatedHotel.setId(id);
+        if (updatedHotel.getCapacity() < updatedHotel.getAvailableRooms()) updatedHotel.setCapacity(updatedHotel.getAvailableRooms());
         return ResponseEntity.ok(hotelRepository.save(updatedHotel));
     }
 
@@ -116,6 +120,7 @@ public class AdminController {
     public Listing addListing(@RequestBody Listing listing){
         listing.setId(null);
         listing.setDemo(false);
+        if (listing.getAvailable() > 0 && listing.getCapacity() < listing.getAvailable()) listing.setCapacity(listing.getAvailable());
         if (listing.getCategory() != null) {
             listing.setCategory(listing.getCategory().toUpperCase(Locale.ROOT));
         }
@@ -128,6 +133,7 @@ public class AdminController {
             return ResponseEntity.notFound().build();
         }
         updated.setId(id);
+        if (updated.getAvailable() > 0 && updated.getCapacity() < updated.getAvailable()) updated.setCapacity(updated.getAvailable());
         if (updated.getCategory() != null) {
             updated.setCategory(updated.getCategory().toUpperCase(Locale.ROOT));
         }

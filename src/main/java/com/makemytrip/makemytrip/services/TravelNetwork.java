@@ -150,6 +150,19 @@ final class TravelNetwork {
         return (minutes / 60) + "h " + String.format("%02d", minutes % 60) + "m";
     }
 
+    /**
+     * How many units there were when fully available. Most items are still fully open, but about one in five has
+     * already sold part of its stock, so demand-based prices are visible in the demo from the start.
+     */
+    static int capacityFor(int available, Random rnd) {
+        if (available <= 0) return 0;
+        if (rnd.nextInt(100) < 20) {
+            double ratioLeft = 0.05 + rnd.nextDouble() * 0.40;
+            return Math.max(available, (int) Math.ceil(available / ratioLeft));
+        }
+        return available;
+    }
+
     private static double roundTo(double value, int step) {
         return Math.max(step, Math.round(value / step) * step);
     }
@@ -161,6 +174,7 @@ final class TravelNetwork {
         l.setPrice(price);
         l.setUnit(unit);
         l.setAvailable(available);
+        l.setCapacity(capacityFor(available, new Random(name.hashCode() * 31L + (long) price)));
         l.setDemo(true);
         return l;
     }
@@ -246,6 +260,7 @@ final class TravelNetwork {
                     f.setArrivalTime(dep.plusMinutes(duration + rnd.nextInt(15)).format(FMT));
                     f.setPrice(roundTo(basePrice * (0.85 + rnd.nextDouble() * 0.35), 10));
                     f.setAvailableSeats(40 + rnd.nextInt(140));
+                    f.setCapacity(capacityFor(f.getAvailableSeats(), rnd));
                     f.setDemo(true);
                     out.add(f);
                 }
@@ -400,7 +415,7 @@ final class TravelNetwork {
                 for (int i = 0; i < 3; i++) {
                     Listing l = base("CAB", types[i].split(" \\(")[0] + " cab", roundTo(450 + roadKm * perKm[i], 50), "per cab", 10 + rnd.nextInt(20));
                     l.setType(types[i]);
-                    l.setProvider("MakeMyTrip Clone Cabs");
+                    l.setProvider("MakeMyTrip Cabs");
                     l.setFrom(from.name);
                     l.setTo(to.name);
                     l.setDuration(durationText(minutes));
@@ -445,6 +460,7 @@ final class TravelNetwork {
                 h.setLocation(c.name);
                 h.setPricePerNight(roundTo((2800 + rnd.nextInt(9000)) * tier, 100));
                 h.setAvailableRooms(20 + rnd.nextInt(70));
+                h.setCapacity(capacityFor(h.getAvailableRooms(), rnd));
                 h.setRating(Math.round((3.7 + rnd.nextDouble() * 1.1) * 10) / 10.0);
                 h.setamenities(amenities[rnd.nextInt(amenities.length)]);
                 h.setDescription("A comfortable stay in " + c.name + " with well-kept rooms, friendly service and easy access to the main sights.");

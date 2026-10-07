@@ -36,9 +36,6 @@ const Navbar = () => {
           <span className="bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-xl font-extrabold tracking-tight text-transparent">
             MakeMyTrip
           </span>
-          <span className="ml-1 rounded-md bg-slate-900 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-            Clone
-          </span>
         </Link>
         <nav className="flex items-center gap-2 sm:gap-4">
           <Link

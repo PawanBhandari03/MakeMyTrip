@@ -35,6 +35,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { formatDate, isoDay, nightsBetween, nowLocalIso } from "@/lib/format";
 import { canonicalCity } from "@/lib/places";
 import Seo from "@/components/Seo";
+import { useLivePrices } from "@/lib/useLivePrices";
 import { AUTHOR, DEFAULT_DESCRIPTION, GITHUB_URL, SITE_NAME, SITE_URL } from "@/lib/site";
 import Link from "next/link";
 
@@ -375,6 +376,18 @@ export default function Home() {
     return sorted;
   }, [tab, a, form.city, form.currency, form.region, flights, hotels, listings, sort, byCategory]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Live prices for what is on screen. Prices depend on the travel date, which is the check-in date for stays.
+  const priceDate = tab === "hotels" || tab === "homestays" ? (a || form).checkIn : tab === "flights" ? undefined : (a || form).date;
+  const liveIds = useMemo(() => (results && tab !== "insurance" ? results.slice(0, 60).map((r: any) => r.id) : []), [results, tab]);
+  const livePrices = useLivePrices(tab === "insurance" ? null : CATEGORY[tab], liveIds, priceDate);
+  const ordered = useMemo(() => {
+    if (!results || (sort !== "price-asc" && sort !== "price-desc")) return results;
+    const price = (x: any) => livePrices[x.id]?.price ?? x.price ?? x.pricePerNight ?? 0;
+    const head = results.slice(0, 60).sort((x: any, y: any) => (sort === "price-asc" ? price(x) - price(y) : price(y) - price(x)));
+    return [...head, ...results.slice(60)];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [results, sort, livePrices]);
+
   // Flights: if nothing on the chosen date, offer the next departures on the same route
   const flightAlternatives = useMemo(() => {
     if (tab !== "flights" || !a || (results && results.length > 0)) return [];
@@ -425,19 +438,19 @@ export default function Home() {
   const renderResult = (item: any) => {
     switch (tab) {
       case "flights":
-        return <FlightCard key={item.id} flight={item} onBook={handleBook} />;
+        return <FlightCard key={item.id} flight={item} onBook={handleBook} live={livePrices[item.id]} />;
       case "hotels":
-        return <StayCard key={item.id} stay={item} kind="hotel" nights={nights} onBook={handleBook} />;
+        return <StayCard key={item.id} stay={item} kind="hotel" nights={nights} onBook={handleBook} live={livePrices[item.id]} />;
       case "homestays":
-        return <StayCard key={item.id} stay={item} kind="homestay" nights={nights} onBook={handleBook} />;
+        return <StayCard key={item.id} stay={item} kind="homestay" nights={nights} onBook={handleBook} live={livePrices[item.id]} />;
       case "holiday":
-        return <HolidayCard key={item.id} pkg={item} onBook={handleBook} />;
+        return <HolidayCard key={item.id} pkg={item} onBook={handleBook} live={livePrices[item.id]} />;
       case "forex":
-        return <ForexCard key={item.id} item={item} amount={(a || form).qty} onBook={handleBook} />;
+        return <ForexCard key={item.id} item={item} amount={(a || form).qty} onBook={handleBook} live={livePrices[item.id]} />;
       case "insurance":
         return <InsuranceCard key={item.id} plan={item} onBook={handleBook} />;
       default:
-        return <RouteCard key={item.id} item={item} onBook={handleBook} />;
+        return <RouteCard key={item.id} item={item} onBook={handleBook} live={livePrices[item.id]} />;
     }
   };
 
@@ -794,7 +807,7 @@ export default function Home() {
           ) : (
             <>
               <div className={gridTabs.includes(tab) ? "grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3" : "space-y-4"}>
-                {results.slice(0, visible).map(renderResult)}
+                {(ordered || results).slice(0, visible).map(renderResult)}
               </div>
               {results.length > visible && (
                 <div className="mt-6 text-center">

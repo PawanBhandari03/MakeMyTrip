@@ -151,9 +151,19 @@ export const getlistingbyid = async (id) => {
   return res.data;
 };
 
-export const getquote = async (category, itemId, quantity, nights, promo) => {
+/** extra: { travelDate, userId, freezeId } */
+export const getquote = async (category, itemId, quantity, nights, promo, extra = {}) => {
   const res = await axios.get(`${BACKEND_URL}/pricing/quote`, {
-    params: { category, itemId, quantity, nights, promo: promo || undefined },
+    params: {
+      category,
+      itemId,
+      quantity,
+      nights,
+      promo: promo || undefined,
+      travelDate: extra.travelDate || undefined,
+      userId: extra.userId || undefined,
+      freezeId: extra.freezeId || undefined,
+    },
   });
   return res.data;
 };
@@ -177,6 +187,8 @@ export const createbooking = async ({
   nights = 1,
   promo,
   travelDate,
+  freezeId,
+  expectedTotal,
 }) => {
   const res = await axios.post(`${BACKEND_URL}/booking`, null, {
     params: {
@@ -187,6 +199,8 @@ export const createbooking = async ({
       nights,
       promo: promo || undefined,
       travelDate: travelDate || undefined,
+      freezeId: freezeId || undefined,
+      expectedTotal: expectedTotal ?? undefined,
     },
   });
   return res.data;
@@ -320,4 +334,81 @@ export const getflightoperations = async () => {
 export const operateflight = async (flightNumber, body) => {
   const res = await axios.post(`${BACKEND_URL}/mock-api/flights/${flightNumber}/events`, body);
   return res.data;
+};
+
+// ---------------------------------------------------------------- dynamic pricing
+
+/** Live prices for the items on screen: { [id]: { price, basePrice, adjustmentPct, trend, tags, adjustments } }. */
+export const getliveprices = async (category, ids, date) => {
+  try {
+    const res = await axios.get(`${BACKEND_URL}/pricing/prices`, {
+      params: { category, ids: ids.join(","), date: date || undefined },
+    });
+    return res.data;
+  } catch (error) {
+    return {};
+  }
+};
+
+/** Price history and forecast; null when the item has a fixed price. */
+export const getpricehistory = async (category, itemId, date, days = 30) => {
+  try {
+    const res = await axios.get(`${BACKEND_URL}/pricing/history`, {
+      params: { category, itemId, date: date || undefined, days },
+    });
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) return null;
+    throw error;
+  }
+};
+
+export const getfreezeoptions = async (category, itemId, quantity, nights, travelDate) => {
+  const res = await axios.get(`${BACKEND_URL}/price-freeze/options`, {
+    params: { category, itemId, quantity, nights, travelDate: travelDate || undefined },
+  });
+  return res.data;
+};
+
+export const createfreeze = async ({ userId, category, itemId, quantity, nights, travelDate, hours }) => {
+  const res = await axios.post(`${BACKEND_URL}/price-freeze`, null, {
+    params: { userId, category, itemId, quantity, nights, travelDate: travelDate || undefined, hours },
+  });
+  return res.data;
+};
+
+export const getfreezes = async (userId) => {
+  const res = await axios.get(`${BACKEND_URL}/price-freeze`, { params: { userId } });
+  return res.data;
+};
+
+/** The customer's live freeze for exactly this booking, or null. */
+export const getactivefreeze = async (userId, category, itemId, travelDate) => {
+  try {
+    const res = await axios.get(`${BACKEND_URL}/price-freeze/active`, {
+      params: { userId, category, itemId, travelDate: travelDate || undefined },
+    });
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) return null;
+    throw error;
+  }
+};
+
+export const getpricingrules = async () => {
+  const res = await axios.get(`${BACKEND_URL}/admin/pricing-rules`);
+  return res.data;
+};
+
+export const savepricingrule = async (rule) => {
+  if (rule.id) {
+    const res = await axios.put(`${BACKEND_URL}/admin/pricing-rules/${rule.id}`, rule);
+    return res.data;
+  }
+  const res = await axios.post(`${BACKEND_URL}/admin/pricing-rules`, rule);
+  return res.data;
+};
+
+export const deletepricingrule = async (id) => {
+  await axios.delete(`${BACKEND_URL}/admin/pricing-rules/${id}`);
 };

@@ -19,8 +19,10 @@ public class BookingController {
                               @RequestParam(defaultValue = "1") int quantity,
                               @RequestParam(defaultValue = "1") int nights,
                               @RequestParam(required = false) String promo,
-                              @RequestParam(required = false) String travelDate){
-        return bookingService.book(userId, category, itemId, quantity, nights, promo, travelDate);
+                              @RequestParam(required = false) String travelDate,
+                              @RequestParam(required = false) String freezeId,
+                              @RequestParam(required = false) Double expectedTotal){
+        return bookingService.book(userId, category, itemId, quantity, nights, promo, travelDate, freezeId, expectedTotal);
     }
 
     @PostMapping("/cancel")

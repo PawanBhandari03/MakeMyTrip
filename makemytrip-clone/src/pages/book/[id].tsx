@@ -20,6 +20,7 @@ import { getlistingbyid } from "@/api";
 import Loader from "@/components/Loader";
 import SmartImage from "@/components/SmartImage";
 import BookingPanel from "@/components/BookingPanel";
+import PriceInsights from "@/components/PriceInsights";
 import Seo from "@/components/Seo";
 import { formatINR, isoDay, nightsBetween } from "@/lib/format";
 
@@ -206,6 +207,14 @@ const BookListingPage = () => {
                 </div>
               )}
             </div>
+            {cat !== "INSURANCE" && (
+              <PriceInsights
+                category={cat}
+                itemId={item.id}
+                date={isForex ? undefined : travelDate}
+                title={isForex ? "Exchange rate history" : "Price history & forecast"}
+              />
+            )}
           </div>
 
           <div className="lg:col-span-1">

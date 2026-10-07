@@ -31,6 +31,8 @@ public class Listing {
     private String unit;
     /** Units left. A negative value means unlimited (forex, insurance). */
     private int available;
+    /** Units when fully available; demand pricing compares units left with this. 0 means unknown. */
+    private int capacity;
     private String departureTime;
     private String arrivalTime;
     private String duration;

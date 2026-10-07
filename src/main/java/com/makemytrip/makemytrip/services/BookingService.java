@@ -43,14 +43,34 @@ public class BookingService {
     private MongoTemplate mongoTemplate;
     @Autowired
     private FlightTrackingService flightTrackingService;
+    @Autowired
+    private PriceFreezeService priceFreezeService;
 
     private final SecureRandom random = new SecureRandom();
 
-    /** Books any category. The price is always recomputed on the server. */
     public Booking book(String userId, String category, String itemId, int quantity, int nights, String promo, String travelDate) {
+        return book(userId, category, itemId, quantity, nights, promo, travelDate, null, null);
+    }
+
+    /**
+     * Books any category. The price is always recomputed on the server.
+     *
+     * @param freezeId      a price freeze to use; the booking is refused (with the reason) if it cannot be applied
+     * @param expectedTotal the total the customer saw; if the price has moved since, nothing is booked and the
+     *                      customer is asked to confirm the new total
+     */
+    public Booking book(String userId, String category, String itemId, int quantity, int nights, String promo, String travelDate,
+                        String freezeId, Double expectedTotal) {
         Users user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        Quote quote = pricingService.quote(category, itemId, quantity, nights, promo);
+        Quote quote = pricingService.quote(category, itemId, quantity, nights, promo, travelDate, userId, freezeId);
         String cat = quote.getCategory();
+
+        if (freezeId != null && !freezeId.isBlank() && !quote.isFrozen()) {
+            throw new RuntimeException(quote.getFreezeMessage() == null ? "That price freeze cannot be used for this booking." : quote.getFreezeMessage());
+        }
+        if (expectedTotal != null && Math.abs(quote.getTotal() - expectedTotal) > 1) {
+            throw new PriceChangedException(expectedTotal, quote.getTotal());
+        }
 
         String title = quote.getItemName();
         String when = travelDate;
@@ -83,12 +103,20 @@ public class BookingService {
         booking.setNights(quote.getNights());
         booking.setDiscount(quote.getDiscount());
         booking.setTotalPrice(quote.getTotal());
+        booking.setUnitPrice(quote.getUnitPrice());
+        booking.setBasePrice(quote.getBaseUnitPrice());
+        booking.setAdjustmentPct(quote.getAdjustmentPct());
+        booking.setPriceFrozen(quote.isFrozen());
+        booking.setFreezeCredit(quote.getFreezeCredit());
         try {
             user.getBookings().add(booking);
             userRepository.save(user);
         } catch (RuntimeException e) {
             releaseStock(cat, itemId, quantity);
             throw e;
+        }
+        if (quote.isFrozen() && freezeId != null) {
+            priceFreezeService.markUsed(freezeId, booking.getReference());
         }
         if ("FLIGHT".equals(cat)) {
             // follow the flight automatically, so delay and gate notifications reach the traveller

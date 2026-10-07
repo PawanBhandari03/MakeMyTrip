@@ -9,7 +9,7 @@ export default function Document() {
         <link rel="alternate icon" href="/favicon.ico" />
         <meta name="theme-color" content="#dc2626" />
         <meta name="keywords" content={KEYWORDS} />
-        <meta name="application-name" content="MakeMyTrip Clone" />
+        <meta name="application-name" content="MakeMyTrip" />
       </Head>
       <body className="antialiased">
         <Main />

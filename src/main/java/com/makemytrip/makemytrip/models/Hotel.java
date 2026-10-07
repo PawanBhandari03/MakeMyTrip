@@ -21,6 +21,9 @@ public class Hotel {
     private String description;
     @Getter @Setter
     private boolean demo;
+    /** Rooms when fully available; demand pricing compares rooms left with this. */
+    @Getter @Setter
+    private int capacity;
     // Getters and Setters
     public String getId() {
         return _id;

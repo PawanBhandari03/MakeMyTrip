@@ -17,6 +17,7 @@ import { getflightbyid, gethotel } from "@/api";
 import Loader from "@/components/Loader";
 import SmartImage from "@/components/SmartImage";
 import BookingPanel from "@/components/BookingPanel";
+import PriceInsights from "@/components/PriceInsights";
 import Seo from "@/components/Seo";
 import { durationBetween, formatDateTime, formatINR, formatTime, formatDate } from "@/lib/format";
 
@@ -181,6 +182,8 @@ const BookFlightPage = () => {
                 </div>
               </div>
             </div>
+
+            <PriceInsights category="FLIGHT" itemId={flight.id} title="Price history & forecast" />
 
             {/* Cancellation Policy */}
             <div className="rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-blue-900/5">

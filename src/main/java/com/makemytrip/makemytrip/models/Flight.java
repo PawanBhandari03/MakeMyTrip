@@ -18,6 +18,9 @@ public class Flight {
     /** true for rows created by the dummy-data loader; only those are removed on reload. */
     @Getter @Setter
     private boolean demo;
+    /** Seats when the flight was fully available; demand pricing compares seats left with this. */
+    @Getter @Setter
+    private int capacity;
 
     // Getters and Setters
 

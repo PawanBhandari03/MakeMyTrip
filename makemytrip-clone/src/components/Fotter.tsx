@@ -23,22 +23,22 @@ const Footer = () => {
         {showAbout && (
           <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
             <div>
-              <h3 className="mb-2 text-sm font-bold text-white">Why MakeMyTrip Clone?</h3>
+              <h3 className="mb-2 text-sm font-bold text-white">Why MakeMyTrip?</h3>
               <p className="leading-relaxed">
-                MakeMyTrip Clone is a full-stack learning project that brings flights, hotels, trains, buses, cabs,
+                MakeMyTrip is a full-stack learning project that brings flights, hotels, trains, buses, cabs,
                 holidays, forex and insurance together in one place, with real search, booking, cancellation and live
                 status, all backed by a Spring Boot and MongoDB API.
               </p>
             </div>
             <div>
-              <h3 className="mb-2 text-sm font-bold text-white">Booking Flights with MakeMyTrip Clone</h3>
+              <h3 className="mb-2 text-sm font-bold text-white">Booking Flights with MakeMyTrip</h3>
               <p className="leading-relaxed">
                 Search flights between more than 60 cities in India and abroad, compare fares by time and price, apply
                 promo codes and see the full tax breakdown before you book. Every booking can be managed from My Trips.
               </p>
             </div>
             <div>
-              <h3 className="mb-2 text-sm font-bold text-white">Domestic Flights with MakeMyTrip Clone</h3>
+              <h3 className="mb-2 text-sm font-bold text-white">Domestic Flights with MakeMyTrip</h3>
               <p className="leading-relaxed">
                 Explore hundreds of domestic and international routes on the Routes page, then follow your flight, train
                 or bus with live status once it is booked.
@@ -80,6 +80,7 @@ const Footer = () => {
               <FooterLink href="/info/privacy">Privacy Policy</FooterLink>
               <FooterLink href="/info/terms">Terms &amp; Conditions</FooterLink>
               <FooterLink href="/info/agreement">User Agreement</FooterLink>
+              <FooterLink href="/info/pricing">How Pricing Works</FooterLink>
             </ul>
           </div>
         </div>
@@ -99,7 +100,7 @@ const Footer = () => {
           <p className="text-center md:text-right">
             © {new Date().getFullYear()} {SITE_NAME} · Built by {AUTHOR}
             <br />
-            An educational project. Not affiliated with MakeMyTrip. All flights, hotels and prices are demo data.
+            A learning project. All flights, hotels and prices are demo data and no real payments are taken.
           </p>
         </div>
       </div>

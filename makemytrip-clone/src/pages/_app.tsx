@@ -53,7 +53,7 @@ export default function App(props: AppProps) {
   return (
     <Provider store={store}>
       <Head>
-        <title key="title">MakeMyTrip Clone</title>
+        <title key="title">MakeMyTrip</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <Myapp {...props} />

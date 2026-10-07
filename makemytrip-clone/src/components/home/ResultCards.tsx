@@ -3,6 +3,8 @@ import { ArrowRight, Clock, MapPin, Plane, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SmartImage from "@/components/SmartImage";
 import { durationBetween, formatDate, formatINR, formatTime } from "@/lib/format";
+import PriceTag from "@/components/PriceTag";
+import type { LivePrice } from "@/lib/useLivePrices";
 
 type OnBook = (item: any) => void;
 
@@ -44,7 +46,7 @@ const Availability = ({ left }: { left: number }) =>
 const cardClass =
   "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg";
 
-export const FlightCard = ({ flight, onBook }: { flight: any; onBook: OnBook }) => {
+export const FlightCard = ({ flight, onBook, live }: { flight: any; onBook: OnBook; live?: LivePrice }) => {
   const flightNo = flight.flightName.split(" ").slice(-1)[0];
   const airline = flight.flightName.replace(flightNo, "").trim() || flight.flightName;
   return (
@@ -79,7 +81,7 @@ export const FlightCard = ({ flight, onBook }: { flight: any; onBook: OnBook }) 
       </div>
       <div className="flex items-center justify-between gap-4 border-t pt-3 md:w-56 md:flex-col md:items-end md:border-l md:border-t-0 md:pl-5 md:pt-0">
         <div className="md:text-right">
-          <div className="text-2xl font-extrabold">{formatINR(flight.price)}</div>
+          <PriceTag basePrice={flight.price} live={live} unitLabel="per seat" align="right" />
           <Availability left={flight.availableSeats} />
         </div>
         <Button
@@ -100,14 +102,17 @@ export const StayCard = ({
   kind,
   nights,
   onBook,
+  live,
 }: {
   stay: any;
   kind: "hotel" | "homestay";
   nights: number;
   onBook: OnBook;
+  live?: LivePrice;
 }) => {
   const name = kind === "hotel" ? stay.hotelName : stay.name;
-  const price = kind === "hotel" ? stay.pricePerNight : stay.price;
+  const basePrice = kind === "hotel" ? stay.pricePerNight : stay.price;
+  const price = live ? live.price : basePrice;
   const left = kind === "hotel" ? stay.availableRooms : stay.available;
   const amenities = kind === "hotel" ? stay.amenities : stay.features;
   return (
@@ -132,7 +137,7 @@ export const StayCard = ({
         </div>
         <div className="flex items-end justify-between gap-4">
           <div>
-            <div className="text-2xl font-extrabold">{formatINR(price)}</div>
+            <PriceTag basePrice={basePrice} live={live} unitLabel="per night" />
             <div className="text-xs text-slate-500">
               per night{nights > 1 ? ` • ${nights} nights = ${formatINR(price * nights)}` : ""}
             </div>
@@ -147,7 +152,7 @@ export const StayCard = ({
   );
 };
 
-export const HolidayCard = ({ pkg, onBook }: { pkg: any; onBook: OnBook }) => (
+export const HolidayCard = ({ pkg, onBook, live }: { pkg: any; onBook: OnBook; live?: LivePrice }) => (
   <div className={`${cardClass} flex flex-col overflow-hidden p-0`}>
     <div className="relative">
       <SmartImage src={pkg.imageUrl} alt={pkg.name} className="h-48 w-full object-cover" />
@@ -168,7 +173,7 @@ export const HolidayCard = ({ pkg, onBook }: { pkg: any; onBook: OnBook }) => (
       <Chips text={pkg.features} max={3} />
       <div className="mt-auto flex items-end justify-between pt-2">
         <div>
-          <div className="text-2xl font-extrabold">{formatINR(pkg.price)}</div>
+          <PriceTag basePrice={pkg.price} live={live} unitLabel="per person" />
           <div className="text-xs text-slate-500">per person</div>
         </div>
         <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => onBook(pkg)}>
@@ -180,7 +185,7 @@ export const HolidayCard = ({ pkg, onBook }: { pkg: any; onBook: OnBook }) => (
 );
 
 /** Trains, buses and cabs share one layout: a route with times, a class/type and a price. */
-export const RouteCard = ({ item, onBook }: { item: any; onBook: OnBook }) => (
+export const RouteCard = ({ item, onBook, live }: { item: any; onBook: OnBook; live?: LivePrice }) => (
   <div className={`${cardClass} flex flex-col gap-4 md:flex-row md:items-center`}>
     <div className="md:w-60">
       <h3 className="font-bold">{item.name}</h3>
@@ -216,7 +221,7 @@ export const RouteCard = ({ item, onBook }: { item: any; onBook: OnBook }) => (
     </div>
     <div className="flex items-center justify-between gap-4 border-t pt-3 md:w-56 md:flex-col md:items-end md:border-l md:border-t-0 md:pl-5 md:pt-0">
       <div className="md:text-right">
-        <div className="text-2xl font-extrabold">{formatINR(item.price)}</div>
+        <PriceTag basePrice={item.price} live={live} unitLabel={item.unit} align="right" />
         <div className="text-xs text-slate-500">{item.unit}</div>
         <Availability left={item.available} />
       </div>
@@ -227,7 +232,9 @@ export const RouteCard = ({ item, onBook }: { item: any; onBook: OnBook }) => (
   </div>
 );
 
-export const ForexCard = ({ item, amount, onBook }: { item: any; amount: number; onBook: OnBook }) => (
+export const ForexCard = ({ item, amount, onBook, live }: { item: any; amount: number; onBook: OnBook; live?: LivePrice }) => {
+  const rate = live ? live.price : item.price;
+  return (
   <div className={`${cardClass} flex items-center justify-between gap-4`}>
     <div className="flex items-center gap-4">
       <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-lg font-extrabold text-emerald-700">
@@ -237,7 +244,7 @@ export const ForexCard = ({ item, amount, onBook }: { item: any; amount: number;
         <h3 className="font-bold">{item.name}</h3>
         <div className="text-sm text-slate-500">{item.description}</div>
         <div className="mt-1 text-sm font-semibold text-slate-800">
-          1 {item.type} = {formatINR(item.price)}
+          1 {item.type} = {formatINR(rate)}
         </div>
       </div>
     </div>
@@ -245,13 +252,14 @@ export const ForexCard = ({ item, amount, onBook }: { item: any; amount: number;
       <div className="text-xs text-slate-500">
         {amount.toLocaleString("en-IN")} {item.type} costs
       </div>
-      <div className="text-2xl font-extrabold">{formatINR(Math.round(item.price * amount))}</div>
+      <div className="text-2xl font-extrabold">{formatINR(Math.round(rate * amount))}</div>
       <Button className="mt-2 bg-blue-600 hover:bg-blue-700" onClick={() => onBook(item)}>
         Book Now
       </Button>
     </div>
   </div>
 );
+};
 
 export const InsuranceCard = ({ plan, onBook }: { plan: any; onBook: OnBook }) => (
   <div className={`${cardClass} flex flex-col gap-3`}>

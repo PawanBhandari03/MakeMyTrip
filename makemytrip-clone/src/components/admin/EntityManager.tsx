@@ -7,7 +7,7 @@ import { errorMessage } from "@/lib/format";
 export type Field = {
   key: string;
   label: string;
-  type: "text" | "number" | "datetime-local" | "select" | "textarea";
+  type: "text" | "number" | "datetime-local" | "date" | "select" | "textarea" | "boolean";
   options?: string[];
   required?: boolean;
   placeholder?: string;
@@ -223,7 +223,17 @@ const EntityManager = ({
               {fields.map((f) => (
                 <div key={f.key} className={f.full || f.type === "textarea" ? "sm:col-span-2" : ""}>
                   <label className="mb-1 block text-sm font-medium text-slate-700">{f.label}</label>
-                  {f.type === "select" ? (
+                  {f.type === "boolean" ? (
+                    <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={!!editing[f.key]}
+                        onChange={(e) => setEditing({ ...editing, [f.key]: e.target.checked })}
+                        className="h-4 w-4"
+                      />
+                      <span>{editing[f.key] ? "Yes" : "No"}</span>
+                    </label>
+                  ) : f.type === "select" ? (
                     <select
                       className={inputClass}
                       value={editing[f.key] ?? ""}

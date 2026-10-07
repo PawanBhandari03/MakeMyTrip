@@ -8,11 +8,11 @@ type Page = { title: string; intro: string; sections: { heading: string; body: s
 const PAGES: Record<string, Page> = {
   about: {
     title: "About Us",
-    intro: "MakeMyTrip Clone is a learning project that shows how a complete travel booking site works.",
+    intro: "MakeMyTrip is a learning project that shows how a complete travel booking site works.",
     sections: [
-      { heading: "Who we are", body: "MakeMyTrip Clone was built by Pawan Bhandari as an internship project. It brings flights, hotels, homestays, trains, buses, cabs, holidays, forex and insurance together in one place, using a Spring Boot API, MongoDB and a Next.js front end." },
+      { heading: "Who we are", body: "MakeMyTrip was built by Pawan Bhandari as an internship project. It brings flights, hotels, homestays, trains, buses, cabs, holidays, forex and insurance together in one place, using a Spring Boot API, MongoDB and a Next.js front end." },
       { heading: "What we believe", body: "Travel should be simple, transparent and affordable. Every fare you see includes a clear breakdown of taxes and fees, and every booking can be managed from a single account." },
-      { heading: "This project", body: "This site is an educational clone and is not affiliated with MakeMyTrip. All flights, hotels, trains, buses and prices are demo data, and no real payments are taken." },
+      { heading: "This project", body: "This site is a learning project. All flights, hotels, trains, buses and prices are demo data, and no real payments are taken." },
     ],
   },
   investors: {
@@ -39,6 +39,20 @@ const PAGES: Record<string, Page> = {
       { heading: "Flexible changes", body: "Many fares and stays allow free date changes or cancellation. Open My Trips to manage a booking." },
     ],
   },
+  pricing: {
+    title: "How Pricing Works",
+    intro: "Every price is built from a base fare plus a short, visible list of adjustments. Nothing is hidden.",
+    sections: [
+      { heading: "What moves a price", body: "Season (festivals, long weekends and off-season sales), weekend travel, how close the trip is, time of day, how many seats or rooms are left, and a small market movement that refreshes every 15 minutes. On any booking page, press \"Why this price?\" to see every adjustment and the reason for it." },
+      { heading: "Limits you can rely on", body: "A price never goes more than 60% above or 15% below the base fare. If the factors add up to more than that, a line called Price protection shows the cap." },
+      { heading: "Peak periods", body: "Festival and holiday periods add about 10% to 20%. For example, Diwali week is +20%. Off-season sales, such as the monsoon saver for hotels, take about 10% off." },
+      { heading: "Booking early and last minute", body: "Booking 45 or more days ahead is cheaper. Prices climb as the trip gets closer, and are highest in the last 24 hours before departure." },
+      { heading: "Price history and forecast", body: "Each booking page shows how the price has moved and where it is heading if demand stays the same, with a note on whether to book now or wait. Earlier history is estimated from past demand patterns and is marked as such; later points are recorded live." },
+      { heading: "Price freeze", body: "Lock today's price for 6, 24 or 48 hours for a small fee (about 1%, 2% or 3.5% of the fare). If the price goes up you still pay the frozen price; if it goes down you pay the lower one. The fee is credited against your booking if you book before the freeze ends, and lost if you do not." },
+      { heading: "If the price changes while you book", body: "Prices update live. If the price moves between seeing it and pressing Book, nothing is charged: you are shown the new total and asked to confirm." },
+      { heading: "Demo notice", body: "All prices are demo data and no real payments are taken." },
+    ],
+  },
   privacy: {
     title: "Privacy Policy",
     intro: "How your information is handled.",
@@ -59,7 +73,7 @@ const PAGES: Record<string, Page> = {
   },
   agreement: {
     title: "User Agreement",
-    intro: "Your agreement with MakeMyTrip Clone.",
+    intro: "Your agreement with MakeMyTrip.",
     sections: [
       { heading: "Your account", body: "You are responsible for keeping your password safe and for all activity under your account." },
       { heading: "Acceptable use", body: "Do not attempt to disrupt the service or access data that belongs to other users." },

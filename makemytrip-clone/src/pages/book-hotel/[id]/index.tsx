@@ -20,6 +20,7 @@ import { gethotelbyid } from "@/api";
 import Loader from "@/components/Loader";
 import SmartImage from "@/components/SmartImage";
 import BookingPanel from "@/components/BookingPanel";
+import PriceInsights from "@/components/PriceInsights";
 import Seo from "@/components/Seo";
 import { formatINR, isoDay, nightsBetween } from "@/lib/format";
 
@@ -162,6 +163,10 @@ const BookHotelPage = () => {
             <p className="mb-8 leading-relaxed text-slate-600">
               {hotel.description || `${hotel.hotelName} offers comfortable rooms and warm hospitality in ${hotel.location}.`}
             </p>
+
+            <div className="mb-8">
+              <PriceInsights category="HOTEL" itemId={hotel.id} date={stayDate} title="Price history & forecast for your stay" />
+            </div>
 
             {/* Amenities */}
             <div className="mb-8">

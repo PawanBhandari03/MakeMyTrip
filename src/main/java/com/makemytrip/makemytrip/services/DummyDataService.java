@@ -3,6 +3,10 @@ package com.makemytrip.makemytrip.services;
 import com.makemytrip.makemytrip.models.Flight;
 import com.makemytrip.makemytrip.models.Hotel;
 import com.makemytrip.makemytrip.models.Listing;
+import com.makemytrip.makemytrip.models.PricingRule;
+import com.makemytrip.makemytrip.repositories.PriceSnapshotRepository;
+import com.makemytrip.makemytrip.repositories.PriceWatchRepository;
+import com.makemytrip.makemytrip.repositories.PricingRuleRepository;
 import com.makemytrip.makemytrip.repositories.FlightRepository;
 import com.makemytrip.makemytrip.repositories.HotelRepository;
 import com.makemytrip.makemytrip.repositories.ListingRepository;
@@ -33,6 +37,14 @@ public class DummyDataService {
     private HotelRepository hotelRepository;
     @Autowired
     private ListingRepository listingRepository;
+    @Autowired
+    private PricingRuleRepository pricingRuleRepository;
+    @Autowired
+    private PriceSnapshotRepository priceSnapshotRepository;
+    @Autowired
+    private PriceWatchRepository priceWatchRepository;
+    @Autowired
+    private DynamicPricingService dynamicPricingService;
 
     private static String img(String id) {
         return "https://images.unsplash.com/photo-" + id + "?auto=format&fit=crop&w=800&q=80";
@@ -44,6 +56,10 @@ public class DummyDataService {
      */
     public Map<String, Object> load(boolean reset) {
         Map<String, Object> result = new LinkedHashMap<>();
+        if (reset) {
+            priceSnapshotRepository.deleteAll();
+            priceWatchRepository.deleteAll();
+        }
 
         boolean flightsOutdated = true;
         Flight latest = flightRepository.findFirstByDemoTrueOrderByDepartureTimeDesc();
@@ -62,7 +78,47 @@ public class DummyDataService {
             listingRepository.deleteByDemoTrue();
             result.put("listings", listingRepository.saveAll(buildListings()).size());
         }
+        if (reset || pricingRuleRepository.countByDemoTrue() == 0) {
+            pricingRuleRepository.deleteByDemoTrue();
+            result.put("pricingRules", pricingRuleRepository.saveAll(buildPricingRules()).size());
+            dynamicPricingService.invalidateRules();
+        }
         return result;
+    }
+
+    // ------------------------------------------------------------------ pricing rules
+
+    private List<PricingRule> buildPricingRules() {
+        // name | category | start | end | percent | description
+        String[] rows = {
+                "Durga Puja & Dussehra|ALL|2026-10-17|2026-10-21|20|Festival rush: the busiest travel days of the season.",
+                "Diwali week|ALL|2026-11-05|2026-11-11|20|Everyone travels home for Diwali, so fares and stays are at their peak.",
+                "Christmas & New Year|ALL|2026-12-22|2027-01-03|20|Year-end holidays and winter breaks.",
+                "Republic Day long weekend|ALL|2027-01-23|2027-01-26|10|A popular long weekend.",
+                "Holi|ALL|2027-03-19|2027-03-23|12|Festival of colours travel rush.",
+                "Summer vacation|ALL|2027-05-01|2027-06-15|10|School holidays make family travel busier.",
+                "Monsoon saver|HOTEL|2027-07-01|2027-09-10|-10|Off-season: hotels offer lower rates during the monsoon.",
+                "Monsoon saver|HOMESTAY|2027-07-01|2027-09-10|-10|Off-season: homestays offer lower rates during the monsoon.",
+                "Monsoon saver|HOLIDAY|2027-07-01|2027-09-10|-10|Off-season: holiday packages are cheaper during the monsoon.",
+                "Independence Day long weekend|ALL|2027-08-13|2027-08-16|10|A popular long weekend.",
+                "Dussehra|ALL|2027-10-07|2027-10-11|20|Festival rush: the busiest travel days of the season.",
+                "Diwali week|ALL|2027-10-28|2027-11-02|20|Everyone travels home for Diwali, so fares and stays are at their peak.",
+        };
+        List<PricingRule> out = new ArrayList<>();
+        for (String row : rows) {
+            String[] c = row.split("\\|");
+            PricingRule r = new PricingRule();
+            r.setName(c[0]);
+            r.setCategory(c[1]);
+            r.setStartDate(c[2]);
+            r.setEndDate(c[3]);
+            r.setPercent(Double.parseDouble(c[4]));
+            r.setDescription(c[5]);
+            r.setActive(true);
+            r.setDemo(true);
+            out.add(r);
+        }
+        return out;
     }
 
     // ------------------------------------------------------------------ flights
@@ -131,6 +187,7 @@ public class DummyDataService {
             h.setLocation(c[1]);
             h.setPricePerNight(Double.parseDouble(c[2]));
             h.setAvailableRooms(Integer.parseInt(c[3]));
+            h.setCapacity(TravelNetwork.capacityFor(h.getAvailableRooms(), new Random(c[0].hashCode())));
             h.setRating(Double.parseDouble(c[4]));
             h.setamenities(c[5]);
             h.setDescription(c[6]);
@@ -166,6 +223,7 @@ public class DummyDataService {
         l.setPrice(price);
         l.setUnit(unit);
         l.setAvailable(available);
+        l.setCapacity(TravelNetwork.capacityFor(available, new Random(name.hashCode() * 31L + (long) price)));
         l.setDemo(true);
         return l;
     }
@@ -224,7 +282,7 @@ public class DummyDataService {
             l.setDescription(c[7]);
             l.setImageUrl(img(c[8]));
             l.setType("Package");
-            l.setProvider("MakeMyTrip Clone Holidays");
+            l.setProvider("MakeMyTrip Holidays");
             out.add(l);
         }
     }
@@ -261,7 +319,7 @@ public class DummyDataService {
             l.setDescription(c[7]);
             l.setImageUrl(img(c[8]));
             l.setType("Package");
-            l.setProvider("MakeMyTrip Clone Holidays");
+            l.setProvider("MakeMyTrip Holidays");
             out.add(l);
         }
     }
@@ -287,7 +345,7 @@ public class DummyDataService {
             Listing l = listing("FOREX", c[0] + " (" + c[1] + ")", Double.parseDouble(c[2]), "per 1 " + c[1], -1);
             l.setType(c[1]);
             l.setLocation(c[1]);
-            l.setProvider("MakeMyTrip Clone Forex");
+            l.setProvider("MakeMyTrip Forex");
             l.setDescription(c[3]);
             l.setFeatures("Cash, Forex card, Doorstep delivery");
             out.add(l);
@@ -313,7 +371,7 @@ public class DummyDataService {
             Listing l = listing("FOREX", c[0] + " (" + c[1] + ")", Double.parseDouble(c[2]), "per 1 " + c[1], -1);
             l.setType(c[1]);
             l.setLocation(c[1]);
-            l.setProvider("MakeMyTrip Clone Forex");
+            l.setProvider("MakeMyTrip Forex");
             l.setDescription(c[3]);
             l.setFeatures("Cash, Forex card, Doorstep delivery");
             out.add(l);
@@ -337,7 +395,7 @@ public class DummyDataService {
             Listing l = listing("INSURANCE", c[0], Double.parseDouble(c[2]), "per traveller", -1);
             l.setLocation(c[1]);
             l.setType(c[3] + " cover");
-            l.setProvider("MakeMyTrip Clone Insurance");
+            l.setProvider("MakeMyTrip Insurance");
             l.setFeatures(c[4]);
             l.setDescription(c[5]);
             l.setRating(4.2);

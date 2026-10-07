@@ -67,5 +67,13 @@ public class Users {
         private int nights;
         private double discount;
         private double totalPrice;
+        /** Price per seat, night or ticket that was charged, and the base fare it started from. */
+        private double unitPrice;
+        private double basePrice;
+        /** Net dynamic-pricing adjustment applied to the base fare, in percent. */
+        private double adjustmentPct;
+        /** True when a price freeze set the price; {@code freezeCredit} is the freeze fee taken off the total. */
+        private boolean priceFrozen;
+        private double freezeCredit;
     }
 }

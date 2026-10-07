@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   Building2,
   Database,
+  Gauge,
   IndianRupee,
   LayoutDashboard,
   Layers,
@@ -20,6 +21,7 @@ import SignupDialog from "@/components/SignupDialog";
 import Seo from "@/components/Seo";
 import EntityManager, { Column, Field } from "@/components/admin/EntityManager";
 import FlightOps from "@/components/admin/FlightOps";
+import PricingAdmin from "@/components/admin/PricingAdmin";
 import {
   addflight,
   addhotel,
@@ -39,7 +41,7 @@ import {
 } from "@/api";
 import { errorMessage, formatDateTime, formatINR } from "@/lib/format";
 
-type Tab = "dashboard" | "flights" | "flightops" | "hotels" | "services" | "users";
+type Tab = "dashboard" | "flights" | "flightops" | "hotels" | "services" | "pricing" | "users";
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
@@ -47,6 +49,7 @@ const NAV: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "flightops", label: "Flight Ops", icon: <Radio className="h-4 w-4" /> },
   { id: "hotels", label: "Hotels", icon: <Building2 className="h-4 w-4" /> },
   { id: "services", label: "Services", icon: <Layers className="h-4 w-4" /> },
+  { id: "pricing", label: "Pricing", icon: <Gauge className="h-4 w-4" /> },
   { id: "users", label: "Users", icon: <UsersIcon className="h-4 w-4" /> },
 ];
 
@@ -344,6 +347,7 @@ const flightFields: Field[] = [
   { key: "departureTime", label: "Departure time", type: "datetime-local", required: true },
   { key: "arrivalTime", label: "Arrival time", type: "datetime-local", required: true },
   { key: "availableSeats", label: "Available seats", type: "number", required: true },
+  { key: "capacity", label: "Capacity (seats when full)", type: "number", help: "Prices rise as seats run out, measured against this. Leave 0 to use the seats above." },
 ];
 
 const flightColumns: Column[] = [
@@ -359,6 +363,7 @@ const hotelFields: Field[] = [
   { key: "location", label: "Location (city)", type: "text", required: true },
   { key: "pricePerNight", label: "Price per night (₹)", type: "number", required: true },
   { key: "availableRooms", label: "Available rooms", type: "number", required: true },
+  { key: "capacity", label: "Capacity (rooms when full)", type: "number", help: "Prices rise as rooms run out, measured against this. Leave 0 to use the rooms above." },
   { key: "rating", label: "Rating (0-5)", type: "number" },
   { key: "imageUrl", label: "Image URL", type: "text", placeholder: "https://..." },
   { key: "amenities", label: "Amenities", type: "textarea", required: true, help: "Separate with commas, e.g. Wi-Fi, Pool, Spa" },
@@ -381,6 +386,7 @@ const listingFields: Field[] = [
   { key: "price", label: "Price (₹)", type: "number", required: true },
   { key: "unit", label: "Price unit", type: "text", placeholder: "per night, per person..." },
   { key: "available", label: "Available units", type: "number", required: true, help: "Use -1 for unlimited (forex, insurance)." },
+  { key: "capacity", label: "Capacity (units when full)", type: "number", help: "Prices rise as units run out, measured against this. Leave 0 to use the units above." },
   { key: "from", label: "From", type: "text", help: "Trains, buses and cabs" },
   { key: "to", label: "To", type: "text", help: "Trains, buses and cabs" },
   { key: "location", label: "Location / region", type: "text", help: "City for homestays, destination for holidays, Domestic/International for insurance" },
@@ -537,6 +543,7 @@ export default function AdminDashboard() {
             />
           )}
           {tab === "services" && <ServicesManager />}
+          {tab === "pricing" && <PricingAdmin />}
           {tab === "users" && <UsersTab currentId={user.id} />}
         </div>
       </div>
