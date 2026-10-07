@@ -163,6 +163,15 @@ final class TravelNetwork {
         return available;
     }
 
+    /**
+     * A rating between 3.5 and 5.0 with one decimal. It depends only on the name, so an item keeps the same
+     * rating every time the demo data is loaded, while different items get clearly different ratings.
+     */
+    static double ratingFor(String name) {
+        double r = 3.5 + new Random(name == null ? 0 : name.hashCode() * 2654435761L).nextDouble() * 1.5;
+        return Math.round(r * 10) / 10.0;
+    }
+
     private static double roundTo(double value, int step) {
         return Math.max(step, Math.round(value / step) * step);
     }
@@ -340,7 +349,7 @@ final class TravelNetwork {
                         l.setDuration(durationText(minutes));
                         l.setProvider("Indian Railways");
                         l.setFeatures("Runs daily");
-                        l.setRating(Math.round((3.7 + rnd.nextDouble() * 1.1) * 10) / 10.0);
+                        l.setRating(ratingFor(l.getName() + l.getType() + l.getFrom() + l.getTo()));
                         out.add(l);
                     }
                 }
@@ -384,7 +393,7 @@ final class TravelNetwork {
                     l.setArrivalTime(arrivalClock(dep, minutes));
                     l.setDuration(durationText(minutes));
                     l.setFeatures("Live tracking, Charging point, Water bottle");
-                    l.setRating(Math.round((3.7 + rnd.nextDouble() * 1.1) * 10) / 10.0);
+                    l.setRating(ratingFor(l.getName() + l.getType() + l.getFrom() + l.getTo()));
                     out.add(l);
                 }
             }
@@ -420,7 +429,7 @@ final class TravelNetwork {
                     l.setTo(to.name);
                     l.setDuration(durationText(minutes));
                     l.setFeatures(seats[i] + ", AC, Driver included, Fuel included, Free cancellation");
-                    l.setRating(4.0 + i * 0.2);
+                    l.setRating(ratingFor(l.getName() + l.getFrom() + l.getTo()));
                     out.add(l);
                 }
             }
@@ -461,7 +470,7 @@ final class TravelNetwork {
                 h.setPricePerNight(roundTo((2800 + rnd.nextInt(9000)) * tier, 100));
                 h.setAvailableRooms(20 + rnd.nextInt(70));
                 h.setCapacity(capacityFor(h.getAvailableRooms(), rnd));
-                h.setRating(Math.round((3.7 + rnd.nextDouble() * 1.1) * 10) / 10.0);
+                h.setRating(ratingFor(h.gethotelName() + h.getLocation()));
                 h.setamenities(amenities[rnd.nextInt(amenities.length)]);
                 h.setDescription("A comfortable stay in " + c.name + " with well-kept rooms, friendly service and easy access to the main sights.");
                 h.setImageUrl(img(HOTEL_IMAGES[rnd.nextInt(HOTEL_IMAGES.length)]));
@@ -484,7 +493,7 @@ final class TravelNetwork {
                 l.setLocation(c.name);
                 l.setType("Entire home");
                 l.setProvider("Hosted stay");
-                l.setRating(Math.round((4.0 + rnd.nextDouble() * 0.9) * 10) / 10.0);
+                l.setRating(ratingFor(l.getName() + l.getLocation()));
                 l.setFeatures(features[rnd.nextInt(features.length)]);
                 l.setDescription("A welcoming local home in " + c.name + " where the hosts cook, guide and make you feel part of the family.");
                 l.setImageUrl(img(STAY_IMAGES[rnd.nextInt(STAY_IMAGES.length)]));

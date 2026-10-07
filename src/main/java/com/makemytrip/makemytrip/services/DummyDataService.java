@@ -188,7 +188,7 @@ public class DummyDataService {
             h.setPricePerNight(Double.parseDouble(c[2]));
             h.setAvailableRooms(Integer.parseInt(c[3]));
             h.setCapacity(TravelNetwork.capacityFor(h.getAvailableRooms(), new Random(c[0].hashCode())));
-            h.setRating(Double.parseDouble(c[4]));
+            h.setRating(TravelNetwork.ratingFor(c[0] + c[1]));
             h.setamenities(c[5]);
             h.setDescription(c[6]);
             h.setImageUrl(img(c[7]));
@@ -248,7 +248,7 @@ public class DummyDataService {
             String[] c = row.split("\\|");
             Listing l = listing("HOMESTAY", c[0], Double.parseDouble(c[2]), "per night", Integer.parseInt(c[3]));
             l.setLocation(c[1]);
-            l.setRating(Double.parseDouble(c[4]));
+            l.setRating(TravelNetwork.ratingFor(c[0] + c[1]));
             l.setFeatures(c[5]);
             l.setDescription(c[6]);
             l.setImageUrl(img(c[7]));
@@ -276,7 +276,7 @@ public class DummyDataService {
             String[] c = row.split("\\|");
             Listing l = listing("HOLIDAY", c[0], Double.parseDouble(c[2]), "per person", Integer.parseInt(c[3]));
             l.setLocation(c[1]);
-            l.setRating(Double.parseDouble(c[4]));
+            l.setRating(TravelNetwork.ratingFor(c[0] + c[1]));
             l.setDuration(c[5]);
             l.setFeatures(c[6]);
             l.setDescription(c[7]);
@@ -313,7 +313,7 @@ public class DummyDataService {
             String[] c = row.split("\\|");
             Listing l = listing("HOLIDAY", c[0], Double.parseDouble(c[2]), "per person", Integer.parseInt(c[3]));
             l.setLocation(c[1]);
-            l.setRating(Double.parseDouble(c[4]));
+            l.setRating(TravelNetwork.ratingFor(c[0] + c[1]));
             l.setDuration(c[5]);
             l.setFeatures(c[6]);
             l.setDescription(c[7]);
@@ -398,7 +398,7 @@ public class DummyDataService {
             l.setProvider("MakeMyTrip Insurance");
             l.setFeatures(c[4]);
             l.setDescription(c[5]);
-            l.setRating(4.2);
+            l.setRating(TravelNetwork.ratingFor(c[0]));
             out.add(l);
         }
     }
