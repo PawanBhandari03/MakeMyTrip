@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
-import { Bell, BellRing, CheckCheck, Clock, DoorOpen, PlaneLanding, PlaneTakeoff, Plane, X, XCircle, CircleCheck } from "lucide-react";
+import { Bell, BellRing, CheckCheck, Clock, DoorOpen, PlaneLanding, PlaneTakeoff, Plane, Receipt, X, XCircle, CircleCheck } from "lucide-react";
 import { getnotifications, marknotificationsread } from "@/api";
 import { timeAgo } from "@/lib/format";
 
@@ -16,6 +16,9 @@ type Item = {
   read: boolean;
   createdAt: string;
 };
+
+const isRefund = (n: { type: string }) => n.type.startsWith("REFUND_");
+const targetOf = (n: { type: string; flightNumber: string }) => (isRefund(n) ? "/profile#refunds" : `/tracker?flight=${n.flightNumber}`);
 
 const iconFor = (type: string) => {
   switch (type) {
@@ -35,6 +38,12 @@ const iconFor = (type: string) => {
       return { icon: <PlaneTakeoff className="h-4 w-4" />, tone: "bg-sky-100 text-sky-700" };
     case "LANDED":
       return { icon: <PlaneLanding className="h-4 w-4" />, tone: "bg-sky-100 text-sky-700" };
+    case "REFUND_PENDING":
+      return { icon: <Receipt className="h-4 w-4" />, tone: "bg-amber-100 text-amber-700" };
+    case "REFUND_PROCESSED":
+      return { icon: <Receipt className="h-4 w-4" />, tone: "bg-blue-100 text-blue-700" };
+    case "REFUND_COMPLETED":
+      return { icon: <Receipt className="h-4 w-4" />, tone: "bg-green-100 text-green-700" };
     default:
       return { icon: <Bell className="h-4 w-4" />, tone: "bg-slate-100 text-slate-600" };
   }
@@ -83,7 +92,7 @@ const NotificationBell = () => {
               const shown = new Notification(n.title, { body: n.message, icon: "/favicon.svg", tag: n.id });
               shown.onclick = () => {
                 window.focus();
-                router.push(`/tracker?flight=${n.flightNumber}`);
+                router.push(targetOf(n));
               };
             } catch (e) {
               // some browsers only allow notifications from a service worker; the pop-up still shows
@@ -124,7 +133,7 @@ const NotificationBell = () => {
       setUnread((u) => Math.max(0, u - 1));
       marknotificationsread(user.id, n.id).catch(() => {});
     }
-    router.push(`/tracker?flight=${n.flightNumber}`);
+    router.push(targetOf(n));
   };
 
   const readAll = async () => {

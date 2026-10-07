@@ -21,6 +21,7 @@ import Loader from "@/components/Loader";
 import SmartImage from "@/components/SmartImage";
 import BookingPanel from "@/components/BookingPanel";
 import PriceInsights from "@/components/PriceInsights";
+import RefundPolicyCard from "@/components/RefundPolicyCard";
 import Seo from "@/components/Seo";
 import { formatINR, isoDay, nightsBetween } from "@/lib/format";
 
@@ -213,6 +214,13 @@ const BookListingPage = () => {
                 itemId={item.id}
                 date={isForex ? undefined : travelDate}
                 title={isForex ? "Exchange rate history" : "Price history & forecast"}
+              />
+            )}
+            {!isForex && (
+              <RefundPolicyCard
+                category={cat}
+                travelAt={travelDate}
+                fee={cat === "TRAIN" ? 35 : cat === "BUS" ? 20 : 0}
               />
             )}
           </div>

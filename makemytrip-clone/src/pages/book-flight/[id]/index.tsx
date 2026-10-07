@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 import {
-  AlertCircle,
   ArrowRight,
   Calendar,
   Clock,
@@ -18,8 +17,9 @@ import Loader from "@/components/Loader";
 import SmartImage from "@/components/SmartImage";
 import BookingPanel from "@/components/BookingPanel";
 import PriceInsights from "@/components/PriceInsights";
+import RefundPolicyCard from "@/components/RefundPolicyCard";
 import Seo from "@/components/Seo";
-import { durationBetween, formatDateTime, formatINR, formatTime, formatDate } from "@/lib/format";
+import { durationBetween, formatINR, formatTime, formatDate } from "@/lib/format";
 
 interface Flight {
   id: string;
@@ -32,7 +32,6 @@ interface Flight {
   availableSeats: number;
 }
 
-const code = (city: string) => (city || "").replace(/[^A-Za-z]/g, "").slice(0, 3).toUpperCase();
 
 const BookFlightPage = () => {
   const router = useRouter();
@@ -89,9 +88,6 @@ const BookFlightPage = () => {
   const duration = durationBetween(flight.departureTime, flight.arrivalTime);
   const flightNo = flight.flightName.split(" ").slice(-1)[0];
   const airline = flight.flightName.replace(flightNo, "").trim() || flight.flightName;
-  const cancellationFee = Math.round(flight.price * 0.1);
-  const dep = new Date(flight.departureTime);
-  const freeUntil = new Date(dep.getTime() - 24 * 3600 * 1000);
 
   return (
     <div className="bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
@@ -112,7 +108,7 @@ const BookFlightPage = () => {
                       <span>{flight.to}</span>
                     </h2>
                     <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700">
-                      CANCELLATION FEES APPLY
+                      PARTLY REFUNDABLE
                     </span>
                   </div>
                   <div className="flex items-center text-sm text-slate-600">
@@ -123,7 +119,7 @@ const BookFlightPage = () => {
                     <span>Non Stop - {duration}</span>
                   </div>
                 </div>
-                <Link href="/info/terms" className="flex items-center text-sm font-medium text-blue-600 hover:text-blue-700">
+                <Link href="/info/cancellation" className="flex items-center text-sm font-medium text-blue-600 hover:text-blue-700">
                   <Info className="mr-1 h-4 w-4" />
                   View Fare Rules
                 </Link>
@@ -185,41 +181,13 @@ const BookFlightPage = () => {
 
             <PriceInsights category="FLIGHT" itemId={flight.id} title="Price history & forecast" />
 
-            {/* Cancellation Policy */}
-            <div className="rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-blue-900/5">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="flex items-center text-lg font-bold">
-                  <AlertCircle className="mr-2 h-5 w-5 text-orange-500" />
-                  Cancellation &amp; Date Change Policy
-                </h2>
-                <Link href="/info/terms" className="text-sm font-medium text-blue-600 hover:text-blue-700">
-                  View Policy
-                </Link>
-              </div>
-              <div className="rounded-xl bg-slate-50 p-6">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-                      <Plane className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <span className="font-semibold">
-                      {code(flight.from)}-{code(flight.to)}
-                    </span>
-                  </div>
-                  <div className="text-lg font-bold">{formatINR(cancellationFee)} per seat</div>
-                </div>
-                <div className="h-2.5 rounded-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" />
-                <div className="mt-2 flex justify-between text-xs text-slate-600">
-                  <span>Now</span>
-                  <span>{formatDateTime(freeUntil.toISOString())}</span>
-                  <span>{formatDateTime(flight.departureTime)}</span>
-                </div>
-                <p className="mt-4 text-sm text-slate-600">
-                  Cancel before {formatDateTime(freeUntil.toISOString())} and only the {formatINR(cancellationFee)}{" "}
-                  airline fee applies. After that the fare is non-refundable.
-                </p>
-              </div>
-            </div>
+            <RefundPolicyCard
+              category="FLIGHT"
+              travelAt={flight.departureTime}
+              total={Math.round(flight.price * 1.12 + 249)}
+              fee={249}
+              unitLabel="one seat"
+            />
 
             {/* Hotel Offers */}
             {hotels.length > 0 && (

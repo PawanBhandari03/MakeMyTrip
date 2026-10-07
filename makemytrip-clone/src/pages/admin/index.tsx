@@ -11,6 +11,7 @@ import {
   Loader2,
   Plane,
   Radio,
+  Receipt,
   RefreshCw,
   Search,
   Ticket,
@@ -22,6 +23,7 @@ import Seo from "@/components/Seo";
 import EntityManager, { Column, Field } from "@/components/admin/EntityManager";
 import FlightOps from "@/components/admin/FlightOps";
 import PricingAdmin from "@/components/admin/PricingAdmin";
+import RefundsAdmin from "@/components/admin/RefundsAdmin";
 import {
   addflight,
   addhotel,
@@ -41,7 +43,7 @@ import {
 } from "@/api";
 import { errorMessage, formatDateTime, formatINR } from "@/lib/format";
 
-type Tab = "dashboard" | "flights" | "flightops" | "hotels" | "services" | "pricing" | "users";
+type Tab = "dashboard" | "flights" | "flightops" | "hotels" | "services" | "pricing" | "refunds" | "users";
 
 const NAV: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
@@ -50,6 +52,7 @@ const NAV: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "hotels", label: "Hotels", icon: <Building2 className="h-4 w-4" /> },
   { id: "services", label: "Services", icon: <Layers className="h-4 w-4" /> },
   { id: "pricing", label: "Pricing", icon: <Gauge className="h-4 w-4" /> },
+  { id: "refunds", label: "Refunds", icon: <Receipt className="h-4 w-4" /> },
   { id: "users", label: "Users", icon: <UsersIcon className="h-4 w-4" /> },
 ];
 
@@ -544,6 +547,7 @@ export default function AdminDashboard() {
           )}
           {tab === "services" && <ServicesManager />}
           {tab === "pricing" && <PricingAdmin />}
+          {tab === "refunds" && <RefundsAdmin />}
           {tab === "users" && <UsersTab currentId={user.id} />}
         </div>
       </div>

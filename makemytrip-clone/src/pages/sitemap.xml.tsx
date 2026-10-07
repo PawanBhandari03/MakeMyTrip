@@ -13,6 +13,7 @@ const PAGES: { path: string; priority: string; changefreq: string }[] = [
   { path: "/info/terms", priority: "0.3", changefreq: "yearly" },
   { path: "/info/agreement", priority: "0.3", changefreq: "yearly" },
   { path: "/info/pricing", priority: "0.5", changefreq: "monthly" },
+  { path: "/info/cancellation", priority: "0.5", changefreq: "monthly" },
 ];
 
 /** Served at /sitemap.xml. */

@@ -206,10 +206,44 @@ export const createbooking = async ({
   return res.data;
 };
 
-export const cancelbooking = async (userId, reference) => {
+/** Cancels a booking (or only `quantity` of its units). Returns { booking, refund, summary }. */
+export const cancelbooking = async (userId, reference, reason, note, quantity) => {
   const res = await axios.post(`${BACKEND_URL}/booking/cancel`, null, {
-    params: { userId, reference },
+    params: { userId, reference, reason: reason || undefined, note: note || undefined, quantity: quantity || undefined },
   });
+  return res.data;
+};
+
+/** What a cancellation would refund, and why. */
+export const previewCancellation = async (userId, reference, quantity) => {
+  const res = await axios.get(`${BACKEND_URL}/booking/cancel/preview`, {
+    params: { userId, reference, quantity: quantity || undefined },
+  });
+  return res.data;
+};
+
+export const getCancellationPolicy = async () => {
+  const res = await axios.get(`${BACKEND_URL}/cancellation/policy`);
+  return res.data;
+};
+
+export const getMyRefunds = async (userId) => {
+  const res = await axios.get(`${BACKEND_URL}/refunds`, { params: { userId } });
+  return res.data;
+};
+
+export const getAllRefunds = async () => {
+  const res = await axios.get(`${BACKEND_URL}/admin/refunds`);
+  return res.data;
+};
+
+export const getRefundStats = async () => {
+  const res = await axios.get(`${BACKEND_URL}/admin/refunds/stats`);
+  return res.data;
+};
+
+export const advanceRefund = async (id) => {
+  const res = await axios.post(`${BACKEND_URL}/admin/refunds/${id}/advance`);
   return res.data;
 };
 

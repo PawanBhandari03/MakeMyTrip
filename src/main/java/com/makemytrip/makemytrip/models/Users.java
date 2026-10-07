@@ -75,5 +75,12 @@ public class Users {
         /** True when a price freeze set the price; {@code freezeCredit} is the freeze fee taken off the total. */
         private boolean priceFrozen;
         private double freezeCredit;
+        /** Non-refundable booking fee included in the total. */
+        private double fees;
+        /** How many of the booked units have been cancelled so far, and the money refunded for them. */
+        private int cancelledQuantity;
+        private double refundAmount;
+        private String cancelReason;
+        private String cancelledAt;
     }
 }

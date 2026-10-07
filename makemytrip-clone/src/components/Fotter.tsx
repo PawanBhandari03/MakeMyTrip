@@ -81,6 +81,7 @@ const Footer = () => {
               <FooterLink href="/info/terms">Terms &amp; Conditions</FooterLink>
               <FooterLink href="/info/agreement">User Agreement</FooterLink>
               <FooterLink href="/info/pricing">How Pricing Works</FooterLink>
+              <FooterLink href="/info/cancellation">Cancellation &amp; Refunds</FooterLink>
             </ul>
           </div>
         </div>

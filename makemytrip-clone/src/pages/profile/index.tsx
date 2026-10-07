@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Bus,
   Calendar,
@@ -23,13 +23,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { clearUser, setUser } from "@/store";
-import { cancelbooking, editprofile } from "@/api";
+import { editprofile } from "@/api";
 import SignupDialog from "@/components/SignupDialog";
 import LiveStatus from "@/components/LiveStatus";
 import PriceFreezeList from "@/components/PriceFreezeList";
+import CancelDialog from "@/components/CancelDialog";
+import RefundList, { RefundListHandle } from "@/components/RefundList";
 import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { errorMessage, formatDate, formatDateTime, formatINR } from "@/lib/format";
 
 const ICONS: Record<string, React.ReactNode> = {
@@ -60,8 +61,7 @@ const Profile = () => {
   const [userData, setUserData] = useState({ firstName: "", lastName: "", email: "", phoneNumber: "" });
   const [filter, setFilter] = useState<Filter>("ALL");
   const [toCancel, setToCancel] = useState<any>(null);
-  const [cancelling, setCancelling] = useState(false);
-  const [cancelError, setCancelError] = useState("");
+  const refunds = useRef<RefundListHandle>(null);
 
   // The user is restored from localStorage after first render, so keep the form in sync with it.
   useEffect(() => {
@@ -96,23 +96,18 @@ const Profile = () => {
     }
   };
 
-  const confirmCancel = async () => {
-    if (!toCancel) return;
-    setCancelling(true);
-    setCancelError("");
-    try {
-      const updated = await cancelbooking(user.id, toCancel.reference);
-      dispatch(
-        setUser({
-          ...user,
-          bookings: user.bookings.map((b: any) => (b.reference === updated.reference ? updated : b)),
-        })
-      );
-      setToCancel(null);
-    } catch (error) {
-      setCancelError(errorMessage(error, "Could not cancel this booking."));
-    } finally {
-      setCancelling(false);
+  const cancelDone = (result: any) => {
+    const updated = result.booking;
+    dispatch(
+      setUser({
+        ...user,
+        bookings: user.bookings.map((b: any) => (b.reference === updated.reference ? updated : b)),
+      })
+    );
+    setToCancel(null);
+    refunds.current?.reload();
+    if (result.refund) {
+      setTimeout(() => document.getElementById("refunds")?.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
     }
   };
 
@@ -320,6 +315,8 @@ const Profile = () => {
                 <div className="space-y-4">
                   {shown.map((booking: any, index: number) => {
                     const cancelled = booking.status === "CANCELLED";
+                    const partlyCancelled = !cancelled && (booking.cancelledQuantity || 0) > 0;
+                    const activeQty = booking.quantity - (booking.cancelledQuantity || 0);
                     return (
                       <div
                         key={booking.reference || index}
@@ -348,7 +345,7 @@ const Profile = () => {
                                 cancelled ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"
                               }`}
                             >
-                              {cancelled ? "Cancelled" : "Confirmed"}
+                              {cancelled ? "Cancelled" : partlyCancelled ? "Partly cancelled" : "Confirmed"}
                             </span>
                           </div>
                         </div>
@@ -365,13 +362,20 @@ const Profile = () => {
                             <div className="flex items-center space-x-1">
                               <Ticket className="h-4 w-4" />
                               <span>
-                                Qty {booking.quantity}
+                                Qty {cancelled ? booking.quantity : activeQty}
+                                {partlyCancelled ? ` of ${booking.quantity}` : ""}
                                 {booking.nights > 1 ? ` • ${booking.nights} nights` : ""}
                               </span>
                             </div>
                             <div className="flex items-center space-x-1">
                               <CreditCard className="h-4 w-4" />
-                              <span>{cancelled ? "Refund initiated" : "Paid"}</span>
+                              <span>
+                                {booking.refundAmount > 0
+                                  ? `Refund ${formatINR(booking.refundAmount)}`
+                                  : cancelled
+                                  ? "No refund due"
+                                  : "Paid"}
+                              </span>
                             </div>
                           </div>
                           {!cancelled && booking.reference && (
@@ -379,15 +383,18 @@ const Profile = () => {
                               variant="outline"
                               size="sm"
                               className="border-red-200 text-red-600 hover:bg-red-50"
-                              onClick={() => {
-                                setCancelError("");
-                                setToCancel(booking);
-                              }}
+                              onClick={() => setToCancel(booking)}
                             >
-                              Cancel booking
+                              {partlyCancelled ? "Cancel the rest" : activeQty > 1 ? "Cancel / modify" : "Cancel booking"}
                             </Button>
                           )}
                         </div>
+                        {(cancelled || partlyCancelled) && booking.cancelReason && (
+                          <p className="mt-3 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
+                            {booking.cancelledQuantity} cancelled on {formatDateTime(booking.cancelledAt)} · {booking.cancelReason}
+                            {booking.refundAmount > 0 ? ` · ${formatINR(booking.refundAmount)} is being refunded (see Refunds below)` : ""}
+                          </p>
+                        )}
                         {!cancelled && ["FLIGHT", "TRAIN", "BUS"].includes(categoryOf(booking)) && <LiveStatus booking={booking} />}
                       </div>
                     );
@@ -395,31 +402,13 @@ const Profile = () => {
                 </div>
               )}
             </div>
+            <RefundList ref={refunds} />
             <PriceFreezeList />
           </div>
         </div>
       </div>
 
-      <Dialog open={!!toCancel} onOpenChange={(o) => !o && setToCancel(null)}>
-        <DialogContent className="bg-white sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Cancel this booking?</DialogTitle>
-            <DialogDescription>
-              {toCancel?.title} ({toCancel?.reference}). The seats or rooms will be released and the amount of{" "}
-              {formatINR(toCancel?.totalPrice)} will be refunded.
-            </DialogDescription>
-          </DialogHeader>
-          {cancelError && <p className="text-sm text-red-600">{cancelError}</p>}
-          <div className="flex gap-3 pt-2">
-            <Button variant="outline" className="flex-1" onClick={() => setToCancel(null)}>
-              Keep booking
-            </Button>
-            <Button className="flex-1 bg-red-600 text-white hover:bg-red-700" onClick={confirmCancel} disabled={cancelling}>
-              {cancelling ? "Cancelling..." : "Yes, cancel"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <CancelDialog booking={toCancel} userId={user.id} onClose={() => setToCancel(null)} onDone={cancelDone} />
     </div>
   );
 };

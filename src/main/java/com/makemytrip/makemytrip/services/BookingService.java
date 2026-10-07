@@ -2,6 +2,7 @@ package com.makemytrip.makemytrip.services;
 import com.makemytrip.makemytrip.models.Flight;
 import com.makemytrip.makemytrip.models.Hotel;
 import com.makemytrip.makemytrip.models.Listing;
+import com.makemytrip.makemytrip.models.Refund;
 import com.makemytrip.makemytrip.models.Users;
 import com.makemytrip.makemytrip.models.Users.Booking;
 import com.makemytrip.makemytrip.repositories.FlightRepository;
@@ -45,6 +46,10 @@ public class BookingService {
     private FlightTrackingService flightTrackingService;
     @Autowired
     private PriceFreezeService priceFreezeService;
+    @Autowired
+    private RefundPolicyService refundPolicyService;
+    @Autowired
+    private RefundService refundService;
 
     private final SecureRandom random = new SecureRandom();
 
@@ -108,6 +113,7 @@ public class BookingService {
         booking.setAdjustmentPct(quote.getAdjustmentPct());
         booking.setPriceFrozen(quote.isFrozen());
         booking.setFreezeCredit(quote.getFreezeCredit());
+        booking.setFees(quote.getFees());
         try {
             user.getBookings().add(booking);
             userRepository.save(user);
@@ -125,19 +131,64 @@ public class BookingService {
         return booking;
     }
 
-    public Booking cancel(String userId, String reference) {
+    /** What cancelling would return, without cancelling anything. */
+    public RefundPolicyService.Preview previewCancel(String userId, String reference, int quantity) {
         Users user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        Booking booking = user.getBookings().stream()
-                .filter(b -> b != null && reference.equals(b.getReference()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+        Booking booking = find(user, reference);
+        int remaining = booking.getQuantity() - booking.getCancelledQuantity();
+        return refundPolicyService.preview(booking, quantity <= 0 ? remaining : quantity);
+    }
+
+    public Booking cancel(String userId, String reference) {
+        return cancel(userId, reference, "Other", null, 0).getBooking();
+    }
+
+    @lombok.Getter
+    @lombok.AllArgsConstructor
+    public static class CancelResult {
+        private final Booking booking;
+        private final Refund refund;
+        private final RefundPolicyService.Preview preview;
+    }
+
+    /**
+     * Cancels {@code quantity} units of a booking (all that remain when 0), works out the refund from the policy
+     * and opens a refund the customer can follow.
+     */
+    public CancelResult cancel(String userId, String reference, String reason, String note, int quantity) {
+        Users user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Booking booking = find(user, reference);
         if ("CANCELLED".equals(booking.getStatus())) {
             throw new RuntimeException("Booking is already cancelled");
         }
-        booking.setStatus("CANCELLED");
-        releaseStock(booking.getCategory(), booking.getBookingId(), booking.getQuantity());
+        int remaining = booking.getQuantity() - booking.getCancelledQuantity();
+        int qty = quantity <= 0 ? remaining : quantity;
+
+        RefundPolicyService.Preview p = refundPolicyService.preview(booking, qty);
+        if (!p.isCancellable()) throw new RuntimeException(p.getMessage());
+        String why = p.isAirlineCancelled() ? RefundPolicyService.AIRLINE_CANCELLED : reason;
+        if (why == null || why.isBlank()) throw new RuntimeException("Please choose a reason for cancelling");
+        if (!p.isAirlineCancelled() && !RefundPolicyService.REASONS.contains(why)) {
+            throw new RuntimeException("Please choose a reason from the list");
+        }
+
+        booking.setCancelledQuantity(booking.getCancelledQuantity() + qty);
+        booking.setRefundAmount(booking.getRefundAmount() + p.getRefund());
+        booking.setCancelReason(why);
+        booking.setCancelledAt(LocalDateTime.now().withNano(0).toString());
+        if (booking.getCancelledQuantity() >= booking.getQuantity()) booking.setStatus("CANCELLED");
+        releaseStock(booking.getCategory(), booking.getBookingId(), qty);
         userRepository.save(user);
-        return booking;
+
+        Refund refund = p.getRefund() > 0 ? refundService.create(user, booking, p, why, note) : null;
+        return new CancelResult(booking, refund, p);
+    }
+
+    private Booking find(Users user, String reference) {
+        return user.getBookings().stream()
+                .filter(b -> b != null && reference.equals(b.getReference()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
     }
 
     // Kept for older clients; the price argument is ignored.

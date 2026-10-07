@@ -109,6 +109,29 @@ Useful endpoints: `GET /pricing/quote`, `GET /pricing/prices?category=&ids=`, `G
 `GET /price-freeze/options`, `GET|POST|PUT|DELETE /admin/pricing-rules`. After deploying, press **Reset demo data** once so every
 item gets a capacity and the seasonal rules are created.
 
+## Cancellation and refunds
+
+Customers cancel from **My Trips**. A dialog asks for a required reason, lets them cancel only some seats, rooms or tickets, and
+shows the exact refund before they confirm. The same rules (`RefundPolicyService`) decide the preview and the real refund.
+
+| When you cancel | Refund |
+|-----------------|--------|
+| Within 24 hours of booking | 50% |
+| More than 48 hours before travel | 25% |
+| Less than 48 hours before travel | 10% |
+| After travel has started | 0% |
+| The airline cancelled the flight (live status) | 100%, no reason needed |
+
+Refund = (amount paid - booking fee) x percent x (cancelled quantity / booked quantity). The booking fee (flights 249, trains 35,
+buses 20) is not refunded unless the airline cancelled.
+
+**Refund tracker:** each refund moves Pending, Processed, Completed (the demo takes about 1.5 and then 4 minutes; admins can
+speed it up in **Admin -> Refunds**). Every step sends a bell notification and shows the date a bank would show the money
+(7th business day). The policy is shown on flight, hotel and service booking pages and at `/info/cancellation`.
+
+Endpoints: `GET /booking/cancel/preview`, `POST /booking/cancel` (`reason`, `note`, `quantity`), `GET /cancellation/policy`,
+`GET /refunds?userId=`, `GET /admin/refunds`, `GET /admin/refunds/stats`, `POST /admin/refunds/{id}/advance`.
+
 ## Adding data
 
 **From the admin page (easiest)** – log in as admin → *ADMIN* → Flights / Hotels / Services → **Add**.

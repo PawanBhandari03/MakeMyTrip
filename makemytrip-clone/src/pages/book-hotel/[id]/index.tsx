@@ -21,6 +21,7 @@ import Loader from "@/components/Loader";
 import SmartImage from "@/components/SmartImage";
 import BookingPanel from "@/components/BookingPanel";
 import PriceInsights from "@/components/PriceInsights";
+import RefundPolicyCard from "@/components/RefundPolicyCard";
 import Seo from "@/components/Seo";
 import { formatINR, isoDay, nightsBetween } from "@/lib/format";
 
@@ -168,6 +169,14 @@ const BookHotelPage = () => {
               <PriceInsights category="HOTEL" itemId={hotel.id} date={stayDate} title="Price history & forecast for your stay" />
             </div>
 
+            <RefundPolicyCard
+              category="HOTEL"
+              travelAt={stayDate}
+              total={Math.round(hotel.pricePerNight * nights * (hotel.pricePerNight <= 7500 ? 1.12 : 1.18))}
+              unitLabel="one room for your stay"
+              className="mb-8"
+            />
+
             {/* Amenities */}
             <div className="mb-8">
               <h2 className="mb-4 text-xl font-semibold">Amenities</h2>
@@ -193,7 +202,7 @@ const BookHotelPage = () => {
               <p className="mb-4 text-slate-600">Fits 2 Adults</p>
               <ul className="mb-4 space-y-2 text-sm text-slate-600">
                 <li>• Complimentary welcome drink on arrival</li>
-                <li>• Free cancellation up to 24 hours before check-in</li>
+                <li>• Part of the room charge is refunded if you cancel (see the refund policy)</li>
                 <li>• 10% off on food &amp; beverage services</li>
               </ul>
               <div className="space-y-2 border-t pt-4 text-sm">

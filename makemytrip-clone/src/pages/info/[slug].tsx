@@ -53,6 +53,19 @@ const PAGES: Record<string, Page> = {
       { heading: "Demo notice", body: "All prices are demo data and no real payments are taken." },
     ],
   },
+  cancellation: {
+    title: "Cancellation & Refund Policy",
+    intro: "Cancel from My Trips at any time before travel. The refund depends on when you cancel, and every rupee is shown before you confirm.",
+    sections: [
+      { heading: "How much you get back", body: "Within 24 hours of booking: 50% of the fare. After that, more than 48 hours before travel: 25%. Less than 48 hours before travel: 10%. Once travel has started: no refund. If the airline cancels your flight you get 100%, including the booking fee, and you do not need to give a reason." },
+      { heading: "Booking fees", body: "The booking fee on flights (₹249), trains (₹35) and buses (₹20) is not refundable, except when the airline cancels. Taxes are part of the fare and are refunded in the same proportion." },
+      { heading: "Partial cancellation", body: "If you booked more than one seat, room or ticket you can cancel only some of them. The refund is worked out for the part you cancel, and the rest of the booking stays confirmed. You can cancel the remainder later." },
+      { heading: "Choose a reason", body: "We ask why you are cancelling (change of plans, a better price, an emergency, wrong dates, a schedule change, documents or visa, or other). It is required, and helps us improve." },
+      { heading: "Following your refund", body: "Under Refunds in My Trips each refund moves through three steps: Requested, Processed and Completed. You get a notification at each step. The demo moves quickly so you can watch it; a real bank usually takes 5 to 7 business days, and the page shows the date to expect the money." },
+      { heading: "Where the money goes", body: "Refunds go back to the original payment method. Price-freeze fees are not refunded, because they are credited against the booking when it is made." },
+      { heading: "Demo notice", body: "No real payments are taken, so no real money moves." },
+    ],
+  },
   privacy: {
     title: "Privacy Policy",
     intro: "How your information is handled.",

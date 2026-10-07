@@ -3,6 +3,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import com.makemytrip.makemytrip.models.Users;
 import com.makemytrip.makemytrip.services.BookingService;
+import com.makemytrip.makemytrip.services.RefundPolicyService;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @CrossOrigin("*")
 @RestController
@@ -25,9 +28,25 @@ public class BookingController {
         return bookingService.book(userId, category, itemId, quantity, nights, promo, travelDate, freezeId, expectedTotal);
     }
 
+    /** Cancels a booking, or only some of its seats, rooms or tickets, and opens a refund. */
     @PostMapping("/cancel")
-    public Users.Booking cancel(@RequestParam String userId, @RequestParam String reference){
-        return bookingService.cancel(userId, reference);
+    public Map<String, Object> cancel(@RequestParam String userId, @RequestParam String reference,
+                                      @RequestParam(required = false) String reason,
+                                      @RequestParam(required = false) String note,
+                                      @RequestParam(defaultValue = "0") int quantity){
+        BookingService.CancelResult r = bookingService.cancel(userId, reference, reason, note, quantity);
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("booking", r.getBooking());
+        out.put("refund", r.getRefund());
+        out.put("summary", r.getPreview());
+        return out;
+    }
+
+    /** The refund the customer would get, and why, before they confirm. */
+    @GetMapping("/cancel/preview")
+    public RefundPolicyService.Preview preview(@RequestParam String userId, @RequestParam String reference,
+                                               @RequestParam(defaultValue = "0") int quantity){
+        return bookingService.previewCancel(userId, reference, quantity);
     }
 
     // The two endpoints below are kept for older clients. Any "price" parameter is ignored:
