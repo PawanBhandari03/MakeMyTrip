@@ -372,7 +372,15 @@ export default function Home() {
       const dur = (f: any) => new Date(f.arrivalTime).getTime() - new Date(f.departureTime).getTime();
       sorted.sort((x, y) => dur(x) - dur(y));
     } else if (tab === "flights") sorted.sort((x, y) => (x.departureTime || "").localeCompare(y.departureTime || ""));
-    else if (sort === "recommended") sorted.sort((x, y) => (y.rating || 0) - (x.rating || 0));
+    else if (sort === "recommended") {
+      // A stable mixed order, so great and average places appear together; "Rating" sorts best first.
+      const mix = (id: string) => {
+        let h = 7;
+        for (let i = 0; i < (id || "").length; i++) h = (h * 31 + id.charCodeAt(i)) | 0;
+        return Math.abs(h);
+      };
+      sorted.sort((x, y) => mix(x.id) - mix(y.id));
+    }
     return sorted;
   }, [tab, a, form.city, form.currency, form.region, flights, hotels, listings, sort, byCategory]); // eslint-disable-line react-hooks/exhaustive-deps
 
