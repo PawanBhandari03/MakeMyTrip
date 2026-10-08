@@ -98,7 +98,7 @@ const BookFlightPage = () => {
       <div className="mx-auto max-w-7xl px-4 py-10">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Content */}
-          <div className="space-y-8 lg:col-span-2">
+          <div className="space-y-8 lg:col-span-2 lg:row-start-1">
             {/* Flight Details */}
             <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-blue-900/5">
               <div className="absolute left-0 top-0 h-1.5 w-full bg-gradient-to-r from-blue-600 to-indigo-600" />
@@ -182,6 +182,26 @@ const BookFlightPage = () => {
               </div>
             </div>
 
+          </div>
+
+          {/* Fare Summary */}
+          <div className="lg:col-span-1 lg:col-start-3 lg:row-span-2 lg:row-start-1">
+            <div>
+              <BookingPanel
+                category="FLIGHT"
+                itemId={flight.id}
+                quantity={quantity}
+                setQuantity={setQuantity}
+                quantityLabel="Tickets"
+                maxQuantity={Math.min(20, flight.availableSeats)}
+                soldOut={flight.availableSeats < 1}
+                onBooked={load}
+              />
+            </div>
+          </div>
+
+          {/* Everything else comes after the booking panel on phones */}
+          <div className="space-y-8 lg:col-span-2 lg:row-start-2">
             <PriceInsights category="FLIGHT" itemId={flight.id} title="Price history & forecast" />
 
             <RefundPolicyCard
@@ -243,21 +263,6 @@ const BookFlightPage = () => {
             )}
           </div>
 
-          {/* Fare Summary */}
-          <div className="lg:col-span-1">
-            <div>
-              <BookingPanel
-                category="FLIGHT"
-                itemId={flight.id}
-                quantity={quantity}
-                setQuantity={setQuantity}
-                quantityLabel="Tickets"
-                maxQuantity={Math.min(20, flight.availableSeats)}
-                soldOut={flight.availableSeats < 1}
-                onBooked={load}
-              />
-            </div>
-          </div>
         </div>
       </div>
     </div>

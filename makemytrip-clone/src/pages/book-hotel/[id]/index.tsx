@@ -124,7 +124,7 @@ const BookHotelPage = () => {
       <div className="mx-auto max-w-7xl px-4 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 lg:row-start-1">
             {/* Hotel Title & Rating */}
             <div className="mb-6">
               <h1 className="mb-2 text-3xl font-extrabold tracking-tight">{hotel.hotelName}</h1>
@@ -164,44 +164,14 @@ const BookHotelPage = () => {
             </div>
 
             {/* Description */}
-            <p className="mb-8 leading-relaxed text-slate-600">
+            <p className="leading-relaxed text-slate-600">
               {hotel.description || `${hotel.hotelName} offers comfortable rooms and warm hospitality in ${hotel.location}.`}
             </p>
 
-            <div className="mb-8">
-              <PriceInsights category="HOTEL" itemId={hotel.id} date={stayDate} title="Price history & forecast for your stay" />
-            </div>
-
-            <RefundPolicyCard
-              category="HOTEL"
-              travelAt={stayDate}
-              total={Math.round(hotel.pricePerNight * nights * (hotel.pricePerNight <= 7500 ? 1.12 : 1.18))}
-              unitLabel="one room for your stay"
-              className="mb-8"
-            />
-
-            <Reviews category="HOTEL" itemId={hotel.id} itemName={hotel.hotelName} className="mb-8" />
-
-            {/* Amenities */}
-            <div className="mb-8">
-              <h2 className="mb-4 text-xl font-semibold">Amenities</h2>
-              <div className="flex flex-wrap gap-3">
-                {amenities.length === 0 && <span className="text-slate-500">No amenities listed.</span>}
-                {amenities.map((a) => (
-                  <div
-                    key={a}
-                    className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
-                  >
-                    {amenityIcon(a)}
-                    <span>{a}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
 
           {/* Booking Card */}
-          <div className="space-y-6 lg:col-span-1">
+          <div className="space-y-6 lg:col-span-1 lg:col-start-3 lg:row-span-2 lg:row-start-1">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/60">
               <h3 className="mb-1 text-xl font-semibold">Standard Room</h3>
               <p className="mb-4 text-slate-600">Fits 2 Adults</p>
@@ -274,6 +244,41 @@ const BookHotelPage = () => {
               </div>
             </div>
           </div>
+
+          {/* Everything else comes after the booking panel on phones */}
+          <div className="lg:col-span-2 lg:row-start-2">
+            <div className="mb-8">
+              <PriceInsights category="HOTEL" itemId={hotel.id} date={stayDate} title="Price history & forecast for your stay" />
+            </div>
+
+            <RefundPolicyCard
+              category="HOTEL"
+              travelAt={stayDate}
+              total={Math.round(hotel.pricePerNight * nights * (hotel.pricePerNight <= 7500 ? 1.12 : 1.18))}
+              unitLabel="one room for your stay"
+              className="mb-8"
+            />
+
+            <Reviews category="HOTEL" itemId={hotel.id} itemName={hotel.hotelName} className="mb-8" />
+
+            {/* Amenities */}
+            <div className="mb-8">
+              <h2 className="mb-4 text-xl font-semibold">Amenities</h2>
+              <div className="flex flex-wrap gap-3">
+                {amenities.length === 0 && <span className="text-slate-500">No amenities listed.</span>}
+                {amenities.map((a) => (
+                  <div
+                    key={a}
+                    className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700"
+                  >
+                    {amenityIcon(a)}
+                    <span>{a}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

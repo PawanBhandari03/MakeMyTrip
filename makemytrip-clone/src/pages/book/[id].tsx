@@ -128,7 +128,7 @@ const BookListingPage = () => {
 
       <div className="mx-auto max-w-7xl px-4 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
+          <div className="space-y-6 lg:col-span-2 lg:row-start-1">
             {item.imageUrl && (
               <div className="overflow-hidden rounded-2xl">
                 <SmartImage src={item.imageUrl} alt={item.name} className="h-72 w-full object-cover" />
@@ -211,25 +211,9 @@ const BookListingPage = () => {
                 </div>
               )}
             </div>
-            {cat !== "INSURANCE" && (
-              <PriceInsights
-                category={cat}
-                itemId={item.id}
-                date={isForex ? undefined : travelDate}
-                title={isForex ? "Exchange rate history" : "Price history & forecast"}
-              />
-            )}
-            {!isForex && cat !== "INSURANCE" && <Reviews category={cat} itemId={item.id} itemName={item.name} />}
-            {!isForex && (
-              <RefundPolicyCard
-                category={cat}
-                travelAt={travelDate}
-                fee={cat === "TRAIN" ? 35 : cat === "BUS" ? 20 : 0}
-              />
-            )}
           </div>
 
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 lg:col-start-3 lg:row-span-2 lg:row-start-1">
             <div>
               <BookingPanel
                 category={cat}
@@ -249,6 +233,27 @@ const BookListingPage = () => {
               />
             </div>
           </div>
+
+          {/* Everything else comes after the booking panel on phones */}
+          <div className="space-y-6 lg:col-span-2 lg:row-start-2">
+            {cat !== "INSURANCE" && (
+              <PriceInsights
+                category={cat}
+                itemId={item.id}
+                date={isForex ? undefined : travelDate}
+                title={isForex ? "Exchange rate history" : "Price history & forecast"}
+              />
+            )}
+            {!isForex && cat !== "INSURANCE" && <Reviews category={cat} itemId={item.id} itemName={item.name} />}
+            {!isForex && (
+              <RefundPolicyCard
+                category={cat}
+                travelAt={travelDate}
+                fee={cat === "TRAIN" ? 35 : cat === "BUS" ? 20 : 0}
+              />
+            )}
+          </div>
+
         </div>
       </div>
     </div>
