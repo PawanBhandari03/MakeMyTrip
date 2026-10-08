@@ -49,7 +49,7 @@ Anyone can also sign up with their own email (sign-up always creates a customer)
 | 4 | **Reviews & ratings** | 1–5 stars, text and photos; helpful votes, replies, reporting with moderation; sorting by helpful, newest, highest and lowest. | [docs/TASK-4-REVIEWS-RATINGS.md](docs/TASK-4-REVIEWS-RATINGS.md) |
 | 5 | **Personalised recommendations** | Suggestions from your bookings, searches and views and from similar travellers, each with a "Why this?" explanation and helpful / not relevant buttons that change what you see next. | [docs/TASK-5-RECOMMENDATIONS.md](docs/TASK-5-RECOMMENDATIONS.md) |
 
-More documents: [Architecture](docs/ARCHITECTURE.md) · [Data model](docs/DATA-MODEL.md) · [API reference](docs/API.md) · [Testing guide](docs/TESTING-GUIDE.md) · [Admin guide](docs/ADMIN-GUIDE.md)
+More documents: [Architecture](docs/ARCHITECTURE.md) · [Data model](docs/DATA-MODEL.md) · [API reference](docs/API.md) · [Testing guide](docs/TESTING-GUIDE.md) · [Admin guide](docs/ADMIN-GUIDE.md) · [Deployment & submission guide](docs/DEPLOYMENT.md)
 
 ---
 
@@ -94,6 +94,8 @@ You need **Java 17+**, **Node 18+** and a free **MongoDB Atlas** cluster.
    Open http://localhost:3000. To use another back end, set `NEXT_PUBLIC_BACKEND_URL`. Set `NEXT_PUBLIC_SITE_URL` to the public address so links and the sitemap are right.
 
 ### Deploying
+
+Full step-by-step instructions, a first-run routine and a submission checklist are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). In short:
 
 | Part | Where | Settings |
 |---|---|---|
