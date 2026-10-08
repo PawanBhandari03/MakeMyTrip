@@ -1,6 +1,18 @@
 package com.makemytrip.makemytrip.services;
 
 import com.makemytrip.makemytrip.models.Flight;
+import com.makemytrip.makemytrip.models.FlightTracking;
+import com.makemytrip.makemytrip.models.Interaction;
+import com.makemytrip.makemytrip.models.Notification;
+import com.makemytrip.makemytrip.models.PriceFreeze;
+import com.makemytrip.makemytrip.models.RecommendationFeedback;
+import com.makemytrip.makemytrip.models.Refund;
+import com.makemytrip.makemytrip.models.Review;
+import com.makemytrip.makemytrip.models.Users;
+import com.makemytrip.makemytrip.repositories.UserRepository;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import com.makemytrip.makemytrip.models.Hotel;
 import com.makemytrip.makemytrip.models.Listing;
 import com.makemytrip.makemytrip.models.PricingRule;
@@ -31,6 +43,10 @@ public class DummyDataService {
 
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private MongoTemplate mongoTemplate;
     @Autowired
     private FlightRepository flightRepository;
     @Autowired
@@ -63,6 +79,7 @@ public class DummyDataService {
         if (reset) {
             priceSnapshotRepository.deleteAll();
             priceWatchRepository.deleteAll();
+            resetDemoCustomer();
         }
 
         boolean flightsOutdated = true;
@@ -94,6 +111,22 @@ public class DummyDataService {
             result.put("demoTravellers", recommendationSeeder.seed());
         }
         return result;
+    }
+
+    /**
+     * Gives the demo customer (user@makemytrip.com) a clean slate. A reset gives every flight and stay a new id,
+     * so the old bookings would point at items that no longer exist. Other customers are never touched.
+     */
+    private void resetDemoCustomer() {
+        Users demo = userRepository.findByEmail("user@makemytrip.com");
+        if (demo == null) return;
+        demo.setBookings(new ArrayList<>());
+        userRepository.save(demo);
+        Query mine = Query.query(Criteria.where("userId").is(demo.getId()));
+        for (Class<?> type : List.of(Refund.class, Notification.class, PriceFreeze.class, FlightTracking.class,
+                RecommendationFeedback.class, Interaction.class, Review.class)) {
+            mongoTemplate.remove(mine, type);
+        }
     }
 
     // ------------------------------------------------------------------ pricing rules
