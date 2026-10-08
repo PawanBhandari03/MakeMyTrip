@@ -243,7 +243,7 @@ const BookFlightPage = () => {
 
           {/* Fare Summary */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24">
+            <div>
               <BookingPanel
                 category="FLIGHT"
                 itemId={flight.id}

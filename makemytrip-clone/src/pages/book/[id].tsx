@@ -228,7 +228,7 @@ const BookListingPage = () => {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="sticky top-24">
+            <div>
               <BookingPanel
                 category={cat}
                 itemId={item.id}
