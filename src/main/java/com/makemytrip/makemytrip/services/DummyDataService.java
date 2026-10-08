@@ -45,6 +45,8 @@ public class DummyDataService {
     private PriceWatchRepository priceWatchRepository;
     @Autowired
     private DynamicPricingService dynamicPricingService;
+    @Autowired
+    private ReviewSeeder reviewSeeder;
 
     private static String img(String id) {
         return "https://images.unsplash.com/photo-" + id + "?auto=format&fit=crop&w=800&q=80";
@@ -82,6 +84,9 @@ public class DummyDataService {
             pricingRuleRepository.deleteByDemoTrue();
             result.put("pricingRules", pricingRuleRepository.saveAll(buildPricingRules()).size());
             dynamicPricingService.invalidateRules();
+        }
+        if (reset || reviewSeeder.needed()) {
+            result.put("reviews", reviewSeeder.seed());
         }
         return result;
     }

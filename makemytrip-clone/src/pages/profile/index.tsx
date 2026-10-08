@@ -13,6 +13,7 @@ import {
   Phone,
   Plane,
   Shield,
+  Star,
   Ticket,
   Train,
   Umbrella,
@@ -46,6 +47,11 @@ const ICONS: Record<string, React.ReactNode> = {
 };
 
 const categoryOf = (b: any) => (b.category || (b.type ? String(b.type).toUpperCase() : "")) as string;
+
+const reviewPath = (b: any) => {
+  const c = categoryOf(b);
+  return c === "FLIGHT" ? `/book-flight/${b.bookingId}` : c === "HOTEL" ? `/book-hotel/${b.bookingId}` : `/book/${b.bookingId}`;
+};
 
 type Filter = "ALL" | "CONFIRMED" | "CANCELLED";
 
@@ -378,6 +384,14 @@ const Profile = () => {
                               </span>
                             </div>
                           </div>
+                          {!cancelled && booking.bookingId && categoryOf(booking) !== "INSURANCE" && categoryOf(booking) !== "FOREX" && (
+                            <Link
+                              href={`${reviewPath(booking)}#reviews`}
+                              className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline"
+                            >
+                              <Star className="h-4 w-4" /> Rate &amp; review
+                            </Link>
+                          )}
                           {!cancelled && booking.reference && (
                             <Button
                               variant="outline"

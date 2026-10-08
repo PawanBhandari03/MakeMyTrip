@@ -22,6 +22,7 @@ import SmartImage from "@/components/SmartImage";
 import BookingPanel from "@/components/BookingPanel";
 import PriceInsights from "@/components/PriceInsights";
 import RefundPolicyCard from "@/components/RefundPolicyCard";
+import Reviews from "@/components/Reviews";
 import Seo from "@/components/Seo";
 import { formatINR, isoDay, nightsBetween } from "@/lib/format";
 
@@ -176,6 +177,8 @@ const BookHotelPage = () => {
               unitLabel="one room for your stay"
               className="mb-8"
             />
+
+            <Reviews category="HOTEL" itemId={hotel.id} itemName={hotel.hotelName} className="mb-8" />
 
             {/* Amenities */}
             <div className="mb-8">

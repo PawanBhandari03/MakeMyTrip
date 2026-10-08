@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
-import { Bell, BellRing, CheckCheck, Clock, DoorOpen, PlaneLanding, PlaneTakeoff, Plane, Receipt, X, XCircle, CircleCheck } from "lucide-react";
+import { Bell, BellRing, MessageSquare, CheckCheck, Clock, DoorOpen, PlaneLanding, PlaneTakeoff, Plane, Receipt, X, XCircle, CircleCheck } from "lucide-react";
 import { getnotifications, marknotificationsread } from "@/api";
 import { timeAgo } from "@/lib/format";
 
@@ -18,7 +18,8 @@ type Item = {
 };
 
 const isRefund = (n: { type: string }) => n.type.startsWith("REFUND_");
-const targetOf = (n: { type: string; flightNumber: string }) => (isRefund(n) ? "/profile#refunds" : `/tracker?flight=${n.flightNumber}`);
+const targetOf = (n: { type: string; flightNumber: string }) =>
+  isRefund(n) ? "/profile#refunds" : n.type.startsWith("REVIEW_") ? n.flightNumber || "/" : `/tracker?flight=${n.flightNumber}`;
 
 const iconFor = (type: string) => {
   switch (type) {
@@ -38,6 +39,10 @@ const iconFor = (type: string) => {
       return { icon: <PlaneTakeoff className="h-4 w-4" />, tone: "bg-sky-100 text-sky-700" };
     case "LANDED":
       return { icon: <PlaneLanding className="h-4 w-4" />, tone: "bg-sky-100 text-sky-700" };
+    case "REVIEW_REPLY":
+      return { icon: <MessageSquare className="h-4 w-4" />, tone: "bg-indigo-100 text-indigo-700" };
+    case "REVIEW_REMOVED":
+      return { icon: <MessageSquare className="h-4 w-4" />, tone: "bg-red-100 text-red-700" };
     case "REFUND_PENDING":
       return { icon: <Receipt className="h-4 w-4" />, tone: "bg-amber-100 text-amber-700" };
     case "REFUND_PROCESSED":

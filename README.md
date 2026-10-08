@@ -132,6 +132,23 @@ speed it up in **Admin -> Refunds**). Every step sends a bell notification and s
 Endpoints: `GET /booking/cancel/preview`, `POST /booking/cancel` (`reason`, `note`, `quantity`), `GET /cancellation/policy`,
 `GET /refunds?userId=`, `GET /admin/refunds`, `GET /admin/refunds/stats`, `POST /admin/refunds/{id}/advance`.
 
+## Reviews and ratings
+
+Hotels, homestays, holiday packages, flights, trains, buses and cabs all have a **Ratings & reviews** section on their booking page.
+
+- **Write a review:** 1 to 5 stars, an optional title, text (10 to 1,500 characters) and up to 3 photos (shrunk in the browser before upload).
+  One review per person per item; writing again edits it. Reviewers with a booking of that item get a "Verified booking" badge.
+  Abusive words are rejected. Reviews can also be started from **My Trips -> Rate & review**.
+- **Sorting:** most helpful, newest, highest rated, lowest rated, plus the average and a 5-to-1 star breakdown.
+- **Helpful votes:** one vote per person (toggle), not on your own review.
+- **Replies:** anyone logged in can reply; admin replies are marked "Official". The author gets a bell notification.
+- **Reporting:** pick a reason. A review reported by 3 different people is hidden until an admin decides in **Admin -> Reviews**
+  (Keep clears the reports, Remove takes it down and notifies the author, Restore puts it back).
+- The rating on search cards is the average of the published reviews. Demo reviews are generated for hotels, homestays and holidays.
+
+Endpoints: `GET|POST /reviews`, `DELETE /reviews/{id}`, `POST /reviews/{id}/helpful|reply|flag`, `GET /reviews/flag-reasons`,
+`GET /admin/reviews`, `GET /admin/reviews/stats`, `POST /admin/reviews/{id}/moderate?action=KEEP|REMOVE|RESTORE`.
+
 ## Adding data
 
 **From the admin page (easiest)** – log in as admin → *ADMIN* → Flights / Hotels / Services → **Add**.

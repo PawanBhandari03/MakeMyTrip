@@ -446,3 +446,56 @@ export const savepricingrule = async (rule) => {
 export const deletepricingrule = async (id) => {
   await axios.delete(`${BACKEND_URL}/admin/pricing-rules/${id}`);
 };
+
+// ---------------------------------------------------------------- reviews
+
+export const getReviews = async (category, itemId, sort = "helpful", page = 0, userId) => {
+  const res = await axios.get(`${BACKEND_URL}/reviews`, {
+    params: { category, itemId, sort, page, size: 6, userId: userId || undefined },
+  });
+  return res.data;
+};
+
+export const saveReview = async (review) => {
+  const res = await axios.post(`${BACKEND_URL}/reviews`, review);
+  return res.data;
+};
+
+export const deleteReview = async (userId, id) => {
+  await axios.delete(`${BACKEND_URL}/reviews/${id}`, { params: { userId } });
+};
+
+export const voteHelpful = async (userId, id) => {
+  const res = await axios.post(`${BACKEND_URL}/reviews/${id}/helpful`, null, { params: { userId } });
+  return res.data;
+};
+
+export const replyToReview = async (userId, id, text) => {
+  const res = await axios.post(`${BACKEND_URL}/reviews/${id}/reply`, { text }, { params: { userId } });
+  return res.data;
+};
+
+export const flagReview = async (userId, id, reason) => {
+  const res = await axios.post(`${BACKEND_URL}/reviews/${id}/flag`, null, { params: { userId, reason } });
+  return res.data;
+};
+
+export const getFlagReasons = async () => {
+  const res = await axios.get(`${BACKEND_URL}/reviews/flag-reasons`);
+  return res.data;
+};
+
+export const getReviewQueue = async (filter = "FLAGGED") => {
+  const res = await axios.get(`${BACKEND_URL}/admin/reviews`, { params: { filter } });
+  return res.data;
+};
+
+export const getReviewStats = async () => {
+  const res = await axios.get(`${BACKEND_URL}/admin/reviews/stats`);
+  return res.data;
+};
+
+export const moderateReview = async (id, action, note) => {
+  const res = await axios.post(`${BACKEND_URL}/admin/reviews/${id}/moderate`, null, { params: { action, note: note || undefined } });
+  return res.data;
+};

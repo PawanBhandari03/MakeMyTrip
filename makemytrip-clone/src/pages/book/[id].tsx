@@ -22,6 +22,7 @@ import SmartImage from "@/components/SmartImage";
 import BookingPanel from "@/components/BookingPanel";
 import PriceInsights from "@/components/PriceInsights";
 import RefundPolicyCard from "@/components/RefundPolicyCard";
+import Reviews from "@/components/Reviews";
 import Seo from "@/components/Seo";
 import { formatINR, isoDay, nightsBetween } from "@/lib/format";
 
@@ -216,6 +217,7 @@ const BookListingPage = () => {
                 title={isForex ? "Exchange rate history" : "Price history & forecast"}
               />
             )}
+            {!isForex && cat !== "INSURANCE" && <Reviews category={cat} itemId={item.id} itemName={item.name} />}
             {!isForex && (
               <RefundPolicyCard
                 category={cat}

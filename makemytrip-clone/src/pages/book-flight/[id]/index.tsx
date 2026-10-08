@@ -18,6 +18,7 @@ import SmartImage from "@/components/SmartImage";
 import BookingPanel from "@/components/BookingPanel";
 import PriceInsights from "@/components/PriceInsights";
 import RefundPolicyCard from "@/components/RefundPolicyCard";
+import Reviews from "@/components/Reviews";
 import Seo from "@/components/Seo";
 import { durationBetween, formatINR, formatTime, formatDate } from "@/lib/format";
 
@@ -188,6 +189,8 @@ const BookFlightPage = () => {
               fee={249}
               unitLabel="one seat"
             />
+
+            <Reviews category="FLIGHT" itemId={flight.id} itemName={flight.flightName} />
 
             {/* Hotel Offers */}
             {hotels.length > 0 && (
