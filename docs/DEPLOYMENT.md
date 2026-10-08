@@ -165,6 +165,6 @@ Do these on the **live site**, in this order, close to the moment you submit.
 | Render says *Live* but `/flight` times out or errors | Open **Logs**. If you see `MongoTimeoutException` or *authentication failed*: Atlas Network Access must contain `0.0.0.0/0`, and the username and password in `MONGODB_URI` must be right |
 | Render logs show an SSL or certificate error | Rare. Check the connection string has no stray characters; as a last resort only, append `&tlsAllowInvalidCertificates=true` |
 | Everything is slow the first time | The free Render service was asleep; wait about a minute |
-| Flights list is empty after a while | The demo flights cover about a week. Run **Reset demo data** again |
+| Flights list is empty after a while | The demo flights cover about two weeks from the last reset. The back end also creates new ones whenever it wakes up and finds them running out; to refresh them at once, run **Reset demo data** again |
 | Changes do not appear on the live site | Wait for both dashboards to finish deploying, then hard refresh (Ctrl+F5) |
 | Cannot log in | Use `user` / `user123` or `admin` / `admin123`. If the database was recreated, the back end creates these on start-up |
