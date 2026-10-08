@@ -47,6 +47,8 @@ public class DummyDataService {
     private DynamicPricingService dynamicPricingService;
     @Autowired
     private ReviewSeeder reviewSeeder;
+    @Autowired
+    private RecommendationSeeder recommendationSeeder;
 
     private static String img(String id) {
         return "https://images.unsplash.com/photo-" + id + "?auto=format&fit=crop&w=800&q=80";
@@ -87,6 +89,9 @@ public class DummyDataService {
         }
         if (reset || reviewSeeder.needed()) {
             result.put("reviews", reviewSeeder.seed());
+        }
+        if (reset || recommendationSeeder.needed()) {
+            result.put("demoTravellers", recommendationSeeder.seed());
         }
         return result;
     }

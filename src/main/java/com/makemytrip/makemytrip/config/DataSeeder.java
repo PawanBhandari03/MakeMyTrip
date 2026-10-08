@@ -5,6 +5,7 @@ import com.makemytrip.makemytrip.repositories.FlightStatusRepository;
 import com.makemytrip.makemytrip.repositories.UserRepository;
 import com.makemytrip.makemytrip.services.DummyDataService;
 import com.makemytrip.makemytrip.services.FlightStatusService;
+import com.makemytrip.makemytrip.services.RecommendationSeeder;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,8 @@ public class DataSeeder {
                                    UserRepository users,
                                    FlightStatusRepository flightStatuses,
                                    FlightStatusService flightStatusService,
-                                   PasswordEncoder passwordEncoder) {
+                                   PasswordEncoder passwordEncoder,
+                                   RecommendationSeeder recommendationSeeder) {
         return args -> {
             dummyData.load(false);
             if (users.findByEmail("admin@makemytrip.com") == null) {
@@ -45,6 +47,7 @@ public class DataSeeder {
                 demo.setRole("USER");
                 users.save(demo);
             }
+            recommendationSeeder.seedDemoUser();
             if (flightStatuses.count() == 0) {
                 flightStatusService.seedMockData();
             } else {
