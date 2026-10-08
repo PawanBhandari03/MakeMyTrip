@@ -39,6 +39,8 @@ Anyone can also sign up with their own email (sign-up always creates a customer)
 
 ---
 
+**Checking the requirements?** [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md) lists every requirement of the five tasks with whether it is done, where to see it on the live site and which file implements it.
+
 ## Features by internship task
 
 | # | Feature | In short | Documentation |
@@ -49,7 +51,7 @@ Anyone can also sign up with their own email (sign-up always creates a customer)
 | 4 | **Reviews & ratings** | 1–5 stars, text and photos; helpful votes, replies, reporting with moderation; sorting by helpful, newest, highest and lowest. | [docs/TASK-4-REVIEWS-RATINGS.md](docs/TASK-4-REVIEWS-RATINGS.md) |
 | 5 | **Personalised recommendations** | Suggestions from your bookings, searches and views and from similar travellers, each with a "Why this?" explanation and helpful / not relevant buttons that change what you see next. | [docs/TASK-5-RECOMMENDATIONS.md](docs/TASK-5-RECOMMENDATIONS.md) |
 
-More documents: [Architecture](docs/ARCHITECTURE.md) · [Data model](docs/DATA-MODEL.md) · [API reference](docs/API.md) · [Testing guide](docs/TESTING-GUIDE.md) · [Admin guide](docs/ADMIN-GUIDE.md) · [Deployment & submission guide](docs/DEPLOYMENT.md)
+More documents: [Architecture](docs/ARCHITECTURE.md) · [Data model](docs/DATA-MODEL.md) · [API reference](docs/API.md) · [Testing guide](docs/TESTING-GUIDE.md) · [Admin guide](docs/ADMIN-GUIDE.md) · [Requirements checklist](docs/REQUIREMENTS.md) · [Deployment & submission guide](docs/DEPLOYMENT.md)
 
 ---
 
