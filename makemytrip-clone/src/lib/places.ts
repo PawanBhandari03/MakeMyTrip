@@ -144,6 +144,17 @@ export type Suggestion = {
   score: number;
 };
 
+/** Well-known places come first when several match equally well, so typing "M" shows Mumbai before Madurai. */
+const POPULAR = [
+  "delhi", "mumbai", "bengaluru", "hyderabad", "chennai", "kolkata", "pune", "goa", "jaipur", "ahmedabad", "kochi",
+  "dubai", "singapore", "london", "bangkok", "paris", "new york", "lucknow", "chandigarh", "udaipur", "varanasi",
+  "amritsar", "agra", "shimla", "manali", "darjeeling", "guwahati", "srinagar", "leh", "dehradun", "visakhapatnam",
+];
+const popularity = (city: string): number => {
+  const i = POPULAR.indexOf(canonicalCity(city));
+  return i === -1 ? 999 : i;
+};
+
 /** Number of single-letter edits (insert, delete, change, swap) between two words. */
 const editDistance = (a: string, b: string): number => {
   if (a === b) return 0;
@@ -178,6 +189,14 @@ const hintFor = (city: string): string => {
  * ("dheradun" finds Dehradun). The best matches come first.
  */
 export const suggestPlaces = (options: { value: string; label: string }[], typed: string, max = 50): Suggestion[] => {
+  const seen = new Map<string, { value: string; label: string }>();
+  for (const o of options) {
+    const key = canonicalCity(o.value);
+    const prev = seen.get(key);
+    // keep the nicely capitalised spelling
+    if (!prev || (prev.label === prev.label.toLowerCase() && o.label !== o.label.toLowerCase())) seen.set(key, o);
+  }
+  options = Array.from(seen.values());
   const t = clean(typed);
   if (!t) {
     return options.slice(0, max).map((o) => ({ value: o.value, label: o.label, hint: hintFor(o.value), kind: "match" as const, score: 0 }));
@@ -200,14 +219,14 @@ export const suggestPlaces = (options: { value: string; label: string }[], typed
     if (l === t || l === canon) score = 100;
     else if (l.startsWith(t) || (canon !== t && l.startsWith(canon))) score = 90;
     else if (words.some((w) => w.startsWith(t))) score = 80;
-    else if (l.includes(t)) score = 60;
-    else if (state && (state === t || state.startsWith(t))) score = 70;
-    else if (country && (country === t || country.startsWith(t))) score = 50;
+    else if (t.length >= 2 && l.includes(t)) score = 60;
+    else if (t.length >= 2 && state && (state === t || state.startsWith(t))) score = 70;
+    else if (t.length >= 2 && country && (country === t || country.startsWith(t))) score = 50;
     else if (t.length >= 3 && state.includes(t)) score = 40;
     else if (tokens.length > 1 && tokens.every((k) => l.includes(k) || state.includes(k) || country.includes(k))) score = 55;
 
     // another name for the same place: typing "bang" finds Bengaluru because of "Bangalore"
-    if (score < 75) {
+    if (score < 75 && t.length >= 2) {
       const alias = aliasKeys.find((k) => ALIASES[k] === l && (k === t || k.startsWith(t)));
       if (alias) {
         score = Math.max(score, 85);
@@ -227,6 +246,6 @@ export const suggestPlaces = (options: { value: string; label: string }[], typed
     }
     if (score > 0) out.push({ value: o.value, label: o.label, hint, kind, score });
   }
-  out.sort((a, b) => b.score - a.score || a.label.localeCompare(b.label));
+  out.sort((a, b) => b.score - a.score || popularity(a.value) - popularity(b.value) || a.label.localeCompare(b.label));
   return out.slice(0, max);
 };
