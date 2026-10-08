@@ -106,8 +106,37 @@ public class RecommendationService {
 
     // ------------------------------------------------------------------ catalogue
 
-    private synchronized void loadCatalog() {
-        if (System.currentTimeMillis() - catalogAt < CATALOG_TTL_MS && !catalog.isEmpty()) return;
+    private final java.util.concurrent.ExecutorService refresher = java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "recommendation-refresh");
+        t.setDaemon(true);
+        return t;
+    });
+    private final java.util.concurrent.atomic.AtomicBoolean refreshingCatalog = new java.util.concurrent.atomic.AtomicBoolean();
+    private final java.util.concurrent.atomic.AtomicBoolean refreshingModel = new java.util.concurrent.atomic.AtomicBoolean();
+
+    /**
+     * Makes sure a catalogue is available. The very first caller builds it; after that an out-of-date copy is still
+     * used straight away while a new one is built in the background, so no visitor waits for a rebuild.
+     */
+    private void loadCatalog() {
+        if (catalog.isEmpty()) {
+            rebuildCatalog();
+            return;
+        }
+        if (System.currentTimeMillis() - catalogAt > CATALOG_TTL_MS && refreshingCatalog.compareAndSet(false, true)) {
+            refresher.submit(() -> {
+                try {
+                    rebuildCatalog();
+                } catch (RuntimeException ignored) {
+                    // keep using the old copy; the next visit tries again
+                } finally {
+                    refreshingCatalog.set(false);
+                }
+            });
+        }
+    }
+
+    private synchronized void rebuildCatalog() {
         Map<String, Cand> c = new LinkedHashMap<>();
         for (Hotel h : hotelRepository.findAll()) {
             if (h.gethotelName() == null) continue;
@@ -143,9 +172,8 @@ public class RecommendationService {
 
     /** Forgets the cached catalogue and similarity model, for example after the demo data was regenerated. */
     public void refresh() {
-        catalogAt = 0;
-        model = new Model();
-        loadCatalog();
+        rebuildCatalog();
+        buildModel();
     }
 
     /** Every hotel, homestay and holiday package. */
@@ -295,8 +323,25 @@ public class RecommendationService {
 
     // ------------------------------------------------------------------ the shared model
 
-    private synchronized Model model() {
-        if (System.currentTimeMillis() - model.builtAt < MODEL_TTL_MS && model.builtAt > 0) return model;
+    /** The similarity model: built by the first caller, then refreshed in the background when it gets old. */
+    private Model model() {
+        Model current = model;
+        if (current.builtAt == 0) return buildModel();
+        if (System.currentTimeMillis() - current.builtAt > MODEL_TTL_MS && refreshingModel.compareAndSet(false, true)) {
+            refresher.submit(() -> {
+                try {
+                    buildModel();
+                } catch (RuntimeException ignored) {
+                    // keep using the old model; the next visit tries again
+                } finally {
+                    refreshingModel.set(false);
+                }
+            });
+        }
+        return current;
+    }
+
+    private synchronized Model buildModel() {
         loadCatalog();
         Model m = new Model();
 
