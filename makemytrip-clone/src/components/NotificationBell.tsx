@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { Bell, BellRing, MessageSquare, CheckCheck, Clock, DoorOpen, PlaneLanding, PlaneTakeoff, Plane, Receipt, X, XCircle, CircleCheck } from "lucide-react";
@@ -65,6 +66,8 @@ const NotificationBell = () => {
   const [unread, setUnread] = useState(0);
   const [open, setOpen] = useState(false);
   const [toasts, setToasts] = useState<Item[]>([]);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const [permission, setPermission] = useState<string>("unsupported");
   const seen = useRef<Set<string> | null>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -237,6 +240,8 @@ const NotificationBell = () => {
       </div>
 
       {/* Pop-ups for brand-new updates */}
+      {mounted &&
+        createPortal(
       <div className="pointer-events-none fixed bottom-4 right-4 z-[60] flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2">
         {toasts.map((n) => {
           const { icon, tone } = iconFor(n.type);
@@ -258,7 +263,9 @@ const NotificationBell = () => {
             </div>
           );
         })}
-      </div>
+      </div>,
+          document.body
+        )}
     </>
   );
 };
