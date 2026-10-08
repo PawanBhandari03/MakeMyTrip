@@ -1,18 +1,8 @@
 package com.makemytrip.makemytrip.services;
 
 import com.makemytrip.makemytrip.models.Flight;
-import com.makemytrip.makemytrip.models.FlightTracking;
-import com.makemytrip.makemytrip.models.Interaction;
-import com.makemytrip.makemytrip.models.Notification;
-import com.makemytrip.makemytrip.models.PriceFreeze;
-import com.makemytrip.makemytrip.models.RecommendationFeedback;
-import com.makemytrip.makemytrip.models.Refund;
-import com.makemytrip.makemytrip.models.Review;
 import com.makemytrip.makemytrip.models.Users;
 import com.makemytrip.makemytrip.repositories.UserRepository;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import com.makemytrip.makemytrip.models.Hotel;
 import com.makemytrip.makemytrip.models.Listing;
 import com.makemytrip.makemytrip.models.PricingRule;
@@ -46,8 +36,6 @@ public class DummyDataService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private MongoTemplate mongoTemplate;
-    @Autowired
     private FlightRepository flightRepository;
     @Autowired
     private HotelRepository hotelRepository;
@@ -65,6 +53,10 @@ public class DummyDataService {
     private ReviewSeeder reviewSeeder;
     @Autowired
     private RecommendationSeeder recommendationSeeder;
+    @Autowired
+    private DemoCustomerSeeder demoCustomerSeeder;
+    @Autowired
+    private UserCleanupService userCleanupService;
 
     private static String img(String id) {
         return "https://images.unsplash.com/photo-" + id + "?auto=format&fit=crop&w=800&q=80";
@@ -110,22 +102,24 @@ public class DummyDataService {
         if (reset || recommendationSeeder.needed()) {
             result.put("demoTravellers", recommendationSeeder.seed());
         }
+        if (reset || demoCustomerSeeder.needed()) {
+            demoCustomerSeeder.seedInBackground();
+            result.put("demoCustomers", "being created");
+        }
         return result;
     }
 
     /**
-     * Gives the demo customer (user@makemytrip.com) a clean slate. A reset gives every flight and stay a new id,
-     * so the old bookings would point at items that no longer exist. Other customers are never touched.
+     * Gives the two built-in accounts (the demo customer and the administrator) a clean slate. A reset gives every flight
+     * and stay a new id, so their old bookings would point at items that no longer exist. Other customers are never touched.
      */
     private void resetDemoCustomer() {
-        Users demo = userRepository.findByEmail("user@makemytrip.com");
-        if (demo == null) return;
-        demo.setBookings(new ArrayList<>());
-        userRepository.save(demo);
-        Query mine = Query.query(Criteria.where("userId").is(demo.getId()));
-        for (Class<?> type : List.of(Refund.class, Notification.class, PriceFreeze.class, FlightTracking.class,
-                RecommendationFeedback.class, Interaction.class, Review.class)) {
-            mongoTemplate.remove(mine, type);
+        for (String email : List.of("user@makemytrip.com", "admin@makemytrip.com")) {
+            Users account = userRepository.findByEmail(email);
+            if (account == null) continue;
+            account.setBookings(new ArrayList<>());
+            userRepository.save(account);
+            userCleanupService.clearActivity(account.getId());
         }
     }
 
