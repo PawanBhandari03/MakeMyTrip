@@ -1,11 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { ChevronDown } from "lucide-react";
+import { suggestPlaces } from "@/lib/places";
 
 type Option = { value: string; label: string };
 
 /**
- * A search box with a dropdown of suggestions. The user can pick a suggestion or type freely;
- * `value` is always the current text, so the parent can use it directly as a filter.
+ * A search box with a list of suggestions. The traveller can type a city, a state or country, another name for a
+ * place ("Bangalore") or even a slightly wrong spelling ("dheradun"), and pick a suggestion with the mouse or the
+ * arrow keys. `value` is always the current text, so the parent can use it directly as a filter.
+ * When the traveller moves on after a clear spelling mistake, the text is corrected to the place we think they meant.
  */
 export function SearchSelect({
   options,
@@ -23,20 +26,35 @@ export function SearchSelect({
   subtitle?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [active, setActive] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const suggestions = useMemo(() => suggestPlaces(options, value), [options, value]);
+  const onlyGuesses = suggestions.length > 0 && suggestions.every((s) => s.kind === "fuzzy");
+
+  // The latest text and suggestions, for the click-outside handler below
+  const latest = useRef({ value, suggestions, onChange });
+  latest.current = { value, suggestions, onChange };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        // Fix a clear spelling mistake when the traveller moves on, but never touch text that already names a place
+        const { value: text, suggestions: list, onChange: change } = latest.current;
+        const typed = text.trim().toLowerCase();
+        if (!typed) return;
+        const exact = list.some((s) => s.label.toLowerCase() === typed || s.value.toLowerCase() === typed);
+        const best = list[0];
+        const clear = best && (best.kind === "fuzzy" || best.kind === "alias") && (list.length === 1 || best.score > list[1].score);
+        if (!exact && best && clear && best.kind === "fuzzy") change(best.value);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const term = value.trim().toLowerCase();
-  const filtered = options.filter((o) => o.label.toLowerCase().includes(term)).slice(0, 50);
+  useEffect(() => setActive(0), [value]);
 
   const pick = (v: string) => {
     onChange(v);
@@ -63,9 +81,16 @@ export function SearchSelect({
               }}
               onFocus={() => setIsOpen(true)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" && isOpen && filtered.length > 0) {
+                if (e.key === "ArrowDown") {
                   e.preventDefault();
-                  pick(filtered[0].value);
+                  setIsOpen(true);
+                  setActive((a) => Math.min(a + 1, Math.max(0, suggestions.length - 1)));
+                } else if (e.key === "ArrowUp") {
+                  e.preventDefault();
+                  setActive((a) => Math.max(a - 1, 0));
+                } else if (e.key === "Enter" && isOpen && suggestions.length > 0) {
+                  e.preventDefault();
+                  pick(suggestions[Math.min(active, suggestions.length - 1)].value);
                 } else if (e.key === "Escape") {
                   setIsOpen(false);
                 }
@@ -73,6 +98,9 @@ export function SearchSelect({
               className="w-full bg-transparent text-lg font-semibold text-slate-900 outline-none placeholder:font-normal placeholder:text-slate-300"
               placeholder={placeholder}
               autoComplete="off"
+              role="combobox"
+              aria-expanded={isOpen}
+              aria-autocomplete="list"
             />
             <div className="truncate text-xs text-slate-400">{subtitle}</div>
           </div>
@@ -88,20 +116,29 @@ export function SearchSelect({
         </div>
       </div>
       {isOpen && (
-        <div className="absolute z-30 mt-1 max-h-64 w-full overflow-auto rounded-xl border border-slate-200 bg-white py-1 shadow-xl">
-          {filtered.length === 0 ? (
-            <div className="px-4 py-3 text-sm text-slate-500">No matching places</div>
+        <div role="listbox" className="absolute z-30 mt-1 max-h-72 w-full overflow-auto rounded-xl border border-slate-200 bg-white py-1 shadow-xl">
+          {suggestions.length === 0 ? (
+            <div className="px-4 py-3 text-sm text-slate-500">
+              No matching places. Try a city, a state or a country, such as <em>Goa</em>, <em>Kerala</em> or <em>Dubai</em>.
+            </div>
           ) : (
-            filtered.map((o) => (
-              <button
-                key={o.value}
-                type="button"
-                className="block w-full px-4 py-2 text-left text-sm hover:bg-blue-50"
-                onClick={() => pick(o.value)}
-              >
-                {o.label}
-              </button>
-            ))
+            <>
+              {onlyGuesses && <div className="px-4 pb-1 pt-2 text-xs font-medium uppercase tracking-wide text-slate-400">Did you mean</div>}
+              {suggestions.map((s, i) => (
+                <button
+                  key={s.value}
+                  type="button"
+                  role="option"
+                  aria-selected={i === active}
+                  className={`flex w-full items-baseline justify-between gap-3 px-4 py-2 text-left text-sm ${i === active ? "bg-blue-50" : "hover:bg-blue-50"}`}
+                  onMouseEnter={() => setActive(i)}
+                  onClick={() => pick(s.value)}
+                >
+                  <span className="font-medium text-slate-900">{s.label}</span>
+                  {s.hint && <span className="truncate text-xs text-slate-400">{s.hint}</span>}
+                </button>
+              ))}
+            </>
           )}
         </div>
       )}
