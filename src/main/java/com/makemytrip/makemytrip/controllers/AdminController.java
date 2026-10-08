@@ -40,6 +40,8 @@ public class AdminController {
 
     @Autowired
     private FlightStatusService flightStatusService;
+    @Autowired
+    private com.makemytrip.makemytrip.services.UserCleanupService userCleanupService;
 
     @GetMapping("/users")
     public ResponseEntity<List<Users>> getallusers(){
@@ -57,6 +59,18 @@ public class AdminController {
             u.setRole(r);
             return ResponseEntity.ok(userRepository.save(u));
         }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    /** Deletes a customer and everything that belongs to the account. Administrator accounts cannot be deleted. */
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String id){
+        Users u = userRepository.findById(id).orElse(null);
+        if (u == null) return ResponseEntity.notFound().build();
+        if ("ADMIN".equals(u.getRole())) {
+            throw new RuntimeException("Administrator accounts cannot be deleted. Make the account a customer first.");
+        }
+        userCleanupService.delete(u);
+        return ResponseEntity.noContent().build();
     }
 
     // ---- flights

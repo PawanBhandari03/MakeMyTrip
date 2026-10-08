@@ -254,6 +254,11 @@ export const getallusers = async () => {
   return res.data;
 };
 
+/** Deletes a customer and everything that belongs to the account. Administrators cannot be deleted. */
+export const deleteuser = async (id) => {
+  await axios.delete(`${BACKEND_URL}/admin/user/${id}`);
+};
+
 export const changeuserrole = async (id, role) => {
   const res = await axios.put(`${BACKEND_URL}/admin/user/${id}/role`, null, {
     params: { role },

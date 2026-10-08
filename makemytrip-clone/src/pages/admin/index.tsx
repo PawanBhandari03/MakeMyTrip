@@ -32,6 +32,7 @@ import {
   addflight,
   addhotel,
   changeuserrole,
+  deleteuser,
   deleteflight,
   deletehotel,
   deletelisting,
@@ -254,6 +255,16 @@ const UsersTab = ({ currentId }: { currentId: string }) => {
     return users.filter((u) => !q || `${u.firstName} ${u.lastName} ${u.email}`.toLowerCase().includes(q));
   }, [users, query]);
 
+  const removeUser = async (u: any) => {
+    if (!window.confirm(`Delete ${u.firstName} ${u.lastName} (${u.email})? Their bookings, refunds and reviews are removed too, and their seats are given back. This cannot be undone.`)) return;
+    try {
+      await deleteuser(u.id);
+      await load();
+    } catch (e) {
+      setError(errorMessage(e, "Could not delete this user."));
+    }
+  };
+
   const toggleRole = async (u: any) => {
     const next = u.role === "ADMIN" ? "USER" : "ADMIN";
     if (!window.confirm(`Make ${u.email} ${next === "ADMIN" ? "an administrator" : "a customer"}?`)) return;
@@ -328,6 +339,11 @@ const UsersTab = ({ currentId }: { currentId: string }) => {
                     >
                       {u.role === "ADMIN" ? "Make customer" : "Make admin"}
                     </Button>
+                    {u.role !== "ADMIN" && (
+                      <Button variant="ghost" size="sm" className="text-red-600 hover:bg-red-50 hover:text-red-700" onClick={() => removeUser(u)}>
+                        Delete
+                      </Button>
+                    )}
                   </td>
                 </tr>
               ))}

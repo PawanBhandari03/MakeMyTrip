@@ -188,6 +188,16 @@ public class BookingService {
         return new CancelResult(booking, refund, p);
     }
 
+    /** Gives back the seats, rooms and tickets of every booking that is still active (used when an account is deleted). */
+    public void releaseActiveStock(Users user) {
+        for (Booking b : user.getBookings()) {
+            if (b == null || "CANCELLED".equals(b.getStatus())) continue;
+            int left = b.getQuantity() - b.getCancelledQuantity();
+            if (left > 0) releaseStock(b.getCategory(), b.getBookingId(), left);
+        }
+        catalogCache.markStale();
+    }
+
     private Booking find(Users user, String reference) {
         return user.getBookings().stream()
                 .filter(b -> b != null && reference.equals(b.getReference()))
