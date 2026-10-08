@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.makemytrip.makemytrip.config.CatalogCache;
 import java.util.List;
 import java.util.Locale;
 
@@ -17,13 +18,16 @@ public class ListingController {
 
     @Autowired
     private ListingRepository listingRepository;
+    @Autowired
+    private CatalogCache catalogCache;
 
     @GetMapping
-    public List<Listing> list(@RequestParam(required = false) String category) {
+    public ResponseEntity<byte[]> list(@RequestParam(required = false) String category) {
         if (category == null || category.isBlank()) {
-            return listingRepository.findAll();
+            return catalogCache.get("listings", listingRepository::findAll);
         }
-        return listingRepository.findByCategory(category.toUpperCase(Locale.ROOT));
+        String cat = category.toUpperCase(Locale.ROOT);
+        return catalogCache.get("listings:" + cat, () -> listingRepository.findByCategory(cat));
     }
 
     @GetMapping("/{id}")

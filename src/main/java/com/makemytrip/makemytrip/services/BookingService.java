@@ -50,6 +50,8 @@ public class BookingService {
     private RefundPolicyService refundPolicyService;
     @Autowired
     private RefundService refundService;
+    @Autowired
+    private com.makemytrip.makemytrip.config.CatalogCache catalogCache;
 
     private final SecureRandom random = new SecureRandom();
 
@@ -124,6 +126,7 @@ public class BookingService {
         if (quote.isFrozen() && freezeId != null) {
             priceFreezeService.markUsed(freezeId, booking.getReference());
         }
+        catalogCache.markStale();
         if ("FLIGHT".equals(cat)) {
             // follow the flight automatically, so delay and gate notifications reach the traveller
             flightTrackingService.trackBooked(userId, itemId);
@@ -179,6 +182,7 @@ public class BookingService {
         if (booking.getCancelledQuantity() >= booking.getQuantity()) booking.setStatus("CANCELLED");
         releaseStock(booking.getCategory(), booking.getBookingId(), qty);
         userRepository.save(user);
+        catalogCache.markStale();
 
         Refund refund = p.getRefund() > 0 ? refundService.create(user, booking, p, why, note) : null;
         return new CancelResult(booking, refund, p);

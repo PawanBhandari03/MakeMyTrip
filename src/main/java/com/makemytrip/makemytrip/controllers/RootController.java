@@ -6,6 +6,7 @@ import com.makemytrip.makemytrip.repositories.HotelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.makemytrip.makemytrip.config.CatalogCache;
 import java.util.List;
 
 @RestController
@@ -16,15 +17,17 @@ public class RootController {
 
     @Autowired
     private FlightRepository flightRepository;
+    @Autowired
+    private CatalogCache catalogCache;
+
     @GetMapping("/")
     public String home() {
         return "✅ It's running on port 8080!";
     }
 
     @GetMapping("/hotel")
-    public ResponseEntity<List<Hotel>> getallhotel(){
-        List<Hotel> hotels=hotelRepository.findAll();
-        return ResponseEntity.ok(hotels);
+    public ResponseEntity<byte[]> getallhotel(){
+        return catalogCache.get("hotels", hotelRepository::findAll);
     }
 
     @GetMapping("/hotel/{id}")
@@ -33,9 +36,8 @@ public class RootController {
     }
 
     @GetMapping("/flight")
-    public ResponseEntity<List<Flight>> getallflights(){
-        List<Flight> flights=flightRepository.findAll();
-        return ResponseEntity.ok(flights);
+    public ResponseEntity<byte[]> getallflights(){
+        return catalogCache.get("flights", flightRepository::findAll);
     }
 
     @GetMapping("/flight/{id}")

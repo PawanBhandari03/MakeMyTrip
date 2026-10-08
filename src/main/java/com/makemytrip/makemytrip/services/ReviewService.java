@@ -56,6 +56,8 @@ public class ReviewService {
     private NotificationRepository notificationRepository;
     @Autowired
     private MongoTemplate mongoTemplate;
+    @Autowired
+    private com.makemytrip.makemytrip.config.CatalogCache catalogCache;
 
     /** A review as the viewer sees it. */
     @Getter
@@ -304,6 +306,7 @@ public class ReviewService {
         double avg = Math.round(published.stream().mapToInt(Review::getRating).average().orElse(0) * 10) / 10.0;
         Query q = Query.query(Criteria.where("_id").is(itemId));
         Update u = new Update().set("rating", avg);
+        catalogCache.markStale();
         switch (category) {
             case "HOTEL" -> mongoTemplate.updateFirst(q, u, Hotel.class);
             case "FLIGHT" -> { /* flights have no rating field */ }
