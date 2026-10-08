@@ -220,7 +220,7 @@ const Card = ({ it, canAnswer, answer, onAnswer }: { it: any; canAnswer: boolean
         <div ref={box} className="relative mt-4 flex items-center justify-between border-t pt-3">
           <button
             type="button"
-            onClick={() => setOpen((o) => !o)}
+            onClick={() => setOpen(true)}
             onMouseEnter={() => setOpen(true)}
             aria-expanded={open}
             className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-blue-700"
