@@ -121,7 +121,18 @@ flowchart LR
 | `api/index.js` | The only place that talks to the back end |
 | `lib/` | Formatting helpers, place data, live-price hook, site settings |
 
-## 6. Security and honesty notes
+## 6. Speed on a small server
+
+The home page needs the whole catalogue (about 6,000 flights, hundreds of hotels and services). Building it from the database takes several seconds on a free server, so the back end keeps the finished lists in memory (`CatalogCache`):
+
+- a list younger than 30 seconds is returned at once, and an older one is still returned at once while a new copy is built in the background;
+- anything an admin changes, and **Reset demo data**, clears it immediately, so edits show up straight away;
+- a booking, a cancellation or a new review only marks it out of date, so seat counts and ratings catch up within a moment (the server always re-checks seats when a booking is made);
+- the lists are built when the server starts, so the first visitor after a wake-up does not wait for them.
+
+On the page, the three lists load independently, so a tab appears as soon as the list it needs arrives, and a note explains if the free server is still waking up.
+
+## 7. Security and honesty notes
 
 - Passwords are stored as BCrypt hashes.
 - Demo accounts are shown on the login dialog on purpose, so a tester can use the site immediately.

@@ -21,6 +21,7 @@ A step-by-step list for anyone checking the project. It takes about 15 minutes a
 |---|---|---|
 | 1 | Open the home page and the **Flights** tab; search any route | Flights with prices that refresh and flash when they change, and star ratings on hotels |
 | 2 | Try the other tabs: Hotels, Homestays, Holiday Packages, Trains, Buses, Cabs, Forex, Insurance | Real results for each; trains, buses and cabs only inside India |
+| 2b | In the **To** box type `assam`, then `kerala`, then `uae`, then a misspelling such as `dheradun` | Suggestions with the state or country (Guwahati, Kochi and Thiruvananthapuram, Dubai, Dehradun); a clear typo is corrected when you click away |
 | 3 | Open **Routes** in the navbar | Every place you can travel, split into National and International |
 | 4 | Log in as `user`, open a flight and press **Book Now** | A confirmation with a booking reference, and the booking in **My Trips** |
 

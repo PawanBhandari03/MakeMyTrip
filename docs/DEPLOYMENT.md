@@ -122,7 +122,7 @@ Do these on the **live site**, in this order, close to the moment you submit.
 - [ ] Log in as **admin / admin123** on the Vercel site.
 - [ ] **Admin → Dashboard → Demo data → Reset demo data** → confirm. Wait for the green message.
 
-  *What it does:* deletes and recreates the generated flights, hotels, services, reviews and demo travellers so flights cover the coming days. It **keeps** accounts, bookings and refunds. Old test bookings keep working, but their "Rate & review" links may stop working because items get new ids.
+  *What it does:* deletes and recreates the generated flights, hotels, services, reviews and demo travellers so flights cover the coming days. It **keeps** accounts and other customers' bookings and refunds, but clears the demo customer `user` (bookings, refunds, notifications) so that account starts clean. Old items get new ids, so a link to an old item may stop working.
   *When to press it:* once after the very first deploy, and once right before you submit. Not in between.
 
 ### D. Click through every feature (about 10 minutes)
