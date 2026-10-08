@@ -12,6 +12,8 @@ public interface ReviewRepository extends MongoRepository<Review, String> {
     List<Review> findTop200ByStatusOrderByFlagCountDescCreatedAtDesc(String status);
     List<Review> findTop200ByFlagCountGreaterThanOrderByFlagCountDescCreatedAtDesc(int flags);
     List<Review> findTop200ByOrderByCreatedAtDesc();
+    List<Review> findByStatus(String status);
+    List<Review> findByUserIdAndStatus(String userId, String status);
     long countByStatus(String status);
     long countByDemoTrue();
     void deleteByDemoTrue();
