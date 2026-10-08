@@ -9,8 +9,8 @@ All data is demo data and no real payment is ever taken.
 
 | | |
 |---|---|
-| **Live site (front end)** | _add your Vercel link here_ |
-| **Live API (back end)** | _add your Render link here_ |
+| **Live site (front end)** | https://make-my-trip-theta.vercel.app |
+| **Live API (back end)** | https://makemytrip-qgai.onrender.com |
 | **Source** | this repository |
 
 > The back end runs on a free Render plan, which sleeps when idle. The first request after a pause can take about a minute; please wait for it.
