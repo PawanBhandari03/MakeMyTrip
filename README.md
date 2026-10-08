@@ -108,7 +108,7 @@ Full step-by-step instructions, a first-run routine and a submission checklist a
 The back end loads any missing demo data every time it starts, and creates new flights when the old ones have passed. In **Admin → Dashboard → Demo data**:
 
 - **Load missing demo data** adds only what is missing and deletes nothing.
-- **Reset demo data** replaces all demo flights, hotels, services, price history, demo reviews and demo travellers with fresh ones. User accounts, bookings and refunds are kept, as is anything an admin added by hand. The one exception is the demo customer `user`, whose bookings, refunds and activity are cleared so that account starts clean (old bookings would point at flights that no longer exist). Run it once after a new deployment, and again just before showing the project so the flights cover the coming days.
+- **Reset demo data** replaces all demo flights, hotels, services, price history, demo reviews, demo travellers and a set of made-up demo customers with fresh ones. The demo customers (fictional addresses ending in `@demo.example`; nobody can log in as them) have bookings, cancellations and paid-out refunds, so the **Admin** pages show believable activity instead of being empty. User accounts, bookings and refunds are kept, as is anything an admin added by hand. The one exception is the demo customer `user`, whose bookings, refunds and activity are cleared so that account starts clean (old bookings would point at flights that no longer exist). Run it once after a new deployment, and again just before showing the project so the flights cover the coming days.
 
 ---
 
