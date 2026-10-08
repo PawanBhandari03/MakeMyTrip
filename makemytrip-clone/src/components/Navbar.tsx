@@ -37,10 +37,10 @@ const Navbar = () => {
             MakeMyTrip
           </span>
         </Link>
-        <nav className="flex items-center gap-2 sm:gap-4">
+        <nav className="flex items-center gap-1 sm:gap-2 lg:gap-4">
           <Link
             href="/routes"
-            className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-slate-100 ${
+            className={`flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium sm:px-3 transition-colors hover:bg-slate-100 ${
               router.pathname === "/routes" ? "text-red-600" : "text-slate-700"
             }`}
           >
@@ -49,7 +49,7 @@ const Navbar = () => {
           </Link>
           <Link
             href="/flight-status"
-            className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-slate-100 ${
+            className={`flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium sm:px-3 transition-colors hover:bg-slate-100 ${
               router.pathname === "/flight-status" ? "text-red-600" : "text-slate-700"
             }`}
           >
@@ -60,7 +60,7 @@ const Navbar = () => {
             <>
               <Link
                 href="/tracker"
-                className={`hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-slate-100 md:flex ${
+                className={`hidden items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium sm:px-3 transition-colors hover:bg-slate-100 md:flex ${
                   router.pathname === "/tracker" ? "text-red-600" : "text-slate-700"
                 }`}
               >
@@ -69,7 +69,7 @@ const Navbar = () => {
               </Link>
               <Link
                 href="/profile"
-                className={`hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-slate-100 sm:flex ${
+                className={`hidden items-center gap-1.5 rounded-lg px-2 py-2 text-sm font-medium sm:px-3 transition-colors hover:bg-slate-100 sm:flex ${
                   router.pathname === "/profile" ? "text-red-600" : "text-slate-700"
                 }`}
               >
@@ -83,9 +83,10 @@ const Navbar = () => {
                   size="sm"
                   className="bg-slate-900 hover:bg-slate-800"
                   onClick={() => router.push("/admin")}
+                  aria-label="Admin"
                 >
                   <LayoutDashboard className="h-4 w-4" />
-                  ADMIN
+                  <span className="hidden sm:inline">ADMIN</span>
                 </Button>
               )}
               <DropdownMenu>
