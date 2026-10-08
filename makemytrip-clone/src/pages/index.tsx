@@ -204,8 +204,10 @@ export default function Home() {
   const [flights, setFlights] = useState<any[]>([]);
   const [hotels, setHotels] = useState<any[]>([]);
   const [listings, setListings] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  // each list is fetched on its own, so a tab can appear as soon as the data it needs has arrived
+  const [ready, setReady] = useState({ flights: false, hotels: false, listings: false });
   const [loadError, setLoadError] = useState(false);
+  const [slow, setSlow] = useState(false);
   const [toast, setToast] = useState("");
   // "Explore" popup opened from the collection and wonder cards
   const [explore, setExplore] = useState<{ title: string; city: string; tab: TabId } | null>(null);
@@ -215,24 +217,31 @@ export default function Home() {
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      try {
-        const [f, h, l] = await Promise.all([getflight(), gethotel(), getlistings()]);
-        if (cancelled) return;
-        setFlights(f || []);
-        setHotels(h || []);
-        setListings(l || []);
-        setLoadError(!f?.length && !h?.length && !l?.length);
-      } catch (error) {
-        if (!cancelled) setLoadError(true);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
+    const load = (fetcher: () => Promise<any[]>, set: (rows: any[]) => void, key: "flights" | "hotels" | "listings") => {
+      fetcher()
+        .then((rows) => !cancelled && set(rows || []))
+        .catch(() => !cancelled && setLoadError(true))
+        .finally(() => !cancelled && setReady((r) => ({ ...r, [key]: true })));
+    };
+    load(getflight, setFlights, "flights");
+    load(gethotel, setHotels, "hotels");
+    load(getlistings, setListings, "listings");
     return () => {
       cancelled = true;
     };
   }, []);
+
+  const loading = tab === "flights" ? !ready.flights : tab === "hotels" ? !ready.hotels : !ready.listings;
+
+  // free hosting sleeps when idle, so the first visit can be slow: say so instead of leaving a bare spinner
+  useEffect(() => {
+    if (!loading) {
+      setSlow(false);
+      return;
+    }
+    const t = setTimeout(() => setSlow(true), 5000);
+    return () => clearTimeout(t);
+  }, [loading]);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -743,12 +752,20 @@ export default function Home() {
           </div>
 
           {loading ? (
-            <div className="flex items-center justify-center rounded-2xl border border-slate-200 bg-white py-16 text-slate-500">
-              <Loader2 className="mr-2 h-5 w-5 animate-spin text-blue-600" /> Loading...
+            <div>
+              <div className="flex items-center justify-center rounded-2xl border border-slate-200 bg-white py-16 text-slate-500">
+                <Loader2 className="mr-2 h-5 w-5 animate-spin text-blue-600" /> Loading...
+              </div>
+              {slow && (
+                <p className="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-center text-sm text-amber-900">
+                  The server is waking up. It runs on free hosting that sleeps when nobody is using it, so the first visit can take up to a
+                  minute. Everything is fast after that. Thank you for waiting.
+                </p>
+              )}
             </div>
           ) : loadError ? (
             <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center text-red-700">
-              Could not load data. Please check that the backend is running on port 8080, then refresh.
+              We could not load the latest data. The server may still be waking up (it runs on free hosting), so please wait a few seconds and refresh the page.
             </div>
           ) : results === null ? (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-white/80 p-10 text-center text-slate-500">
