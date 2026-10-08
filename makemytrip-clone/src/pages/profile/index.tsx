@@ -30,6 +30,7 @@ import LiveStatus from "@/components/LiveStatus";
 import PriceFreezeList from "@/components/PriceFreezeList";
 import CancelDialog from "@/components/CancelDialog";
 import RefundList, { RefundListHandle } from "@/components/RefundList";
+import Recommendations from "@/components/Recommendations";
 import Seo from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import { errorMessage, formatDate, formatDateTime, formatINR } from "@/lib/format";
@@ -418,6 +419,9 @@ const Profile = () => {
             </div>
             <RefundList ref={refunds} />
             <PriceFreezeList />
+            <div className="mt-8 rounded-2xl border border-slate-100 bg-white p-6 shadow-lg shadow-slate-200/60">
+              <Recommendations title="Recommended for your next trip" limit={4} />
+            </div>
           </div>
         </div>
       </div>

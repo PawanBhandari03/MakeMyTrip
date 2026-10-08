@@ -31,11 +31,14 @@ import {
   Users,
 } from "lucide-react";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { formatDate, isoDay, nightsBetween, nowLocalIso } from "@/lib/format";
 import { canonicalCity } from "@/lib/places";
 import Seo from "@/components/Seo";
 import { useLivePrices } from "@/lib/useLivePrices";
+import Recommendations from "@/components/Recommendations";
+import { recordActivity } from "@/api";
 import { AUTHOR, DEFAULT_DESCRIPTION, GITHUB_URL, SITE_NAME, SITE_URL } from "@/lib/site";
 import Link from "next/link";
 
@@ -191,6 +194,7 @@ const uniqueSorted = (values: (string | undefined)[]) =>
 
 export default function Home() {
   const router = useRouter();
+  const loggedInUserId = useSelector((state: any) => state.user.user?.id);
   const [tab, setTab] = useState<TabId>("flights");
   const [form, setForm] = useState<Form>(defaultForm);
   const [applied, setApplied] = useState<({ tab: TabId } & Form) | null>(null);
@@ -307,6 +311,9 @@ export default function Home() {
   const setField = <K extends keyof Form>(key: K, value: Form[K]) => setForm((f) => ({ ...f, [key]: value }));
 
   const handleSearch = () => {
+    // remember what the customer searched for, so "Recommended for you" can learn from it
+    const place = tab === "hotels" || tab === "homestays" || tab === "holiday" ? form.city : form.to;
+    if (loggedInUserId && place && place.trim()) recordActivity(loggedInUserId, "SEARCH", { query: place.trim() });
     setVisible(PAGE_SIZE);
     setApplied({ tab, ...form });
     setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
@@ -829,6 +836,8 @@ export default function Home() {
         </div>
 
         <div className="mx-auto mt-12 max-w-7xl px-0">
+          <Recommendations className="my-16" />
+
           {/* Offers Section */}
           <section className="my-16">
             <h2 className="mb-8 text-3xl font-bold text-slate-900">Best Offers</h2>

@@ -23,6 +23,7 @@ import BookingPanel from "@/components/BookingPanel";
 import PriceInsights from "@/components/PriceInsights";
 import RefundPolicyCard from "@/components/RefundPolicyCard";
 import Reviews from "@/components/Reviews";
+import { useTrackView } from "@/lib/useTrackView";
 import Seo from "@/components/Seo";
 import { formatINR, isoDay, nightsBetween } from "@/lib/format";
 
@@ -48,6 +49,7 @@ const BookListingPage = () => {
   const router = useRouter();
   const { id, qty, date, checkIn, checkOut } = router.query;
   const [item, setItem] = useState<any>(null);
+  useTrackView(item?.category || "", item?.category ? item?.id : null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [quantity, setQuantity] = useState(1);

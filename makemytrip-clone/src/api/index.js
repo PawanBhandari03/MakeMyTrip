@@ -499,3 +499,37 @@ export const moderateReview = async (id, action, note) => {
   const res = await axios.post(`${BACKEND_URL}/admin/reviews/${id}/moderate`, null, { params: { action, note: note || undefined } });
   return res.data;
 };
+
+// ---------------------------------------------------------------- recommendations
+
+export const getRecommendations = async (userId, limit = 8, category) => {
+  const res = await axios.get(`${BACKEND_URL}/recommendations`, {
+    params: { userId: userId || undefined, limit, category: category || undefined },
+  });
+  return res.data;
+};
+
+/** verdict is "HELPFUL" or "IRRELEVANT". */
+export const sendRecommendationFeedback = async (userId, category, itemId, verdict) => {
+  const res = await axios.post(`${BACKEND_URL}/recommendations/feedback`, null, { params: { userId, category, itemId, verdict } });
+  return res.data;
+};
+
+export const clearRecommendationFeedback = async (userId, category, itemId) => {
+  const res = await axios.delete(`${BACKEND_URL}/recommendations/feedback`, { params: { userId, category, itemId } });
+  return res.data;
+};
+
+/** Tells the server what a customer opened (VIEW) or searched (SEARCH), so suggestions can learn from it. */
+export const recordActivity = async (userId, type, { category, itemId, query, source } = {}) => {
+  try {
+    await axios.post(`${BACKEND_URL}/activity`, null, { params: { userId, type, category, itemId, query, source } });
+  } catch (e) {
+    // tracking must never get in the way of the page
+  }
+};
+
+export const getRecommendationStats = async (inspectUserId) => {
+  const res = await axios.get(`${BACKEND_URL}/admin/recommendations/stats`, { params: { inspectUserId: inspectUserId || undefined } });
+  return res.data;
+};

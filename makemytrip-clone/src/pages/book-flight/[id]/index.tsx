@@ -19,6 +19,7 @@ import BookingPanel from "@/components/BookingPanel";
 import PriceInsights from "@/components/PriceInsights";
 import RefundPolicyCard from "@/components/RefundPolicyCard";
 import Reviews from "@/components/Reviews";
+import { useTrackView } from "@/lib/useTrackView";
 import Seo from "@/components/Seo";
 import { durationBetween, formatINR, formatTime, formatDate } from "@/lib/format";
 
@@ -38,6 +39,7 @@ const BookFlightPage = () => {
   const router = useRouter();
   const { id, qty } = router.query;
   const [flight, setFlight] = useState<Flight | null>(null);
+  useTrackView("FLIGHT", flight?.id);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [hotels, setHotels] = useState<any[]>([]);
