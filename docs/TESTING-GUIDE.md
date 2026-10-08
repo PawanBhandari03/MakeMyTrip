@@ -66,6 +66,19 @@ A step-by-step list for anyone checking the project. It takes about 15 minutes a
 | 6 | Press **Report**, choose a reason | The button changes to "Reported". Reported by three different accounts, the review is hidden |
 | 7 | As admin: **Admin → Reviews** | The reported review with its reasons; press **Keep** or **Remove** |
 
+## Task 5: Recommendations
+
+| Step | What to do | You should see |
+|---|---|---|
+| 1 | Logged in as `user`, scroll the home page to **Recommended for you** | Cards with a reason such as "You looked at 3 places in Pondicherry" |
+| 2 | Press **Why this?** on a card | The reasons, and a bar showing how much came from your history, similar travellers, ratings and budget |
+| 3 | Press the thumbs-down on a card | The card disappears with an **Undo** bar; places like it appear less |
+| 4 | Press the thumbs-up on another card | It is marked; similar places rise in the list after a refresh |
+| 5 | Sign up a new account and look at the same row | Popular, highly rated places, with an invitation to log in or browse |
+| 6 | As that new user, open three hotels in one city (or search for the city) and refresh the row | The row turns personal: that city comes first, with reasons that mention it |
+| 7 | **My Trips**, scroll to the bottom | **Recommended for your next trip** |
+| 8 | As admin: **Admin → Recommendations**, choose a customer under **Inspect a customer** | Their learned profile and what they would be shown, with scores |
+
 ## Responsive check
 
 Resize the window or use the browser's phone view. Every page, including the booking pages, My Trips and the admin area, should fit without sideways scrolling.

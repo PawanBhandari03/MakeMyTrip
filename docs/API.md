@@ -71,6 +71,15 @@ Most customer calls take the logged-in user's id as `userId`.
 | POST | `/reviews/{id}/flag?userId=&reason=` | Report a review |
 | GET | `/reviews/flag-reasons` | Report reasons |
 
+## Recommendations (Task 5)
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/recommendations?userId=&limit=&category=` | Suggestions with reasons and a score breakdown; popular items when there is no user or no history |
+| POST | `/recommendations/feedback?userId=&category=&itemId=&verdict=` | `HELPFUL` or `IRRELEVANT` |
+| DELETE | `/recommendations/feedback?userId=&category=&itemId=` | Undo an answer |
+| POST | `/activity?userId=&type=&category=&itemId=&query=&source=` | Record a `VIEW` or a `SEARCH` |
+
 ## Admin
 
 These are used by the Admin pages. Note the known limitation: they are not protected by server-side authentication.
@@ -86,3 +95,4 @@ These are used by the Admin pages. Note the known limitation: they are not prote
 | POST | `/admin/refunds/{id}/advance` | Move a refund one step forward |
 | GET | `/admin/reviews?filter=`, `/admin/reviews/stats` | Moderation queue (`FLAGGED`, `HIDDEN`, `REMOVED`, `ALL`) and totals |
 | POST | `/admin/reviews/{id}/moderate?action=` | `KEEP`, `REMOVE` or `RESTORE` |
+| GET | `/admin/recommendations/stats?inspectUserId=` | Feedback totals, model size, and optionally one customer's profile and suggestions |

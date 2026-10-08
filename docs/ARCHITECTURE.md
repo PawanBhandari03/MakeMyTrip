@@ -46,6 +46,7 @@ A rule that matters for honesty: **the server decides every amount.** The browse
 | Refund processor | every 15 s | Moves refunds from *Pending* to *Processed* to *Completed* after a short delay |
 | Price snapshots | every 15 min | Records the current price of items people look at, book or freeze |
 | Snapshot clean-up | daily at 03:30 | Removes price records older than 60 days and watches older than 7 days |
+| Similarity model refresh | when needed, at most every 5 minutes | Rebuilds "travellers who chose X also chose Y" from everyone's history |
 | Demo-data loader | at start-up | Adds any missing demo data and creates the two accounts |
 
 The server's clock is fixed to India time (`Asia/Kolkata`) so flight times and "now" agree wherever it is hosted.
@@ -82,7 +83,7 @@ sequenceDiagram
 
 If the price moved while you were looking, **nothing is charged** until you agree to the new total. Seats are taken with a single atomic database update, so two people cannot book the last seat.
 
-## 4. How the five areas connect
+## 4. How the five features connect
 
 ```mermaid
 flowchart LR
@@ -97,6 +98,11 @@ flowchart LR
     B --> RV["Reviews<br/>Task 4"]
     RV -->|average becomes the rating| SR["Search results"]
     PR --> SR
+    B --> RC["Recommendations<br/>Task 5"]
+    RV --> RC
+    SR -->|searches and views| RC
+    RC -->|feedback| RC
+    RC --> HP["Recommended for you<br/>home page and My Trips"]
 ```
 
 - A booked flight is **followed automatically**, so its delays reach the bell.
@@ -104,6 +110,7 @@ flowchart LR
 - If the airline **cancels a flight** in the live feed, cancelling that booking gives a full refund with no reason needed.
 - Refund steps and review replies use the same **notification bell** as flight updates.
 - The **rating on search cards** is the average of published reviews.
+- **Recommendations** learn from bookings, reviews, searches and page views, and use review ratings to rank places.
 
 ## 5. Front-end structure
 

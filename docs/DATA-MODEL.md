@@ -22,6 +22,8 @@ erDiagram
     REVIEWS }o--|| HOTELS : about
     REVIEWS }o--|| LISTINGS : about
     REVIEWS }o--|| FLIGHT : about
+    USERS ||--o{ INTERACTIONS : "views and searches"
+    USERS ||--o{ RECOMMENDATION_FEEDBACK : "thumbs up or down"
     PRICING_RULES }o--o{ PRICE_SNAPSHOTS : "shape prices"
     PRICE_WATCH ||--o{ PRICE_SNAPSHOTS : "records"
 
@@ -73,6 +75,8 @@ erDiagram
 | `price_watch` | Items people looked at, so history keeps growing | category, item, travel date, last viewed |
 | `price_freezes` | Locked prices | user, item, locked unit price, fee, hours, expires, status |
 | `refunds` | Refund tracker records | booking reference, quantity, paid, fee, percent, amount, reason, status, timestamps, expected date |
+| `interactions` | What customers viewed or searched (and the demo travellers' bookings) | user, category, item, type (`VIEW`, `SEARCH`, `BOOK`), destination, source, time, demo flag |
+| `recommendation_feedback` | Helpful / not-relevant answers | user, item, destination, verdict (`HELPFUL`, `IRRELEVANT`), time |
 | `reviews` | Ratings and reviews | item, user, rating, title, text, photos, helpful count, replies, flags, status |
 
 ## Booking fields (inside a user)
@@ -90,4 +94,4 @@ erDiagram
 
 ## Demo data flag
 
-Generated rows carry `demo = true`. **Reset demo data** deletes and recreates only those, so anything an admin adds by hand is kept. Customers' bookings, accounts and refunds are never touched.
+Generated rows (including the demo travellers' activity) carry `demo = true`. **Reset demo data** deletes and recreates only those, so anything an admin adds by hand is kept. Customers' bookings, accounts and refunds are never touched.

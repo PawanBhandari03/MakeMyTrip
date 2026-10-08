@@ -12,6 +12,7 @@ Log in as `admin` / `admin123` and press **Admin** in the navbar. The sections a
 | Pricing | Season rules that move prices (Task 2) |
 | Refunds | The refund queue, totals and cancellation reasons (Task 3) |
 | Reviews | Moderate reported reviews (Task 4) |
+| Recommendations | Feedback totals, similarity-model size, and **Inspect a customer** (Task 5) |
 | Users | See users and promote or demote admins |
 
 ## Demo data buttons
@@ -19,7 +20,7 @@ Log in as `admin` / `admin123` and press **Admin** in the navbar. The sections a
 | Button | What it does |
 |---|---|
 | **Load missing demo data** | Adds only what is missing or out of date. Deletes nothing. The back end also does this by itself at every start-up. |
-| **Reset demo data** | Deletes every demo flight, hotel and service, their price history and demo reviews, then creates fresh ones. Accounts, bookings, refunds and anything added by hand are kept. Old items get new ids, so a link to an old item may stop working. |
+| **Reset demo data** | Deletes every demo flight, hotel and service, their price history, demo reviews and demo travellers, then creates fresh ones. Accounts, bookings, refunds and anything added by hand are kept. Old items get new ids, so a link to an old item may stop working. |
 
 Run **Reset** once after a new deployment, and once more just before showing the project so that flights cover the coming days.
 
