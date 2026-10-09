@@ -136,10 +136,3 @@ The back end loads any missing demo data every time it starts, and creates new f
 ```
 
 ---
-
-## Known limitations
-
-- Payments are simulated; no money moves.
-- The admin screens are hidden from customers in the interface, but the admin API endpoints are not protected by server-side authentication. Add Spring Security with JWT before using this for anything real.
-- The free hosting plans sleep when idle, so the first request can be slow.
-- Flight, hotel and price data are generated demo data.
