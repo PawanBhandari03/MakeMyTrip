@@ -1,6 +1,6 @@
 # Architecture
 
-This page explains how the pieces of MakeMyTrip fit together and what happens when a customer books a trip.
+This page explains how the pieces of TravelEase fit together and what happens when a customer books a trip.
 
 ## 1. The big picture
 
@@ -120,6 +120,8 @@ flowchart LR
 | `components/` | `BookingPanel`, `PriceInsights`, `PriceFreezeCard`, `CancelDialog`, `RefundList`, `RefundPolicyCard`, `Reviews`, `NotificationBell`, `admin/*` ... |
 | `api/index.js` | The only place that talks to the back end |
 | `lib/` | Formatting helpers, place data, live-price hook, site settings |
+
+The look is defined once: `tailwind.config.ts` holds the `brand` colour scale (teal) and `styles/globals.css` the default button and focus colours, with navy-toned neutrals for text. Red is kept only for errors, deletions, cancelled states and rising prices.
 
 ## 6. Speed on a small server
 

@@ -55,7 +55,7 @@ sequenceDiagram
     participant N as Notification bell
 
     U->>S: writes a review
-    A->>S: replies as MakeMyTrip team
+    A->>S: replies as TravelEase team
     S->>N: New reply to your review
     N-->>U: bell opens the hotel page at the review
 ```

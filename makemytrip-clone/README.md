@@ -1,6 +1,6 @@
-# MakeMyTrip front end
+# TravelEase front end
 
-The Next.js (pages router) + React + Redux Toolkit + Tailwind CSS front end of MakeMyTrip.
+The React (Next.js pages router) + TypeScript + Redux Toolkit + Tailwind CSS front end of TravelEase.
 The project overview, setup and documentation are in the [main README](../README.md).
 
 ```
