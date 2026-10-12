@@ -1,6 +1,6 @@
-# TravelEase front end
+# Voyago front end
 
-The React (Next.js pages router) + TypeScript + Redux Toolkit + Tailwind CSS front end of TravelEase.
+The React (Next.js pages router) + TypeScript + Redux Toolkit + Tailwind CSS front end of Voyago.
 The project overview, setup and documentation are in the [main README](../README.md).
 
 ```

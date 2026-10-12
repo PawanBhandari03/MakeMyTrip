@@ -1,6 +1,6 @@
 # Deployment and submission guide
 
-How to put TravelEase on the internet, and how to check it before handing it in. It uses only free plans:
+How to put Voyago on the internet, and how to check it before handing it in. It uses only free plans:
 
 | Part | Service | What it hosts |
 |---|---|---|

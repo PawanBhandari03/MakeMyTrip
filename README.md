@@ -1,6 +1,6 @@
-# TravelEase: Full-Stack Travel Booking Platform
+# Voyago: Full-Stack Travel Booking Platform
 
-TravelEase is a full-stack travel booking platform: search and book **flights, hotels, homestays, holiday packages, trains, buses, cabs, forex and travel insurance**, with live flight tracking, dynamic pricing, refunds, reviews and personalised recommendations.
+Voyago is a full-stack travel booking platform: search and book **flights, hotels, homestays, holiday packages, trains, buses, cabs, forex and travel insurance**, with live flight tracking, dynamic pricing, refunds, reviews and personalised recommendations.
 
 **All five internship features are built and working**: live flight status, dynamic pricing, cancellation and refunds, reviews and ratings, and personalised recommendations. Each is listed below with a link to its documentation.
 
@@ -15,7 +15,7 @@ All data is demo data and no real payment is ever taken.
 
 > The back end runs on a free Render plan, which sleeps when idle. The first request after a pause can take about a minute; please wait for it.
 >
-> **A note on names:** the product is called TravelEase. A few internal names keep the project's original working name so that nothing that is already deployed breaks: the Java package `com.makemytrip`, the database name, the front-end folder `makemytrip-clone`, the repository name and the hosted web addresses above.
+> **A note on names:** the product is called Voyago. A few internal names keep the project's original working name so that nothing that is already deployed breaks: the Java package `com.makemytrip`, the database name, the front-end folder `makemytrip-clone`, the repository name and the hosted web addresses above.
 
 ---
 
@@ -28,7 +28,7 @@ Two ready-made accounts exist, so nothing needs to be signed up for. The login d
 | Customer | `user` | `user123` | Search, book, cancel, review, follow flights |
 | Admin | `admin` | `admin123` | Everything above, plus the **Admin** area |
 
-`user` and `admin` are shorthand for the built-in accounts `user@travelease.com` and `admin@travelease.com`. Anyone can also sign up with their own email (sign-up always creates a customer).
+`user` and `admin` are shorthand for the built-in accounts `user@voyago.com` and `admin@voyago.com`. Anyone can also sign up with their own email (sign-up always creates a customer).
 
 **A short tour that touches every feature** (the full step-by-step list is in [docs/TESTING-GUIDE.md](docs/TESTING-GUIDE.md)):
 

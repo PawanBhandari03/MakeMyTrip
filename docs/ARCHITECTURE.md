@@ -1,6 +1,6 @@
 # Architecture
 
-This page explains how the pieces of TravelEase fit together and what happens when a customer books a trip.
+This page explains how the pieces of Voyago fit together and what happens when a customer books a trip.
 
 ## 1. The big picture
 
