@@ -6,7 +6,7 @@ import { errorMessage, formatDateTime, formatINR } from "@/lib/format";
 
 const BADGE: Record<string, string> = {
   PENDING: "bg-amber-100 text-amber-700",
-  PROCESSED: "bg-blue-100 text-blue-700",
+  PROCESSED: "bg-brand-100 text-brand-700",
   COMPLETED: "bg-emerald-100 text-emerald-700",
 };
 
@@ -78,7 +78,7 @@ const RefundsAdmin = () => {
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <Stat label="Total refunds" value={String(stats.count)} tone="text-slate-900" />
           <Stat label="Pending" value={formatINR(stats.pendingAmount)} tone="text-amber-600" />
-          <Stat label="Processed" value={formatINR(stats.processedAmount)} tone="text-blue-600" />
+          <Stat label="Processed" value={formatINR(stats.processedAmount)} tone="text-brand-600" />
           <Stat label="Completed" value={formatINR(stats.completedAmount)} tone="text-emerald-600" />
         </div>
       )}
@@ -91,7 +91,7 @@ const RefundsAdmin = () => {
               <div key={name} className="flex items-center gap-3 text-sm">
                 <span className="w-44 shrink-0 truncate sm:w-60">{name}</span>
                 <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
-                  <div className="h-full rounded-full bg-blue-500" style={{ width: `${(count / maxReason) * 100}%` }} />
+                  <div className="h-full rounded-full bg-brand-500" style={{ width: `${(count / maxReason) * 100}%` }} />
                 </div>
                 <span className="w-6 text-right font-semibold">{count}</span>
               </div>

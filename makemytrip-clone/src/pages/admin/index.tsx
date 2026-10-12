@@ -74,7 +74,7 @@ const DemoBadge = ({ row }: { row: any }) =>
 
 const StatCard = ({ label, value, icon }: { label: string; value: React.ReactNode; icon: React.ReactNode }) => (
   <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">{icon}</div>
+    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600">{icon}</div>
     <div className="text-2xl font-extrabold">{value}</div>
     <div className="text-sm text-slate-500">{label}</div>
   </div>
@@ -121,7 +121,7 @@ const Dashboard = () => {
   if (!stats)
     return (
       <div className="flex justify-center py-20">
-        <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+        <Loader2 className="h-6 w-6 animate-spin text-brand-600" />
       </div>
     );
 
@@ -158,7 +158,7 @@ const Dashboard = () => {
                     <span className="font-semibold">{formatINR(value)}</span>
                   </div>
                   <div className="h-2 rounded-full bg-slate-100">
-                    <div className="h-2 rounded-full bg-blue-600" style={{ width: `${(value / maxRevenue) * 100}%` }} />
+                    <div className="h-2 rounded-full bg-brand-600" style={{ width: `${(value / maxRevenue) * 100}%` }} />
                   </div>
                 </div>
               ))}
@@ -175,7 +175,7 @@ const Dashboard = () => {
             yourself are never removed.
           </p>
           <div className="flex flex-wrap gap-3">
-            <Button disabled={busy} onClick={() => runSeed(false)} className="bg-blue-600 hover:bg-blue-700">
+            <Button disabled={busy} onClick={() => runSeed(false)} className="bg-brand-600 hover:bg-brand-700">
               {busy && <Loader2 className="h-4 w-4 animate-spin" />} Load missing demo data
             </Button>
             <Button disabled={busy} variant="outline" onClick={() => runSeed(true)}>
@@ -289,7 +289,7 @@ const UsersTab = ({ currentId }: { currentId: string }) => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search user by name or email"
-            className="w-full rounded-lg border border-slate-200 py-2 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            className="w-full rounded-lg border border-slate-200 py-2 pl-9 pr-3 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
           />
         </div>
         {error && <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
@@ -297,7 +297,7 @@ const UsersTab = ({ currentId }: { currentId: string }) => {
       <div className="overflow-x-auto p-5">
         {loading ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+            <Loader2 className="h-6 w-6 animate-spin text-brand-600" />
           </div>
         ) : (
           <table className="w-full min-w-[640px] text-left text-sm">
@@ -459,7 +459,7 @@ const ServicesManager = () => {
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
+          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-500"
         >
           <option value="ALL">All categories</option>
           {CATEGORIES.map((c) => (
@@ -507,7 +507,7 @@ export default function AdminDashboard() {
         </p>
         <div className="mt-6 flex justify-center gap-3">
           {!user && (
-            <SignupDialog trigger={<Button className="bg-blue-600 text-white hover:bg-blue-700">Log in</Button>} />
+            <SignupDialog trigger={<Button className="bg-brand-600 text-white hover:bg-brand-700">Log in</Button>} />
           )}
           <Link href="/" className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-slate-50">
             Back to home

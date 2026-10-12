@@ -75,7 +75,7 @@ const PriceTag = ({
             <button
               type="button"
               onClick={() => setOpen((o) => !o)}
-              className="inline-flex items-center gap-0.5 text-[11px] font-medium text-blue-600 hover:underline"
+              className="inline-flex items-center gap-0.5 text-[11px] font-medium text-brand-600 hover:underline"
               aria-expanded={open}
             >
               <Info className="h-3 w-3" /> Why this price?

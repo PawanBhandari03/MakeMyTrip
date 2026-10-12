@@ -86,7 +86,7 @@ const BookHotelPage = () => {
       <div className="mx-auto max-w-xl px-4 py-24 text-center">
         <h1 className="text-2xl font-bold">Hotel not found</h1>
         <p className="mt-2 text-slate-600">This hotel may have been removed.</p>
-        <Link href="/?tab=hotels" className="mt-6 inline-block rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white">
+        <Link href="/?tab=hotels" className="mt-6 inline-block rounded-lg bg-brand-600 px-5 py-2 font-semibold text-white">
           Search hotels
         </Link>
       </div>
@@ -108,11 +108,11 @@ const BookHotelPage = () => {
       <div className="border-b bg-white">
         <div className="mx-auto max-w-7xl px-4 py-3">
           <div className="flex items-center space-x-2 text-sm">
-            <Link href="/" className="text-blue-600 hover:underline">
+            <Link href="/" className="text-brand-600 hover:underline">
               Home
             </Link>
             <ChevronRight className="h-4 w-4 text-slate-400" />
-            <Link href={`/?tab=hotels&city=${encodeURIComponent(hotel.location)}`} className="text-blue-600 hover:underline">
+            <Link href={`/?tab=hotels&city=${encodeURIComponent(hotel.location)}`} className="text-brand-600 hover:underline">
               {hotel.location}
             </Link>
             <ChevronRight className="h-4 w-4 text-slate-400" />
@@ -216,7 +216,7 @@ const BookHotelPage = () => {
             {/* Rating Card */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div className="flex items-center space-x-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-blue-600 text-2xl font-bold text-white">
+                <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-brand-600 text-2xl font-bold text-white">
                   {rating ? rating.toFixed(1) : "–"}
                 </div>
                 <div>
@@ -237,7 +237,7 @@ const BookHotelPage = () => {
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.hotelName + " " + hotel.location)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm font-medium text-blue-600 hover:underline"
+                  className="text-sm font-medium text-brand-600 hover:underline"
                 >
                   See on Map
                 </a>

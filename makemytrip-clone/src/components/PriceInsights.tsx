@@ -101,7 +101,7 @@ const PriceInsights = ({
   if (loading) {
     return (
       <div className="flex items-center justify-center rounded-2xl border border-slate-100 bg-white p-10 shadow-sm">
-        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+        <Loader2 className="h-5 w-5 animate-spin text-brand-600" />
       </div>
     );
   }
@@ -128,10 +128,10 @@ const PriceInsights = ({
   };
 
   return (
-    <section className="rounded-2xl border border-slate-100 bg-white p-6 shadow-lg shadow-blue-900/5 sm:p-8">
+    <section className="rounded-2xl border border-slate-100 bg-white p-6 shadow-lg shadow-brand-900/5 sm:p-8">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-lg font-bold">
-          <TrendingUp className="h-5 w-5 text-blue-600" />
+          <TrendingUp className="h-5 w-5 text-brand-600" />
           {title}
         </h2>
         <div className="inline-flex rounded-lg bg-slate-100 p-1 text-sm">
@@ -203,8 +203,8 @@ const PriceInsights = ({
         >
           <defs>
             <linearGradient id="priceArea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#2563eb" stopOpacity="0.22" />
-              <stop offset="100%" stopColor="#2563eb" stopOpacity="0.02" />
+              <stop offset="0%" stopColor="#0d9488" stopOpacity="0.22" />
+              <stop offset="100%" stopColor="#0d9488" stopOpacity="0.02" />
             </linearGradient>
           </defs>
 
@@ -223,8 +223,8 @@ const PriceInsights = ({
           ))}
 
           <path d={chart.area} fill="url(#priceArea)" />
-          {chart.estimated.length > 1 && <path d={chart.line(chart.estimated)} fill="none" stroke="#93c5fd" strokeWidth="2" strokeLinejoin="round" />}
-          {chart.live.length > 1 && <path d={chart.line(chart.live)} fill="none" stroke="#2563eb" strokeWidth="2.5" strokeLinejoin="round" />}
+          {chart.estimated.length > 1 && <path d={chart.line(chart.estimated)} fill="none" stroke="#5eead4" strokeWidth="2" strokeLinejoin="round" />}
+          {chart.live.length > 1 && <path d={chart.line(chart.live)} fill="none" stroke="#0d9488" strokeWidth="2.5" strokeLinejoin="round" />}
           {chart.future.length > 0 && (
             <path d={chart.line(chart.connectFrom)} fill="none" stroke="#f59e0b" strokeWidth="2.5" strokeDasharray="6 5" strokeLinejoin="round" />
           )}
@@ -235,13 +235,13 @@ const PriceInsights = ({
             Today
           </text>
           {chart.past.length > 0 && (
-            <circle cx={nowX} cy={chart.y(chart.past[chart.past.length - 1].price)} r="5" fill="#2563eb" stroke="white" strokeWidth="2" />
+            <circle cx={nowX} cy={chart.y(chart.past[chart.past.length - 1].price)} r="5" fill="#0d9488" stroke="white" strokeWidth="2" />
           )}
 
           {hovered && (
             <g>
-              <line x1={chart.px(hovered)} x2={chart.px(hovered)} y1={PAD.t} y2={H - PAD.b} stroke="#2563eb" strokeOpacity="0.35" />
-              <circle cx={chart.px(hovered)} cy={chart.y(hovered.price)} r="5" fill="white" stroke="#2563eb" strokeWidth="2.5" />
+              <line x1={chart.px(hovered)} x2={chart.px(hovered)} y1={PAD.t} y2={H - PAD.b} stroke="#0d9488" strokeOpacity="0.35" />
+              <circle cx={chart.px(hovered)} cy={chart.y(hovered.price)} r="5" fill="white" stroke="#0d9488" strokeWidth="2.5" />
             </g>
           )}
         </svg>
@@ -261,10 +261,10 @@ const PriceInsights = ({
 
       <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-slate-500">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-0.5 w-5 bg-blue-600" /> Recorded
+          <span className="inline-block h-0.5 w-5 bg-brand-600" /> Recorded
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-0.5 w-5 bg-blue-300" /> Earlier history (estimated from past demand patterns)
+          <span className="inline-block h-0.5 w-5 bg-brand-300" /> Earlier history (estimated from past demand patterns)
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-0.5 w-5 border-t-2 border-dashed border-amber-500" /> Forecast if demand stays the same

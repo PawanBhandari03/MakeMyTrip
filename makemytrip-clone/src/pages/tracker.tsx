@@ -137,13 +137,13 @@ export default function Tracker() {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
         <Seo title="My Flights" path="/tracker" noindex />
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600">
           <PlaneTakeoff className="h-8 w-8" />
         </div>
         <h1 className="text-2xl font-bold">Follow your flights</h1>
         <p className="mt-2 text-slate-600">Log in to follow several flights at once and get a notification the moment one is delayed, changes gate or lands.</p>
         <div className="mt-6">
-          <SignupDialog trigger={<Button className="bg-blue-600 px-8 text-white hover:bg-blue-700">Login / Sign Up</Button>} />
+          <SignupDialog trigger={<Button className="bg-brand-600 px-8 text-white hover:bg-brand-700">Login / Sign Up</Button>} />
         </div>
       </div>
     );
@@ -156,7 +156,7 @@ export default function Tracker() {
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="flex items-center gap-2 text-3xl font-extrabold tracking-tight">
-            <PlaneTakeoff className="h-7 w-7 text-blue-600" /> My Flights
+            <PlaneTakeoff className="h-7 w-7 text-brand-600" /> My Flights
           </h1>
           <p className="mt-1 text-slate-600">
             Live status for every flight you follow. Flights you book are added automatically, and you are notified of any change.
@@ -202,9 +202,9 @@ export default function Tracker() {
             value={input}
             onChange={(e) => setInput(e.target.value.toUpperCase())}
             placeholder="Follow another flight, e.g. 6E-126 or AI1234"
-            className="h-11 w-full rounded-xl border border-slate-200 px-4 font-medium uppercase sm:flex-1 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            className="h-11 w-full rounded-xl border border-slate-200 px-4 font-medium uppercase sm:flex-1 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
           />
-          <Button type="submit" disabled={adding || !input.trim()} className="h-11 bg-blue-600 px-6 hover:bg-blue-700">
+          <Button type="submit" disabled={adding || !input.trim()} className="h-11 bg-brand-600 px-6 hover:bg-brand-700">
             {adding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />} Follow flight
           </Button>
         </form>
@@ -221,7 +221,7 @@ export default function Tracker() {
                   type="button"
                   onClick={() => addFlight(s.flightNumber)}
                   disabled={adding}
-                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 disabled:opacity-60"
+                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 disabled:opacity-60"
                 >
                   {s.flightNumber} · {s.from} → {s.to}
                 </button>
@@ -234,7 +234,7 @@ export default function Tracker() {
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+          <Loader2 className="h-6 w-6 animate-spin text-brand-600" />
         </div>
       ) : flights.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white/70 px-6 py-16 text-center">
@@ -243,7 +243,7 @@ export default function Tracker() {
           <p className="mx-auto mt-1 max-w-md text-sm text-slate-600">
             Enter a flight number above, or pick one of the next departures. Flights you book are followed automatically.
           </p>
-          <Link href="/" className="mt-5 inline-block rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+          <Link href="/" className="mt-5 inline-block rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-700">
             Search flights
           </Link>
         </div>

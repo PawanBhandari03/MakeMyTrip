@@ -116,7 +116,7 @@ const FlightStatus = () => {
     !user ? (
       <SignupDialog
         trigger={
-          <button type="button" className="flex items-center gap-1 font-semibold text-blue-600 hover:underline">
+          <button type="button" className="flex items-center gap-1 font-semibold text-brand-600 hover:underline">
             <BellRing className="h-3.5 w-3.5" /> Log in to get notified
           </button>
         }
@@ -131,12 +131,12 @@ const FlightStatus = () => {
             Stop
           </button>
         )}
-        <Link href={`/tracker?flight=${flight.flightNumber}`} className="font-medium text-blue-600 hover:underline">
+        <Link href={`/tracker?flight=${flight.flightNumber}`} className="font-medium text-brand-600 hover:underline">
           Open in My Flights
         </Link>
       </>
     ) : (
-      <Button size="sm" disabled={busy} onClick={follow} className="h-8 bg-blue-600 hover:bg-blue-700">
+      <Button size="sm" disabled={busy} onClick={follow} className="h-8 bg-brand-600 hover:bg-brand-700">
         {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />} Follow this flight
       </Button>
     )
@@ -171,12 +171,12 @@ const FlightStatus = () => {
                 <input
                   type="text"
                   placeholder="Enter flight number (e.g., 6E-126 or AI1234)"
-                  className="h-12 w-full rounded-xl border border-slate-200 pl-10 pr-3 text-lg uppercase outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  className="h-12 w-full rounded-xl border border-slate-200 pl-10 pr-3 text-lg uppercase outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
                   value={flightNumber}
                   onChange={(e) => setFlightNumber(e.target.value)}
                 />
               </div>
-              <Button type="submit" className="h-12 bg-blue-600 px-8 text-lg hover:bg-blue-700">
+              <Button type="submit" className="h-12 bg-brand-600 px-8 text-lg hover:bg-brand-700">
                 Check Status
               </Button>
             </form>
@@ -190,7 +190,7 @@ const FlightStatus = () => {
                     setFlightNumber(s.flightNumber);
                     search(s.flightNumber);
                   }}
-                  className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 font-medium text-gray-700 transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+                  className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 font-medium text-gray-700 transition-colors hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
                 >
                   {s.flightNumber}
                 </button>
@@ -200,7 +200,7 @@ const FlightStatus = () => {
 
           {loading && !flight && (
             <div className="py-12 text-center">
-              <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-blue-600" />
+              <div className="mx-auto h-12 w-12 animate-spin rounded-full border-b-2 border-brand-600" />
               <p className="mt-4 font-medium text-gray-500">Fetching live updates...</p>
             </div>
           )}

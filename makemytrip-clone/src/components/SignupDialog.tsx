@@ -151,14 +151,14 @@ const SignupDialog = ({trigger}:any) => {
                 <button
                   type="button"
                   onClick={() => { setEmail("admin"); setPassword("admin123"); }}
-                  className="rounded-md border border-slate-200 bg-white px-2.5 py-1 font-mono hover:border-blue-400"
+                  className="rounded-md border border-slate-200 bg-white px-2.5 py-1 font-mono hover:border-brand-400"
                 >
                   admin / admin123
                 </button>
                 <button
                   type="button"
                   onClick={() => { setEmail("user"); setPassword("user123"); }}
-                  className="rounded-md border border-slate-200 bg-white px-2.5 py-1 font-mono hover:border-blue-400"
+                  className="rounded-md border border-slate-200 bg-white px-2.5 py-1 font-mono hover:border-brand-400"
                 >
                   user / user123
                 </button>
@@ -168,7 +168,7 @@ const SignupDialog = ({trigger}:any) => {
           {error && <p className="text-sm text-red-600">{error}</p>}
           <Button
             type="submit"
-            className="w-full bg-blue-600 text-white"
+            className="w-full bg-brand-600 text-white"
             variant="outline"
           >
             {isSignup ? "Sign Up" : "Login"}
@@ -180,7 +180,7 @@ const SignupDialog = ({trigger}:any) => {
               Already have an account?{" "}
               <Button
                 variant="link"
-                className="p-0 text-blue-600"
+                className="p-0 text-brand-600"
                 onClick={() => { setIsSignup(false); setError(""); }}
               >
                 Login
@@ -191,7 +191,7 @@ const SignupDialog = ({trigger}:any) => {
               Don't have an account?{" "}
               <Button
                 variant="link"
-                className="p-0 text-blue-600"
+                className="p-0 text-brand-600"
                 onClick={() => { setIsSignup(true); setError(""); }}
               >
                 Sign Up

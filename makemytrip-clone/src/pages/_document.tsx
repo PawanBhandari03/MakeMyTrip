@@ -7,9 +7,9 @@ export default function Document() {
       <Head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="alternate icon" href="/favicon.ico" />
-        <meta name="theme-color" content="#dc2626" />
+        <meta name="theme-color" content="#0f766e" />
         <meta name="keywords" content={KEYWORDS} />
-        <meta name="application-name" content="MakeMyTrip" />
+        <meta name="application-name" content="TravelEase" />
       </Head>
       <body className="antialiased">
         <Main />

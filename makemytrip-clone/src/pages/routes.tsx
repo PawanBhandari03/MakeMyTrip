@@ -45,10 +45,10 @@ const Card = ({ children }: { children: React.ReactNode }) => (
 const RouteChip = ({ mode, route }: { mode: Mode; route: Route }) => (
   <Link
     href={`/?tab=${mode}&from=${encodeURIComponent(route.from)}&to=${encodeURIComponent(route.to)}`}
-    className="group inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-700 transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+    className="group inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-700 transition-colors hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
   >
     <span className="font-medium">{route.to}</span>
-    {isFinite(route.minPrice) && <span className="text-xs text-slate-400 group-hover:text-blue-500">from {formatINR(route.minPrice)}</span>}
+    {isFinite(route.minPrice) && <span className="text-xs text-slate-400 group-hover:text-brand-500">from {formatINR(route.minPrice)}</span>}
   </Link>
 );
 
@@ -78,7 +78,7 @@ const RouteGroups = ({ mode, routes, groupBy }: { mode: Mode; routes: Route[]; g
           <div className="mb-3 flex items-start justify-between gap-3">
             <div>
               <h3 className="flex items-center gap-1.5 text-lg font-bold">
-                <MapPin className="h-4 w-4 text-blue-600" />
+                <MapPin className="h-4 w-4 text-brand-600" />
                 {groupBy === "origin" ? `From ${g.title}` : g.title}
               </h3>
               {g.subtitle && <p className="text-xs text-slate-500">{g.subtitle}</p>}
@@ -169,7 +169,7 @@ export default function RoutesPage() {
       />
       <div className="mb-8">
         <h1 className="flex items-center gap-2 text-3xl font-extrabold tracking-tight">
-          <Globe2 className="h-7 w-7 text-blue-600" /> Routes &amp; Destinations
+          <Globe2 className="h-7 w-7 text-brand-600" /> Routes &amp; Destinations
         </h1>
         <p className="mt-1 text-slate-600">
           Every place you can travel to and from. Pick a route to search it straight away.
@@ -197,8 +197,8 @@ export default function RoutesPage() {
               onClick={() => setMode(m.id)}
               className={`flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                 mode === m.id
-                  ? "border-blue-600 bg-blue-600 text-white"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-700"
+                  ? "border-brand-600 bg-brand-600 text-white"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:text-brand-700"
               }`}
             >
               {m.icon}
@@ -213,13 +213,13 @@ export default function RoutesPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search a city or country, e.g. Goa, London..."
-          className="w-full max-w-md rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          className="w-full max-w-md rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
         />
       </div>
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+          <Loader2 className="h-6 w-6 animate-spin text-brand-600" />
         </div>
       ) : mode === "stays" ? (
         <>
@@ -233,7 +233,7 @@ export default function RoutesPage() {
               {stayGroups.map(([group, items]) => (
                 <Card key={group}>
                   <h3 className="mb-3 flex items-center gap-1.5 text-lg font-bold">
-                    <MapPin className="h-4 w-4 text-blue-600" />
+                    <MapPin className="h-4 w-4 text-brand-600" />
                     {group}
                   </h3>
                   <ul className="space-y-2">
@@ -244,7 +244,7 @@ export default function RoutesPage() {
                           <span className="font-medium">{p.name}</span>
                           <span className="flex flex-wrap gap-2">
                             {p.hotels > 0 && (
-                              <Link href={`/?tab=hotels&city=${encodeURIComponent(p.name)}`} className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700 hover:bg-blue-100">
+                              <Link href={`/?tab=hotels&city=${encodeURIComponent(p.name)}`} className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-700 hover:bg-brand-100">
                                 {p.hotels} hotel{p.hotels > 1 ? "s" : ""}
                               </Link>
                             )}
@@ -271,11 +271,11 @@ export default function RoutesPage() {
         <Card>
           <p className="py-6 text-center text-slate-600">
             {MODES.find((m) => m.id === mode)?.label} are available within India only. For international travel, choose{" "}
-            <button className="font-semibold text-blue-600 hover:underline" onClick={() => setMode("flights")}>
+            <button className="font-semibold text-brand-600 hover:underline" onClick={() => setMode("flights")}>
               Flights
             </button>{" "}
             or{" "}
-            <button className="font-semibold text-blue-600 hover:underline" onClick={() => setMode("stays")}>
+            <button className="font-semibold text-brand-600 hover:underline" onClick={() => setMode("stays")}>
               Stays &amp; Holidays
             </button>
             .

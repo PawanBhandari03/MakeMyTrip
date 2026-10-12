@@ -14,7 +14,7 @@ const STEPS = [
 
 const BADGE: Record<string, string> = {
   PENDING: "bg-amber-100 text-amber-700",
-  PROCESSED: "bg-blue-100 text-blue-700",
+  PROCESSED: "bg-brand-100 text-brand-700",
   COMPLETED: "bg-emerald-100 text-emerald-700",
 };
 

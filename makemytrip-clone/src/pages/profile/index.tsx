@@ -36,11 +36,11 @@ import { Button } from "@/components/ui/button";
 import { errorMessage, formatDate, formatDateTime, formatINR } from "@/lib/format";
 
 const ICONS: Record<string, React.ReactNode> = {
-  FLIGHT: <Plane className="h-6 w-6 text-blue-600" />,
+  FLIGHT: <Plane className="h-6 w-6 text-brand-600" />,
   HOTEL: <Hotel className="h-6 w-6 text-green-600" />,
   HOMESTAY: <Home className="h-6 w-6 text-emerald-600" />,
   HOLIDAY: <Umbrella className="h-6 w-6 text-orange-600" />,
-  TRAIN: <Train className="h-6 w-6 text-indigo-600" />,
+  TRAIN: <Train className="h-6 w-6 text-brand-600" />,
   BUS: <Bus className="h-6 w-6 text-red-600" />,
   CAB: <Car className="h-6 w-6 text-yellow-600" />,
   FOREX: <CreditCard className="h-6 w-6 text-teal-600" />,
@@ -124,13 +124,13 @@ const Profile = () => {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
         <Seo title="My Trips & Profile" path="/profile" noindex />
-        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600">
           <User className="h-8 w-8" />
         </div>
         <h1 className="text-2xl font-bold">Please log in</h1>
         <p className="mt-2 text-slate-600">Log in to see your profile and your trips.</p>
         <div className="mt-6">
-          <SignupDialog trigger={<Button className="bg-blue-600 px-8 text-white hover:bg-blue-700">Login / Sign Up</Button>} />
+          <SignupDialog trigger={<Button className="bg-brand-600 px-8 text-white hover:bg-brand-700">Login / Sign Up</Button>} />
         </div>
       </div>
     );
@@ -147,7 +147,7 @@ const Profile = () => {
     .reduce((sum, b) => sum + (b.totalPrice || 0), 0);
 
   const inputClass =
-    "w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100";
+    "w-full rounded-lg border border-slate-200 px-3 py-2 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100";
 
   return (
     <div className="px-4 py-8">
@@ -212,7 +212,7 @@ const Profile = () => {
                     <button
                       onClick={handleSave}
                       disabled={saving}
-                      className="flex flex-1 items-center justify-center space-x-2 rounded-lg bg-red-600 py-2 text-white transition-colors hover:bg-red-700 disabled:opacity-60"
+                      className="flex flex-1 items-center justify-center space-x-2 rounded-lg bg-brand-600 py-2 text-white transition-colors hover:bg-brand-700 disabled:opacity-60"
                     >
                       <Check className="h-4 w-4" />
                       <span>{saving ? "Saving..." : "Save"}</span>
@@ -243,7 +243,7 @@ const Profile = () => {
                       <p className="font-medium">
                         {user.firstName} {user.lastName}
                       </p>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-blue-600">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-brand-600">
                         {user.role === "ADMIN" ? "Administrator" : "Customer"}
                       </p>
                     </div>
@@ -313,7 +313,7 @@ const Profile = () => {
                     {bookings.length === 0 ? "You have no bookings yet." : `No ${filter.toLowerCase()} bookings.`}
                   </p>
                   {bookings.length === 0 && (
-                    <Link href="/" className="mt-4 inline-block rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white hover:bg-blue-700">
+                    <Link href="/" className="mt-4 inline-block rounded-lg bg-brand-600 px-5 py-2 font-semibold text-white hover:bg-brand-700">
                       Start exploring
                     </Link>
                   )}
@@ -388,7 +388,7 @@ const Profile = () => {
                           {!cancelled && booking.bookingId && categoryOf(booking) !== "INSURANCE" && categoryOf(booking) !== "FOREX" && (
                             <Link
                               href={`${reviewPath(booking)}#reviews`}
-                              className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline"
+                              className="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:underline"
                             >
                               <Star className="h-4 w-4" /> Rate &amp; review
                             </Link>

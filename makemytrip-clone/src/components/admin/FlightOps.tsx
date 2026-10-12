@@ -59,13 +59,13 @@ const FlightOps = () => {
     }
   };
 
-  const btn = "rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:border-blue-300 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40";
+  const btn = "rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-700 hover:border-brand-300 hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-40";
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
       <div className="border-b p-5">
         <h2 className="flex items-center gap-2 text-lg font-bold">
-          <Radio className="h-5 w-5 text-blue-600" /> Flight Operations
+          <Radio className="h-5 w-5 text-brand-600" /> Flight Operations
         </h2>
         <p className="text-sm text-slate-500">
           This console plays the part of an airline sending live updates. Delay a flight, change its gate or cancel it, and every customer
@@ -80,7 +80,7 @@ const FlightOps = () => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by flight number, airline or city"
-            className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
           />
         </div>
         <span className="text-sm text-slate-500">Showing flights from 3 hours ago to the next 36 hours</span>
@@ -93,7 +93,7 @@ const FlightOps = () => {
       <div className="overflow-x-auto p-5">
         {loading ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+            <Loader2 className="h-6 w-6 animate-spin text-brand-600" />
           </div>
         ) : shown.length === 0 ? (
           <p className="py-12 text-center text-slate-500">No flights found.</p>

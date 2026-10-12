@@ -65,7 +65,7 @@ export function SearchSelect({
     <div ref={wrapperRef} className="relative h-full">
       <div
         className={`h-full rounded-xl border p-3 transition-colors bg-white ${
-          isOpen ? "border-blue-500 ring-2 ring-blue-100" : "border-slate-200 hover:border-blue-400"
+          isOpen ? "border-brand-500 ring-2 ring-brand-100" : "border-slate-200 hover:border-brand-400"
         }`}
       >
         <div className="flex items-center gap-3">
@@ -130,7 +130,7 @@ export function SearchSelect({
                   type="button"
                   role="option"
                   aria-selected={i === active}
-                  className={`flex w-full items-baseline justify-between gap-3 px-4 py-2 text-left text-sm ${i === active ? "bg-blue-50" : "hover:bg-blue-50"}`}
+                  className={`flex w-full items-baseline justify-between gap-3 px-4 py-2 text-left text-sm ${i === active ? "bg-brand-50" : "hover:bg-brand-50"}`}
                   onMouseEnter={() => setActive(i)}
                   onClick={() => pick(s.value)}
                 >

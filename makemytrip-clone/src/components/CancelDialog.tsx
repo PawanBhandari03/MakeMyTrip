@@ -156,7 +156,7 @@ const CancelDialog = ({ booking, userId, onClose, onDone }: Props) => {
                 setReason(e.target.value);
                 setError("");
               }}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
             >
               <option value="">Select a reason</option>
               {reasons.map((r) => (
@@ -171,7 +171,7 @@ const CancelDialog = ({ booking, userId, onClose, onDone }: Props) => {
                 onChange={(e) => setNote(e.target.value.slice(0, 200))}
                 rows={2}
                 placeholder="Tell us a little more (optional)"
-                className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
               />
             )}
           </div>

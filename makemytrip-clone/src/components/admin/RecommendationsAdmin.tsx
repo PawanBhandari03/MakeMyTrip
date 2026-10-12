@@ -63,7 +63,7 @@ const RecommendationsAdmin = () => {
           <Stat label="Marked helpful" value={stats.helpful} tone="text-emerald-600" />
           <Stat label="Marked not relevant" value={stats.irrelevant} tone="text-red-600" />
           <Stat label="Helpful rate" value={total ? `${rate}%` : "-"} tone="text-slate-900" />
-          <Stat label="Visits from suggestions" value={stats.fromRecommendations} tone="text-blue-600" />
+          <Stat label="Visits from suggestions" value={stats.fromRecommendations} tone="text-brand-600" />
           <Stat label="Travellers learned from" value={stats.modelTravellers} tone="text-violet-600" />
         </div>
       )}

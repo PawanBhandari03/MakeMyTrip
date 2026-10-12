@@ -137,13 +137,13 @@ const PriceFreezeCard = ({ category, itemId, quantity, nights = 1, travelDate, o
   // ---- not logged in
   if (!user) {
     return (
-      <div className="rounded-xl border border-indigo-200 bg-indigo-50/60 p-4 text-sm">
-        <h3 className="mb-1 flex items-center gap-1.5 font-bold text-indigo-900">
+      <div className="rounded-xl border border-brand-200 bg-brand-50/60 p-4 text-sm">
+        <h3 className="mb-1 flex items-center gap-1.5 font-bold text-brand-900">
           <Snowflake className="h-4 w-4" /> Worried the price will go up?
         </h3>
-        <p className="text-indigo-900">Log in to freeze this price for up to 48 hours.</p>
+        <p className="text-brand-900">Log in to freeze this price for up to 48 hours.</p>
         <div className="mt-2">
-          <SignupDialog trigger={<button type="button" className="font-semibold text-indigo-700 hover:underline">Log in to freeze price</button>} />
+          <SignupDialog trigger={<button type="button" className="font-semibold text-brand-700 hover:underline">Log in to freeze price</button>} />
         </div>
       </div>
     );
@@ -152,11 +152,11 @@ const PriceFreezeCard = ({ category, itemId, quantity, nights = 1, travelDate, o
   // ---- the offer
   const chosen = options.find((o) => o.hours === hours);
   return (
-    <div className="rounded-xl border border-indigo-200 bg-indigo-50/60 p-4 text-sm">
-      <h3 className="mb-1 flex items-center gap-1.5 font-bold text-indigo-900">
+    <div className="rounded-xl border border-brand-200 bg-brand-50/60 p-4 text-sm">
+      <h3 className="mb-1 flex items-center gap-1.5 font-bold text-brand-900">
         <Snowflake className="h-4 w-4" /> Freeze this price
       </h3>
-      <p className="text-indigo-900">Lock today&apos;s price while you decide. If it rises you still pay this price; if it falls you pay the lower one.</p>
+      <p className="text-brand-900">Lock today&apos;s price while you decide. If it rises you still pay this price; if it falls you pay the lower one.</p>
 
       <div className="mt-3 grid grid-cols-3 gap-2">
         {(options.length ? options : [6, 24, 48].map((h) => ({ hours: h, fee: null }))).map((o: any) => (
@@ -165,10 +165,10 @@ const PriceFreezeCard = ({ category, itemId, quantity, nights = 1, travelDate, o
             type="button"
             onClick={() => setHours(o.hours)}
             className={`rounded-lg border px-2 py-2 text-center transition-colors ${
-              hours === o.hours ? "border-indigo-600 bg-white shadow-sm" : "border-indigo-200 bg-white/60 hover:border-indigo-400"
+              hours === o.hours ? "border-brand-600 bg-white shadow-sm" : "border-brand-200 bg-white/60 hover:border-brand-400"
             }`}
           >
-            <div className="font-bold text-indigo-900">{o.hours}h</div>
+            <div className="font-bold text-brand-900">{o.hours}h</div>
             <div className="text-xs text-slate-600">{o.fee == null ? "…" : formatINR(o.fee)}</div>
           </button>
         ))}
@@ -179,7 +179,7 @@ const PriceFreezeCard = ({ category, itemId, quantity, nights = 1, travelDate, o
         type="button"
         onClick={create}
         disabled={creating || !chosen}
-        className="mt-3 w-full bg-indigo-600 text-white hover:bg-indigo-700"
+        className="mt-3 w-full bg-brand-600 text-white hover:bg-brand-700"
       >
         {creating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Lock className="h-4 w-4" />}
         {chosen ? `Freeze for ${hours} hours · ${formatINR(chosen.fee)}` : "Freeze price"}

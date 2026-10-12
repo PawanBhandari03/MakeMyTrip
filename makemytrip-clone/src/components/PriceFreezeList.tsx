@@ -26,7 +26,7 @@ const left = (iso: string) => {
 
 const STATUS: Record<string, string> = {
   ACTIVE: "bg-emerald-100 text-emerald-700",
-  USED: "bg-blue-100 text-blue-700",
+  USED: "bg-brand-100 text-brand-700",
   EXPIRED: "bg-slate-100 text-slate-600",
 };
 
@@ -58,7 +58,7 @@ const PriceFreezeList = () => {
   return (
     <div id="freezes" className="mt-8 rounded-2xl border border-slate-100 bg-white p-6 shadow-lg shadow-slate-200/60">
       <h2 className="mb-1 flex items-center gap-2 text-2xl font-bold">
-        <Snowflake className="h-6 w-6 text-indigo-600" /> Price freezes
+        <Snowflake className="h-6 w-6 text-brand-600" /> Price freezes
       </h2>
       <p className="mb-5 text-sm text-slate-500">Prices you have locked. The freeze fee is credited when you book before it ends.</p>
       <div className="space-y-3">
@@ -85,7 +85,7 @@ const PriceFreezeList = () => {
                     ? `Today's price (${formatINR(f.currentUnitPrice)}) is lower, so you will pay that`
                     : "Today's price matches your frozen price"}
                 </p>
-                <Link href={bookLink(f)} className="inline-flex items-center gap-1 rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-700">
+                <Link href={bookLink(f)} className="inline-flex items-center gap-1 rounded-lg bg-brand-600 px-4 py-2 font-semibold text-white hover:bg-brand-700">
                   <Lock className="h-4 w-4" /> Book at this price
                 </Link>
               </div>

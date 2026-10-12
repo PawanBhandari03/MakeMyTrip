@@ -88,7 +88,7 @@ const BookListingPage = () => {
       <div className="mx-auto max-w-xl px-4 py-24 text-center">
         <h1 className="text-2xl font-bold">Not found</h1>
         <p className="mt-2 text-slate-600">This item may have been removed.</p>
-        <Link href="/" className="mt-6 inline-block rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white">
+        <Link href="/" className="mt-6 inline-block rounded-lg bg-brand-600 px-5 py-2 font-semibold text-white">
           Back to home
         </Link>
       </div>
@@ -113,11 +113,11 @@ const BookListingPage = () => {
       <div className="border-b bg-white">
         <div className="mx-auto max-w-7xl px-4 py-3">
           <div className="flex items-center space-x-2 text-sm">
-            <Link href="/" className="text-blue-600 hover:underline">
+            <Link href="/" className="text-brand-600 hover:underline">
               Home
             </Link>
             <ChevronRight className="h-4 w-4 text-slate-400" />
-            <Link href={`/?tab=${meta.tab}`} className="text-blue-600 hover:underline">
+            <Link href={`/?tab=${meta.tab}`} className="text-brand-600 hover:underline">
               {meta.label}s
             </Link>
             <ChevronRight className="h-4 w-4 text-slate-400" />
@@ -137,7 +137,7 @@ const BookListingPage = () => {
 
             <div className="rounded-2xl border border-slate-100 bg-white p-8 shadow-sm">
               <div className="mb-4 flex items-start gap-4">
-                <div className="rounded-xl bg-blue-50 p-3 text-blue-600">{meta.icon}</div>
+                <div className="rounded-xl bg-brand-50 p-3 text-brand-600">{meta.icon}</div>
                 <div className="min-w-0 flex-1">
                   <h1 className="text-2xl font-extrabold tracking-tight">{item.name}</h1>
                   <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">

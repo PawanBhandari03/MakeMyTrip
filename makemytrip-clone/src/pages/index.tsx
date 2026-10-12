@@ -583,7 +583,7 @@ export default function Home() {
                     type="button"
                     onClick={swap}
                     aria-label="Swap from and to"
-                    className="absolute -right-4 top-1/2 z-20 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border bg-white text-blue-600 shadow hover:bg-blue-50 lg:flex"
+                    className="absolute -right-4 top-1/2 z-20 hidden h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border bg-white text-brand-600 shadow hover:bg-brand-50 lg:flex"
                   >
                     <ArrowLeftRight className="h-4 w-4" />
                   </button>
@@ -698,7 +698,7 @@ export default function Home() {
 
             <Button
               type="submit"
-              className="h-full min-h-[60px] rounded-xl bg-gradient-to-r from-blue-500 to-blue-700 text-lg font-bold text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
+              className="h-full min-h-[60px] rounded-xl bg-gradient-to-r from-brand-500 to-brand-700 text-lg font-bold text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl"
             >
               SEARCH
             </Button>
@@ -712,7 +712,7 @@ export default function Home() {
                   key={from + to}
                   type="button"
                   onClick={() => shortcut(tab, { from, to })}
-                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700 transition-colors hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700 transition-colors hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
                 >
                   {from} → {to}
                 </button>
@@ -739,7 +739,7 @@ export default function Home() {
                 <select
                   value={sort}
                   onChange={(e) => setSort(e.target.value)}
-                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-blue-500"
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm outline-none focus:border-brand-500"
                 >
                   {sortOptions.map(([v, l]) => (
                     <option key={v} value={v}>
@@ -754,7 +754,7 @@ export default function Home() {
           {loading ? (
             <div>
               <div className="flex items-center justify-center rounded-2xl border border-slate-200 bg-white py-16 text-slate-500">
-                <Loader2 className="mr-2 h-5 w-5 animate-spin text-blue-600" /> Loading...
+                <Loader2 className="mr-2 h-5 w-5 animate-spin text-brand-600" /> Loading...
               </div>
               {slow && (
                 <p className="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-center text-sm text-amber-900">
@@ -817,7 +817,7 @@ export default function Home() {
                             key={to}
                             type="button"
                             onClick={() => shortcut(tab, { from: a.from, to })}
-                            className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+                            className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700 hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
                           >
                             {a.from} → {to}
                           </button>
@@ -832,7 +832,7 @@ export default function Home() {
                   )}
                 </div>
               )}
-              <Link href="/routes" className="mt-4 inline-block text-sm font-medium text-blue-600 hover:underline">
+              <Link href="/routes" className="mt-4 inline-block text-sm font-medium text-brand-600 hover:underline">
                 See all routes &amp; destinations
               </Link>
             </div>
@@ -941,7 +941,7 @@ export default function Home() {
               Close
             </Button>
             <Button
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-brand-600 hover:bg-brand-700"
               onClick={() => {
                 if (!explore) return;
                 const target = explore;
@@ -975,22 +975,22 @@ const OfferCard = ({ title, description, imageUrl, code, onBook, onCopy }: any) 
     <div className="p-5">
       <h3 className="mb-1 text-lg font-semibold">{title}</h3>
       <p className="text-sm text-slate-600">{description}</p>
-      <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-dashed border-blue-300 bg-blue-50 px-3 py-2">
+      <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-dashed border-brand-300 bg-brand-50 px-3 py-2">
         <div>
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-blue-700">Use code</div>
-          <div className="font-mono text-base font-bold text-blue-800">{code}</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wide text-brand-700">Use code</div>
+          <div className="font-mono text-base font-bold text-brand-800">{code}</div>
         </div>
         <button
           type="button"
           onClick={onCopy}
-          className="flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-blue-700 hover:bg-blue-100"
+          className="flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-brand-700 hover:bg-brand-100"
         >
           <Copy className="h-4 w-4" /> Copy
         </button>
       </div>
       <button
         onClick={onBook}
-        className="mt-4 rounded-md bg-blue-600 px-6 py-2 font-medium text-white transition-colors hover:bg-blue-700"
+        className="mt-4 rounded-md bg-brand-600 px-6 py-2 font-medium text-white transition-colors hover:bg-brand-700"
       >
         Book Now
       </button>
@@ -1011,13 +1011,13 @@ const CollectionCard = ({ title, imageUrl, tag, onClick }: any) => (
     />
     <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/20 to-black/90">
       <div className="absolute left-4 top-4">
-        <span className="rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-blue-900 shadow-sm backdrop-blur-sm">
+        <span className="rounded-full bg-white/95 px-3 py-1.5 text-xs font-bold text-brand-900 shadow-sm backdrop-blur-sm">
           {tag}
         </span>
       </div>
       <div className="absolute bottom-4 left-4 right-4 transition-transform duration-300 group-hover:-translate-y-2">
         <h3 className="mb-1 text-xl font-bold text-white">{title}</h3>
-        <p className="flex items-center text-sm text-blue-200 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <p className="flex items-center text-sm text-brand-200 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
           Explore Collection &rarr;
         </p>
       </div>
@@ -1051,11 +1051,11 @@ function NavItem({ icon, text, active = false, onClick }: any) {
   return (
     <button
       className={`flex flex-col items-center rounded-xl px-4 py-3 transition-all duration-200 ${
-        active ? "scale-105 bg-blue-50 text-blue-600 shadow-md" : "text-slate-500 hover:bg-slate-50 hover:text-blue-500"
+        active ? "scale-105 bg-brand-50 text-brand-600 shadow-md" : "text-slate-500 hover:bg-slate-50 hover:text-brand-500"
       }`}
       onClick={onClick}
     >
-      <div className={`mb-1 transition-colors ${active ? "text-blue-600" : "text-slate-400"}`}>{icon}</div>
+      <div className={`mb-1 transition-colors ${active ? "text-brand-600" : "text-slate-400"}`}>{icon}</div>
       <span className="whitespace-nowrap text-sm font-bold">{text}</span>
     </button>
   );
@@ -1063,7 +1063,7 @@ function NavItem({ icon, text, active = false, onClick }: any) {
 
 function DateField({ label, value, min, max, onChange, subtitle }: { label: string; value: string; min?: string; max?: string; onChange: (v: string) => void; subtitle?: string }) {
   return (
-    <div className="h-full rounded-xl border border-slate-200 bg-white p-3 transition-colors hover:border-blue-400 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100">
+    <div className="h-full rounded-xl border border-slate-200 bg-white p-3 transition-colors hover:border-brand-400 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-100">
       <div className="flex items-center gap-3">
         <Calendar className="text-slate-400" />
         <div className="min-w-0 flex-1">
@@ -1102,9 +1102,9 @@ function CountField({
 }) {
   const clamp = (n: number) => Math.max(min, Math.min(max, n));
   const btn =
-    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 text-lg font-bold leading-none text-blue-600 transition-colors hover:border-blue-400 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:bg-transparent";
+    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 text-lg font-bold leading-none text-brand-600 transition-colors hover:border-brand-400 hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:bg-transparent";
   return (
-    <div className="h-full rounded-xl border border-slate-200 bg-white p-3 transition-colors hover:border-blue-400 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100">
+    <div className="h-full rounded-xl border border-slate-200 bg-white p-3 transition-colors hover:border-brand-400 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-100">
       <div className="flex items-center gap-3">
         <Users className="shrink-0 text-slate-400" />
         <div className="min-w-0 flex-1">

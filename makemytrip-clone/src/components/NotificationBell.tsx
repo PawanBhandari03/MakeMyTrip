@@ -33,7 +33,7 @@ const iconFor = (type: string) => {
     case "CANCELLED":
       return { icon: <XCircle className="h-4 w-4" />, tone: "bg-red-100 text-red-700" };
     case "GATE_CHANGED":
-      return { icon: <DoorOpen className="h-4 w-4" />, tone: "bg-blue-100 text-blue-700" };
+      return { icon: <DoorOpen className="h-4 w-4" />, tone: "bg-brand-100 text-brand-700" };
     case "BOARDING":
       return { icon: <Plane className="h-4 w-4" />, tone: "bg-green-100 text-green-700" };
     case "DEPARTED":
@@ -41,13 +41,13 @@ const iconFor = (type: string) => {
     case "LANDED":
       return { icon: <PlaneLanding className="h-4 w-4" />, tone: "bg-sky-100 text-sky-700" };
     case "REVIEW_REPLY":
-      return { icon: <MessageSquare className="h-4 w-4" />, tone: "bg-indigo-100 text-indigo-700" };
+      return { icon: <MessageSquare className="h-4 w-4" />, tone: "bg-brand-100 text-brand-700" };
     case "REVIEW_REMOVED":
       return { icon: <MessageSquare className="h-4 w-4" />, tone: "bg-red-100 text-red-700" };
     case "REFUND_PENDING":
       return { icon: <Receipt className="h-4 w-4" />, tone: "bg-amber-100 text-amber-700" };
     case "REFUND_PROCESSED":
-      return { icon: <Receipt className="h-4 w-4" />, tone: "bg-blue-100 text-blue-700" };
+      return { icon: <Receipt className="h-4 w-4" />, tone: "bg-brand-100 text-brand-700" };
     case "REFUND_COMPLETED":
       return { icon: <Receipt className="h-4 w-4" />, tone: "bg-green-100 text-green-700" };
     default:
@@ -178,7 +178,7 @@ const NotificationBell = () => {
             <div className="flex items-center justify-between border-b px-4 py-3">
               <h3 className="font-bold">Notifications</h3>
               {unread > 0 && (
-                <button type="button" onClick={readAll} className="flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline">
+                <button type="button" onClick={readAll} className="flex items-center gap-1 text-xs font-medium text-brand-600 hover:underline">
                   <CheckCheck className="h-3.5 w-3.5" /> Mark all read
                 </button>
               )}
@@ -188,7 +188,7 @@ const NotificationBell = () => {
               <button
                 type="button"
                 onClick={askPermission}
-                className="flex w-full items-center gap-2 border-b bg-blue-50 px-4 py-2.5 text-left text-xs font-medium text-blue-700 hover:bg-blue-100"
+                className="flex w-full items-center gap-2 border-b bg-brand-50 px-4 py-2.5 text-left text-xs font-medium text-brand-700 hover:bg-brand-100"
               >
                 <BellRing className="h-4 w-4 shrink-0" /> Turn on browser alerts to hear about delays even in another tab
               </button>
@@ -211,7 +211,7 @@ const NotificationBell = () => {
                       key={n.id}
                       type="button"
                       onClick={() => openItem(n)}
-                      className={`flex w-full gap-3 border-b px-4 py-3 text-left last:border-0 hover:bg-slate-50 ${n.read ? "" : "bg-blue-50/50"}`}
+                      className={`flex w-full gap-3 border-b px-4 py-3 text-left last:border-0 hover:bg-slate-50 ${n.read ? "" : "bg-brand-50/50"}`}
                     >
                       <span className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${tone}`}>{icon}</span>
                       <span className="min-w-0 flex-1">
@@ -219,7 +219,7 @@ const NotificationBell = () => {
                         <span className="mt-0.5 line-clamp-2 block text-xs text-slate-600">{n.message}</span>
                         <span className="mt-1 block text-[11px] text-slate-400">{timeAgo(n.createdAt)}</span>
                       </span>
-                      {!n.read && <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-blue-600" />}
+                      {!n.read && <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-brand-600" />}
                     </button>
                   );
                 })
@@ -231,7 +231,7 @@ const NotificationBell = () => {
                 setOpen(false);
                 router.push("/tracker");
               }}
-              className="block w-full border-t bg-slate-50 px-4 py-2.5 text-center text-sm font-semibold text-blue-600 hover:bg-slate-100"
+              className="block w-full border-t bg-slate-50 px-4 py-2.5 text-center text-sm font-semibold text-brand-600 hover:bg-slate-100"
             >
               Open My Flights
             </button>

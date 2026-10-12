@@ -258,7 +258,7 @@ const BookingPanel = ({
             value={travelDate || ""}
             min={minDate}
             onChange={(e) => setTravelDate(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 px-3 py-2 font-medium outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2 font-medium outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
           />
         </div>
       )}
@@ -286,7 +286,7 @@ const BookingPanel = ({
                 <button
                   type="button"
                   onClick={() => setWhy((w) => !w)}
-                  className="flex items-center gap-1 text-xs font-semibold text-blue-600 hover:underline"
+                  className="flex items-center gap-1 text-xs font-semibold text-brand-600 hover:underline"
                   aria-expanded={why}
                 >
                   <Info className="h-3.5 w-3.5" /> Why this price?
@@ -338,7 +338,7 @@ const BookingPanel = ({
         </>
       ) : (
         <div className="flex justify-center py-6">
-          <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+          <Loader2 className="h-6 w-6 animate-spin text-brand-600" />
         </div>
       )}
 
@@ -365,7 +365,7 @@ const BookingPanel = ({
             value={promoInput}
             onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
             onKeyDown={(e) => e.key === "Enter" && applyPromo(promoInput)}
-            className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm uppercase outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            className="min-w-0 flex-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm uppercase outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
           />
           <Button type="button" variant="outline" className="bg-white" onClick={() => applyPromo(promoInput)}>
             Apply
@@ -384,10 +384,10 @@ const BookingPanel = ({
                 }`}
               >
                 <div>
-                  <div className="font-semibold text-red-600">{p.code}</div>
+                  <div className="font-semibold text-brand-700">{p.code}</div>
                   <div className="text-slate-600">{p.description}</div>
                 </div>
-                <button type="button" className="shrink-0 text-sm font-semibold text-blue-600 hover:text-blue-700" onClick={() => applyPromo(p.code)}>
+                <button type="button" className="shrink-0 text-sm font-semibold text-brand-600 hover:text-brand-700" onClick={() => applyPromo(p.code)}>
                   {promo === p.code ? "Applied" : "Apply"}
                 </button>
               </li>
@@ -406,7 +406,7 @@ const BookingPanel = ({
         <Button
           onClick={handleBook}
           disabled={booking || !quote}
-          className="h-12 w-full bg-gradient-to-r from-red-500 to-red-600 text-base font-bold text-white shadow-lg hover:from-red-600 hover:to-red-700"
+          className="h-12 w-full bg-gradient-to-r from-brand-600 to-brand-700 text-base font-bold text-white shadow-lg hover:from-brand-700 hover:to-brand-800"
         >
           {booking && <Loader2 className="h-4 w-4 animate-spin" />}
           {bookLabel}
@@ -416,7 +416,7 @@ const BookingPanel = ({
         <div className="space-y-2">
           <SignupDialog
             trigger={
-              <Button className="h-12 w-full bg-gradient-to-r from-red-500 to-red-600 text-base font-bold text-white hover:from-red-600 hover:to-red-700">
+              <Button className="h-12 w-full bg-gradient-to-r from-brand-600 to-brand-700 text-base font-bold text-white hover:from-brand-700 hover:to-brand-800">
                 Log In / Sign Up to Book
               </Button>
             }

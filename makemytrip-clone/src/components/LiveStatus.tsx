@@ -7,7 +7,7 @@ const TONES: Record<string, { box: string; pill: string; bar: string }> = {
   good: { box: "border-green-200 bg-green-50/60", pill: "bg-green-100 text-green-700", bar: "bg-green-500" },
   warn: { box: "border-amber-200 bg-amber-50/70", pill: "bg-amber-100 text-amber-800", bar: "bg-amber-500" },
   bad: { box: "border-red-200 bg-red-50/70", pill: "bg-red-100 text-red-700", bar: "bg-red-500" },
-  info: { box: "border-blue-200 bg-blue-50/60", pill: "bg-blue-100 text-blue-700", bar: "bg-blue-500" },
+  info: { box: "border-brand-200 bg-brand-50/60", pill: "bg-brand-100 text-brand-700", bar: "bg-brand-500" },
 };
 
 const REFRESH_MS = 30000;
@@ -89,7 +89,7 @@ const LiveStatus = ({ booking }: { booking: any }) => {
 
       {info.flightNumber && (
         <div className="mt-2 text-xs">
-          <Link href={`/tracker?flight=${info.flightNumber}`} className="font-semibold text-blue-600 hover:underline">
+          <Link href={`/tracker?flight=${info.flightNumber}`} className="font-semibold text-brand-600 hover:underline">
             See every update in My Flights
           </Link>
           <span className="text-slate-500"> · you are notified automatically of delays and gate changes</span>

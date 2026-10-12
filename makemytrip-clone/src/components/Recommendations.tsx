@@ -17,7 +17,7 @@ type Props = {
 const KIND: Record<string, string> = { HOTEL: "Hotel", HOMESTAY: "Homestay", HOLIDAY: "Holiday package", FLIGHT: "Flight" };
 
 const BAR: Record<string, string> = {
-  "Your history": "bg-blue-500",
+  "Your history": "bg-brand-500",
   "Similar travellers": "bg-violet-500",
   Ratings: "bg-amber-400",
   "Budget fit": "bg-emerald-500",
@@ -173,7 +173,7 @@ const Card = ({ it, canAnswer, answer, onAnswer }: { it: any; canAnswer: boolean
       <Link href={it.path} className="block overflow-hidden rounded-t-2xl">
         <div className="relative h-40 w-full bg-slate-100">
           {isFlight ? (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-500 to-indigo-600 text-white">
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-500 to-brand-800 text-white">
               <Plane className="h-12 w-12" />
             </div>
           ) : (
@@ -190,7 +190,7 @@ const Card = ({ it, canAnswer, answer, onAnswer }: { it: any; canAnswer: boolean
       </Link>
 
       <div className="flex flex-1 flex-col p-4">
-        <Link href={it.path} className="line-clamp-2 font-semibold leading-snug text-slate-900 hover:text-blue-700">
+        <Link href={it.path} className="line-clamp-2 font-semibold leading-snug text-slate-900 hover:text-brand-700">
           {it.name}
         </Link>
         {it.location && (
@@ -212,7 +212,7 @@ const Card = ({ it, canAnswer, answer, onAnswer }: { it: any; canAnswer: boolean
             <div className="text-lg font-bold text-slate-900">{formatINR(it.price)}</div>
             <div className="text-xs text-slate-500">{it.unit}</div>
           </div>
-          <Link href={it.path} className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:underline">
+          <Link href={it.path} className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:underline">
             View <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -223,7 +223,7 @@ const Card = ({ it, canAnswer, answer, onAnswer }: { it: any; canAnswer: boolean
             onClick={() => setOpen(true)}
             onMouseEnter={() => setOpen(true)}
             aria-expanded={open}
-            className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-blue-700"
+            className="inline-flex items-center gap-1 text-xs font-medium text-slate-600 hover:text-brand-700"
           >
             <Info className="h-4 w-4" /> Why this?
           </button>

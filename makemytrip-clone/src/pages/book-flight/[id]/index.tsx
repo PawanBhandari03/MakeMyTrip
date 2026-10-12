@@ -81,7 +81,7 @@ const BookFlightPage = () => {
       <div className="mx-auto max-w-xl px-4 py-24 text-center">
         <h1 className="text-2xl font-bold">Flight not found</h1>
         <p className="mt-2 text-slate-600">This flight may have been removed.</p>
-        <Link href="/" className="mt-6 inline-block rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white">
+        <Link href="/" className="mt-6 inline-block rounded-lg bg-brand-600 px-5 py-2 font-semibold text-white">
           Search flights
         </Link>
       </div>
@@ -93,15 +93,15 @@ const BookFlightPage = () => {
   const airline = flight.flightName.replace(flightNo, "").trim() || flight.flightName;
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20">
+    <div className="bg-gradient-to-br from-slate-50 via-brand-50/40 to-brand-100/30">
       <Seo title={`${flight.from} to ${flight.to} flight, ${flight.flightName}`} path={`/book-flight/${flight.id}`} noindex />
       <div className="mx-auto max-w-7xl px-4 py-10">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           {/* Main Content */}
           <div className="space-y-8 lg:col-span-2 lg:row-start-1">
             {/* Flight Details */}
-            <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-blue-900/5">
-              <div className="absolute left-0 top-0 h-1.5 w-full bg-gradient-to-r from-blue-600 to-indigo-600" />
+            <div className="relative overflow-hidden rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-brand-900/5">
+              <div className="absolute left-0 top-0 h-1.5 w-full bg-gradient-to-r from-brand-600 to-brand-800" />
               <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <div className="mb-2 flex flex-wrap items-center gap-4">
@@ -122,22 +122,22 @@ const BookFlightPage = () => {
                     <span>Non Stop - {duration}</span>
                   </div>
                 </div>
-                <Link href="/info/cancellation" className="flex items-center text-sm font-medium text-blue-600 hover:text-blue-700">
+                <Link href="/info/cancellation" className="flex items-center text-sm font-medium text-brand-600 hover:text-brand-700">
                   <Info className="mr-1 h-4 w-4" />
                   View Fare Rules
                 </Link>
               </div>
 
               <div className="mb-6 flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                  <Plane className="h-6 w-6 text-blue-600" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-100">
+                  <Plane className="h-6 w-6 text-brand-600" />
                 </div>
                 <div>
                   <div className="font-semibold">{airline}</div>
                   <div className="text-sm text-slate-600">{flightNo} • Airbus A320</div>
                 </div>
                 <div className="ml-auto text-sm">
-                  <span className="rounded-full bg-blue-50 px-3 py-1 text-blue-600">Economy</span>
+                  <span className="rounded-full bg-brand-50 px-3 py-1 text-brand-600">Economy</span>
                   <span className="ml-2 text-slate-500">{flight.availableSeats} seats left</span>
                 </div>
               </div>
@@ -216,13 +216,13 @@ const BookFlightPage = () => {
 
             {/* Hotel Offers */}
             {hotels.length > 0 && (
-              <div className="rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-blue-900/5">
+              <div className="rounded-2xl border border-slate-100 bg-white p-8 shadow-lg shadow-brand-900/5">
                 <div className="mb-6 flex items-center justify-between">
                   <h2 className="flex items-center text-lg font-bold">
-                    <Gift className="mr-2 h-5 w-5 text-red-500" />
+                    <Gift className="mr-2 h-5 w-5 text-brand-500" />
                     Book a Flight &amp; unlock these offers
                   </h2>
-                  <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-600">
+                  <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">
                     Flyer Exclusive Deal
                   </span>
                 </div>

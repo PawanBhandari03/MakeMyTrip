@@ -61,13 +61,13 @@ const RefundPolicyCard = ({ travelAt, total, fee = 0, category, unitLabel, class
   const noun = category === "HOTEL" || category === "HOMESTAY" ? "stay" : "booking";
 
   return (
-    <div className={`rounded-2xl border border-slate-100 bg-white p-6 shadow-lg shadow-blue-900/5 sm:p-8 ${className}`}>
+    <div className={`rounded-2xl border border-slate-100 bg-white p-6 shadow-lg shadow-brand-900/5 sm:p-8 ${className}`}>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-2">
         <h2 className="flex items-center text-lg font-bold">
           <ShieldCheck className="mr-2 h-5 w-5 text-emerald-600" />
           Cancellation &amp; refund policy
         </h2>
-        <Link href="/info/cancellation" className="text-sm font-medium text-blue-600 hover:text-blue-700">
+        <Link href="/info/cancellation" className="text-sm font-medium text-brand-600 hover:text-brand-700">
           Full policy
         </Link>
       </div>

@@ -8,11 +8,11 @@ type Page = { title: string; intro: string; sections: { heading: string; body: s
 const PAGES: Record<string, Page> = {
   about: {
     title: "About Us",
-    intro: "MakeMyTrip is a learning project that shows how a complete travel booking site works.",
+    intro: "TravelEase is a full-stack travel booking platform: search, book, track and manage trips in one place.",
     sections: [
-      { heading: "Who we are", body: "MakeMyTrip was built by Pawan Bhandari as an internship project. It brings flights, hotels, homestays, trains, buses, cabs, holidays, forex and insurance together in one place, using a Spring Boot API, MongoDB and a Next.js front end." },
+      { heading: "Who we are", body: "TravelEase was built by Pawan Bhandari. It brings flights, hotels, homestays, trains, buses, cabs, holidays, forex and insurance together in one place, using a Java Spring Boot API, MongoDB, and a React and TypeScript front end styled with Tailwind CSS." },
       { heading: "What we believe", body: "Travel should be simple, transparent and affordable. Every fare you see includes a clear breakdown of taxes and fees, and every booking can be managed from a single account." },
-      { heading: "This project", body: "This site is a learning project. All flights, hotels, trains, buses and prices are demo data, and no real payments are taken." },
+      { heading: "Demo data", body: "This site runs on demo data. All flights, hotels, trains, buses and prices are demo data, and no real payments are taken." },
     ],
   },
   investors: {
@@ -86,7 +86,7 @@ const PAGES: Record<string, Page> = {
   },
   agreement: {
     title: "User Agreement",
-    intro: "Your agreement with MakeMyTrip.",
+    intro: "Your agreement with TravelEase.",
     sections: [
       { heading: "Your account", body: "You are responsible for keeping your password safe and for all activity under your account." },
       { heading: "Acceptable use", body: "Do not attempt to disrupt the service or access data that belongs to other users." },
@@ -110,7 +110,7 @@ export default function InfoPage({ slug }: { slug: string }) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <h1 className="text-2xl font-bold">Page not found</h1>
-        <Link href="/" className="mt-4 inline-block text-blue-600 hover:underline">
+        <Link href="/" className="mt-4 inline-block text-brand-600 hover:underline">
           Back to home
         </Link>
       </div>
@@ -119,7 +119,7 @@ export default function InfoPage({ slug }: { slug: string }) {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
       <Seo title={page.title} description={page.intro} path={`/info/${slug}`} />
-      <Link href="/" className="mb-6 inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
+      <Link href="/" className="mb-6 inline-flex items-center gap-1 text-sm text-brand-600 hover:underline">
         <ArrowLeft className="h-4 w-4" /> Back to home
       </Link>
       <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">{page.title}</h1>

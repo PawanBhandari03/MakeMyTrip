@@ -61,7 +61,7 @@ const PricingAdmin = () => (
   <div className="space-y-6">
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
       <h2 className="flex items-center gap-2 text-lg font-bold">
-        <Gauge className="h-5 w-5 text-blue-600" /> Dynamic pricing
+        <Gauge className="h-5 w-5 text-brand-600" /> Dynamic pricing
       </h2>
       <p className="mt-1 text-sm text-slate-600">
         Every price starts from the base fare you set on a flight, hotel or service, and is moved by the factors below. The total is kept

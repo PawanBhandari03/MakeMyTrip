@@ -44,7 +44,7 @@ const Availability = ({ left }: { left: number }) =>
   );
 
 const cardClass =
-  "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-lg";
+  "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-lg";
 
 export const FlightCard = ({ flight, onBook, live }: { flight: any; onBook: OnBook; live?: LivePrice }) => {
   const flightNo = flight.flightName.split(" ").slice(-1)[0];
@@ -52,7 +52,7 @@ export const FlightCard = ({ flight, onBook, live }: { flight: any; onBook: OnBo
   return (
     <div className={`${cardClass} flex flex-col gap-4 md:flex-row md:items-center`}>
       <div className="flex items-center gap-3 md:w-52">
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-brand-600">
           <Plane className="h-5 w-5" />
         </div>
         <div>
@@ -85,7 +85,7 @@ export const FlightCard = ({ flight, onBook, live }: { flight: any; onBook: OnBo
           <Availability left={flight.availableSeats} />
         </div>
         <Button
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-brand-600 hover:bg-brand-700"
           disabled={flight.availableSeats < 1}
           onClick={() => onBook(flight)}
         >
@@ -143,7 +143,7 @@ export const StayCard = ({
             </div>
             <Availability left={left} />
           </div>
-          <Button className="bg-blue-600 hover:bg-blue-700" disabled={left === 0} onClick={() => onBook(stay)}>
+          <Button className="bg-brand-600 hover:bg-brand-700" disabled={left === 0} onClick={() => onBook(stay)}>
             Book Now
           </Button>
         </div>
@@ -156,7 +156,7 @@ export const HolidayCard = ({ pkg, onBook, live }: { pkg: any; onBook: OnBook; l
   <div className={`${cardClass} flex flex-col overflow-hidden p-0`}>
     <div className="relative">
       <SmartImage src={pkg.imageUrl} alt={pkg.name} className="h-48 w-full object-cover" />
-      <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-blue-900 shadow">
+      <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-bold text-brand-900 shadow">
         {pkg.duration}
       </span>
     </div>
@@ -176,7 +176,7 @@ export const HolidayCard = ({ pkg, onBook, live }: { pkg: any; onBook: OnBook; l
           <PriceTag basePrice={pkg.price} live={live} unitLabel="per person" />
           <div className="text-xs text-slate-500">per person</div>
         </div>
-        <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => onBook(pkg)}>
+        <Button className="bg-brand-600 hover:bg-brand-700" onClick={() => onBook(pkg)}>
           Book Now
         </Button>
       </div>
@@ -192,7 +192,7 @@ export const RouteCard = ({ item, onBook, live }: { item: any; onBook: OnBook; l
       <div className="mt-0.5 text-xs text-slate-500">{item.provider}</div>
       <div className="mt-2 flex flex-wrap items-center gap-2">
         {item.type && (
-          <span className="rounded-md bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700">{item.type}</span>
+          <span className="rounded-md bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700">{item.type}</span>
         )}
         <Rating value={item.rating} />
       </div>
@@ -225,7 +225,7 @@ export const RouteCard = ({ item, onBook, live }: { item: any; onBook: OnBook; l
         <div className="text-xs text-slate-500">{item.unit}</div>
         <Availability left={item.available} />
       </div>
-      <Button className="bg-blue-600 hover:bg-blue-700" disabled={item.available === 0} onClick={() => onBook(item)}>
+      <Button className="bg-brand-600 hover:bg-brand-700" disabled={item.available === 0} onClick={() => onBook(item)}>
         Book Now
       </Button>
     </div>
@@ -253,7 +253,7 @@ export const ForexCard = ({ item, amount, onBook, live }: { item: any; amount: n
         {amount.toLocaleString("en-IN")} {item.type} costs
       </div>
       <div className="text-2xl font-extrabold">{formatINR(Math.round(rate * amount))}</div>
-      <Button className="mt-2 bg-blue-600 hover:bg-blue-700" onClick={() => onBook(item)}>
+      <Button className="mt-2 bg-brand-600 hover:bg-brand-700" onClick={() => onBook(item)}>
         Book Now
       </Button>
     </div>
@@ -268,7 +268,7 @@ export const InsuranceCard = ({ plan, onBook }: { plan: any; onBook: OnBook }) =
         <h3 className="text-lg font-bold">{plan.name}</h3>
         <div className="text-sm text-slate-500">{plan.location} trips</div>
       </div>
-      <span className="rounded-md bg-blue-50 px-2 py-1 text-xs font-bold text-blue-700">{plan.type}</span>
+      <span className="rounded-md bg-brand-50 px-2 py-1 text-xs font-bold text-brand-700">{plan.type}</span>
     </div>
     <p className="text-sm text-slate-600">{plan.description}</p>
     <Chips text={plan.features} max={4} />
@@ -277,7 +277,7 @@ export const InsuranceCard = ({ plan, onBook }: { plan: any; onBook: OnBook }) =
         <div className="text-2xl font-extrabold">{formatINR(plan.price)}</div>
         <div className="text-xs text-slate-500">per traveller</div>
       </div>
-      <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => onBook(plan)}>
+      <Button className="bg-brand-600 hover:bg-brand-700" onClick={() => onBook(plan)}>
         Book Now
       </Button>
     </div>

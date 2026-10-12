@@ -102,7 +102,7 @@ const FlightStatusCard = ({ f, elapsedMin, flash, highlighted, onUntrack, action
     >
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-50 text-brand-600">
             <Plane className="h-5 w-5" />
           </div>
           <div>
@@ -196,7 +196,7 @@ const FlightStatusCard = ({ f, elapsedMin, flash, highlighted, onUntrack, action
             ))}
           </ul>
           {events.length > 3 && (
-            <button type="button" onClick={() => setShowAll((v) => !v)} className="mt-2 text-xs font-medium text-blue-600 hover:underline">
+            <button type="button" onClick={() => setShowAll((v) => !v)} className="mt-2 text-xs font-medium text-brand-600 hover:underline">
               {showAll ? "Show fewer updates" : `Show all ${events.length} updates`}
             </button>
           )}
@@ -206,7 +206,7 @@ const FlightStatusCard = ({ f, elapsedMin, flash, highlighted, onUntrack, action
       <footer className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t pt-3 text-xs text-slate-500">
         <span className="flex items-center gap-1.5">
           {f.source === "BOOKING" ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 font-medium text-blue-700">
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2 py-0.5 font-medium text-brand-700">
               <Ticket className="h-3 w-3" /> From your booking
             </span>
           ) : f.tracked ? (

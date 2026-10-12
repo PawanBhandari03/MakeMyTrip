@@ -36,7 +36,7 @@ type Props = {
 const PAGE = 15;
 
 const inputClass =
-  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100";
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100";
 
 const EntityManager = ({
   title,
@@ -132,7 +132,7 @@ const EntityManager = ({
             setFormError("");
             setEditing(blank());
           }}
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-brand-600 hover:bg-brand-700"
         >
           <Plus className="h-4 w-4" /> Add {noun.toLowerCase()}
         </Button>
@@ -158,7 +158,7 @@ const EntityManager = ({
       <div className="overflow-x-auto p-5">
         {loading ? (
           <div className="flex justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+            <Loader2 className="h-6 w-6 animate-spin text-brand-600" />
           </div>
         ) : shown.length === 0 ? (
           <p className="py-12 text-center text-slate-500">Nothing here yet.</p>
@@ -274,7 +274,7 @@ const EntityManager = ({
                 <Button type="button" variant="outline" onClick={() => setEditing(null)}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={saving} className="bg-blue-600 hover:bg-blue-700">
+                <Button type="submit" disabled={saving} className="bg-brand-600 hover:bg-brand-700">
                   {saving && <Loader2 className="h-4 w-4 animate-spin" />}
                   {editing.id ? "Update" : "Add"} {noun.toLowerCase()}
                 </Button>

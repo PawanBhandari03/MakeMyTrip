@@ -119,14 +119,14 @@ const Reviews = ({ category, itemId, itemName, className = "" }: Props) => {
   };
 
   return (
-    <section id="reviews" className={`scroll-mt-24 rounded-2xl border border-slate-100 bg-white p-6 shadow-lg shadow-blue-900/5 sm:p-8 ${className}`}>
+    <section id="reviews" className={`scroll-mt-24 rounded-2xl border border-slate-100 bg-white p-6 shadow-lg shadow-brand-900/5 sm:p-8 ${className}`}>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h2 className="flex items-center text-lg font-bold">
-          <MessageSquare className="mr-2 h-5 w-5 text-blue-600" />
+          <MessageSquare className="mr-2 h-5 w-5 text-brand-600" />
           Ratings &amp; reviews
         </h2>
         {user ? (
-          <Button onClick={() => setWriting(true)} className="bg-blue-600 text-white hover:bg-blue-700">
+          <Button onClick={() => setWriting(true)} className="bg-brand-600 text-white hover:bg-brand-700">
             <Pencil className="mr-1.5 h-4 w-4" /> {mine ? "Edit your review" : "Write a review"}
           </Button>
         ) : (
@@ -183,7 +183,7 @@ const Reviews = ({ category, itemId, itemName, className = "" }: Props) => {
                 type="button"
                 onClick={() => setSort(s.value)}
                 className={`rounded-full border px-3 py-1 text-sm transition-colors ${
-                  sort === s.value ? "border-blue-600 bg-blue-600 text-white" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                  sort === s.value ? "border-brand-600 bg-brand-600 text-white" : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
                 }`}
               >
                 {s.label}
@@ -310,15 +310,15 @@ const ReviewCard = ({
   };
 
   return (
-    <article className={`rounded-xl border p-4 ${v.mine ? "border-blue-200 bg-blue-50/40" : ""}`}>
+    <article className={`rounded-xl border p-4 ${v.mine ? "border-brand-200 bg-brand-50/40" : ""}`}>
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 font-semibold text-white">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-brand-800 font-semibold text-white">
           {(r.userName || "T").charAt(0).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
             <span className="font-semibold">{r.userName}</span>
-            {v.mine && <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">Your review</span>}
+            {v.mine && <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-semibold text-brand-700">Your review</span>}
             {r.verified && (
               <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700">
                 <BadgeCheck className="h-3.5 w-3.5" /> Verified booking
@@ -349,10 +349,10 @@ const ReviewCard = ({
               disabled={!user || v.mine}
               title={!user ? "Log in to vote" : v.mine ? "You cannot vote on your own review" : undefined}
               className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 transition-colors disabled:cursor-not-allowed disabled:opacity-60 ${
-                v.helpfulByMe ? "border-blue-600 bg-blue-50 text-blue-700" : "hover:bg-slate-50"
+                v.helpfulByMe ? "border-brand-600 bg-brand-50 text-brand-700" : "hover:bg-slate-50"
               }`}
             >
-              <ThumbsUp className={`h-4 w-4 ${v.helpfulByMe ? "fill-blue-600" : ""}`} /> Helpful ({r.helpfulCount})
+              <ThumbsUp className={`h-4 w-4 ${v.helpfulByMe ? "fill-brand-600" : ""}`} /> Helpful ({r.helpfulCount})
             </button>
             {user && (
               <button type="button" onClick={() => setReplying((x) => !x)} className="inline-flex items-center gap-1 hover:text-slate-800">
@@ -393,11 +393,11 @@ const ReviewCard = ({
                 onChange={(e) => setText(e.target.value.slice(0, 600))}
                 rows={2}
                 placeholder="Write a reply..."
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
               />
               {err && <p className="mt-1 text-xs text-red-600">{err}</p>}
               <div className="mt-2 flex gap-2">
-                <Button size="sm" onClick={sendReply} disabled={busy || !text.trim()} className="bg-blue-600 text-white hover:bg-blue-700">
+                <Button size="sm" onClick={sendReply} disabled={busy || !text.trim()} className="bg-brand-600 text-white hover:bg-brand-700">
                   {busy ? "Posting..." : "Post reply"}
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => setReplying(false)}>
@@ -413,7 +413,7 @@ const ReviewCard = ({
                 <div key={rep.id} className="rounded-lg bg-slate-50 p-3 text-sm">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-semibold">{rep.userName}</span>
-                    {rep.role === "ADMIN" && <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">Official</span>}
+                    {rep.role === "ADMIN" && <span className="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-semibold text-brand-700">Official</span>}
                     <span className="text-xs text-slate-400">{when(rep.createdAt)}</span>
                   </div>
                   <p className="mt-1 whitespace-pre-line break-words text-slate-700">{rep.text}</p>
@@ -536,7 +536,7 @@ const WriteDialog = ({
             value={title}
             onChange={(e) => setTitle(e.target.value.slice(0, 80))}
             placeholder="Sum it up in a few words"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
           />
         </div>
 
@@ -550,7 +550,7 @@ const WriteDialog = ({
             onChange={(e) => setText(e.target.value.slice(0, 1500))}
             rows={5}
             placeholder="What did you like or dislike? How were the staff, cleanliness, location and value?"
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
           />
           <div className="mt-0.5 text-right text-xs text-slate-400">{text.length}/1500</div>
         </div>
@@ -577,7 +577,7 @@ const WriteDialog = ({
               <button
                 type="button"
                 onClick={() => file.current?.click()}
-                className="flex h-20 w-20 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-slate-300 text-xs text-slate-500 hover:border-blue-400 hover:text-blue-600"
+                className="flex h-20 w-20 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-slate-300 text-xs text-slate-500 hover:border-brand-400 hover:text-brand-600"
               >
                 <ImagePlus className="h-5 w-5" /> Add photo
               </button>
@@ -592,7 +592,7 @@ const WriteDialog = ({
           <Button variant="outline" className="flex-1" onClick={onClose} disabled={busy}>
             Cancel
           </Button>
-          <Button className="flex-1 bg-blue-600 text-white hover:bg-blue-700" onClick={submit} disabled={busy}>
+          <Button className="flex-1 bg-brand-600 text-white hover:bg-brand-700" onClick={submit} disabled={busy}>
             {busy ? "Saving..." : existing ? "Update review" : "Submit review"}
           </Button>
         </div>
@@ -642,7 +642,7 @@ const FlagDialog = ({ target, userId, onClose, onDone }: { target: any; userId?:
         </DialogHeader>
         <div className="space-y-2">
           {reasons.map((r) => (
-            <label key={r} className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm ${reason === r ? "border-blue-600 bg-blue-50" : "hover:bg-slate-50"}`}>
+            <label key={r} className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 text-sm ${reason === r ? "border-brand-600 bg-brand-50" : "hover:bg-slate-50"}`}>
               <input type="radio" name="flag-reason" checked={reason === r} onChange={() => setReason(r)} />
               {r}
             </label>
