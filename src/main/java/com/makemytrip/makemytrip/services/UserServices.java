@@ -12,10 +12,10 @@ public class UserServices{
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    /** "admin" and "user" are accepted as shortcuts for admin@travelease.com and user@travelease.com. */
+    /** "admin" and "user" are accepted as shortcuts for admin@voyago.com and user@voyago.com. */
     private static String loginId(String identifier){
         String id = identifier == null ? "" : identifier.trim();
-        return id.contains("@") ? id : id.toLowerCase() + "@travelease.com";
+        return id.contains("@") ? id : id.toLowerCase() + "@voyago.com";
     }
 
     public Users login(String email ,String password){
@@ -23,7 +23,10 @@ public class UserServices{
         Users user = userRepository.findByEmail(loginId(email));
         if (user == null && !typed.contains("@")) {
             // a database that was created before the rename may still hold the older built-in addresses
-            user = userRepository.findByEmail(typed.toLowerCase() + "@makemytrip.com");
+            for (String older : new String[]{"travelease.com", "makemytrip.com"}) {
+                user = userRepository.findByEmail(typed.toLowerCase() + "@" + older);
+                if (user != null) break;
+            }
         }
         if(user != null && passwordEncoder.matches(password,user.getPassword())){
             return  user;

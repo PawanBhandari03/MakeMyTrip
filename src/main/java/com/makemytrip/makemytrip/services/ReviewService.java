@@ -206,7 +206,7 @@ public class ReviewService {
         Review.Reply reply = new Review.Reply();
         reply.setId(UUID.randomUUID().toString().substring(0, 8));
         reply.setUserId(userId);
-        reply.setUserName(admin ? "TravelEase team" : displayName(user));
+        reply.setUserName(admin ? "Voyago team" : displayName(user));
         reply.setRole(admin ? "ADMIN" : "USER");
         reply.setText(body);
         reply.setCreatedAt(now());

@@ -114,7 +114,7 @@ public class DummyDataService {
      * and stay a new id, so their old bookings would point at items that no longer exist. Other customers are never touched.
      */
     private void resetDemoCustomer() {
-        for (String email : List.of("user@travelease.com", "admin@travelease.com")) {
+        for (String email : List.of("user@voyago.com", "admin@voyago.com")) {
             Users account = userRepository.findByEmail(email);
             if (account == null) continue;
             account.setBookings(new ArrayList<>());
@@ -319,7 +319,7 @@ public class DummyDataService {
             l.setDescription(c[7]);
             l.setImageUrl(img(c[8]));
             l.setType("Package");
-            l.setProvider("TravelEase Holidays");
+            l.setProvider("Voyago Holidays");
             out.add(l);
         }
     }
@@ -356,7 +356,7 @@ public class DummyDataService {
             l.setDescription(c[7]);
             l.setImageUrl(img(c[8]));
             l.setType("Package");
-            l.setProvider("TravelEase Holidays");
+            l.setProvider("Voyago Holidays");
             out.add(l);
         }
     }
@@ -382,7 +382,7 @@ public class DummyDataService {
             Listing l = listing("FOREX", c[0] + " (" + c[1] + ")", Double.parseDouble(c[2]), "per 1 " + c[1], -1);
             l.setType(c[1]);
             l.setLocation(c[1]);
-            l.setProvider("TravelEase Forex");
+            l.setProvider("Voyago Forex");
             l.setDescription(c[3]);
             l.setFeatures("Cash, Forex card, Doorstep delivery");
             out.add(l);
@@ -408,7 +408,7 @@ public class DummyDataService {
             Listing l = listing("FOREX", c[0] + " (" + c[1] + ")", Double.parseDouble(c[2]), "per 1 " + c[1], -1);
             l.setType(c[1]);
             l.setLocation(c[1]);
-            l.setProvider("TravelEase Forex");
+            l.setProvider("Voyago Forex");
             l.setDescription(c[3]);
             l.setFeatures("Cash, Forex card, Doorstep delivery");
             out.add(l);
@@ -432,7 +432,7 @@ public class DummyDataService {
             Listing l = listing("INSURANCE", c[0], Double.parseDouble(c[2]), "per traveller", -1);
             l.setLocation(c[1]);
             l.setType(c[3] + " cover");
-            l.setProvider("TravelEase Insurance");
+            l.setProvider("Voyago Insurance");
             l.setFeatures(c[4]);
             l.setDescription(c[5]);
             l.setRating(TravelNetwork.ratingFor(c[0]));

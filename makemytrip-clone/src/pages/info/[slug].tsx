@@ -8,9 +8,9 @@ type Page = { title: string; intro: string; sections: { heading: string; body: s
 const PAGES: Record<string, Page> = {
   about: {
     title: "About Us",
-    intro: "TravelEase is a full-stack travel booking platform: search, book, track and manage trips in one place.",
+    intro: "Voyago is a full-stack travel booking platform: search, book, track and manage trips in one place.",
     sections: [
-      { heading: "Who we are", body: "TravelEase was built by Pawan Bhandari. It brings flights, hotels, homestays, trains, buses, cabs, holidays, forex and insurance together in one place, using a Java Spring Boot API, MongoDB, and a React and TypeScript front end styled with Tailwind CSS." },
+      { heading: "Who we are", body: "Voyago was built by Pawan Bhandari. It brings flights, hotels, homestays, trains, buses, cabs, holidays, forex and insurance together in one place, using a Java Spring Boot API, MongoDB, and a React and TypeScript front end styled with Tailwind CSS." },
       { heading: "What we believe", body: "Travel should be simple, transparent and affordable. Every fare you see includes a clear breakdown of taxes and fees, and every booking can be managed from a single account." },
       { heading: "Demo data", body: "This site runs on demo data. All flights, hotels, trains, buses and prices are demo data, and no real payments are taken." },
     ],
@@ -86,7 +86,7 @@ const PAGES: Record<string, Page> = {
   },
   agreement: {
     title: "User Agreement",
-    intro: "Your agreement with TravelEase.",
+    intro: "Your agreement with Voyago.",
     sections: [
       { heading: "Your account", body: "You are responsible for keeping your password safe and for all activity under your account." },
       { heading: "Acceptable use", body: "Do not attempt to disrupt the service or access data that belongs to other users." },

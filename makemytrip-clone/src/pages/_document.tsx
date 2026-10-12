@@ -9,7 +9,7 @@ export default function Document() {
         <link rel="alternate icon" href="/favicon.ico" />
         <meta name="theme-color" content="#0f766e" />
         <meta name="keywords" content={KEYWORDS} />
-        <meta name="application-name" content="TravelEase" />
+        <meta name="application-name" content="Voyago" />
       </Head>
       <body className="antialiased">
         <Main />

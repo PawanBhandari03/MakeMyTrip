@@ -28,23 +28,25 @@ public class DataSeeder {
         return args -> {
             dummyData.load(false);
             // the built-in accounts were renamed with the product: move existing ones over instead of creating duplicates
-            renameAccount(users, "admin@makemytrip.com", "admin@travelease.com");
-            renameAccount(users, "user@makemytrip.com", "user@travelease.com");
-            if (users.findByEmail("admin@travelease.com") == null) {
+            for (String older : new String[]{"makemytrip.com", "travelease.com"}) {
+                renameAccount(users, "admin@" + older, "admin@voyago.com");
+                renameAccount(users, "user@" + older, "user@voyago.com");
+            }
+            if (users.findByEmail("admin@voyago.com") == null) {
                 Users admin = new Users();
                 admin.setFirstName("Admin");
                 admin.setLastName("User");
-                admin.setEmail("admin@travelease.com");
+                admin.setEmail("admin@voyago.com");
                 admin.setPhoneNumber("9999999999");
                 admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setRole("ADMIN");
                 users.save(admin);
             }
-            if (users.findByEmail("user@travelease.com") == null) {
+            if (users.findByEmail("user@voyago.com") == null) {
                 Users demo = new Users();
                 demo.setFirstName("Demo");
                 demo.setLastName("User");
-                demo.setEmail("user@travelease.com");
+                demo.setEmail("user@voyago.com");
                 demo.setPhoneNumber("9999999998");
                 demo.setPassword(passwordEncoder.encode("user123"));
                 demo.setRole("USER");

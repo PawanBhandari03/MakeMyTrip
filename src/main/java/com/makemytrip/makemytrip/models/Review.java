@@ -54,7 +54,7 @@ public class Review {
         private String id;
         private String userId;
         private String userName;
-        /** ADMIN replies are shown as coming from the TravelEase team. */
+        /** ADMIN replies are shown as coming from the Voyago team. */
         private String role;
         private String text;
         private String createdAt;

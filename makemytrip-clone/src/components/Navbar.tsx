@@ -34,7 +34,7 @@ const Navbar = () => {
             <Plane className="h-5 w-5 text-white" />
           </div>
           <span className="bg-gradient-to-r from-brand-700 to-slate-800 bg-clip-text text-xl font-extrabold tracking-tight text-transparent">
-            TravelEase
+            Voyago
           </span>
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2 lg:gap-4">
