@@ -131,7 +131,7 @@ public class ReviewSeeder {
                 Review.Reply reply = new Review.Reply();
                 reply.setId(UUID.randomUUID().toString().substring(0, 8));
                 reply.setUserId("demo-admin");
-                reply.setUserName("MakeMyTrip team");
+                reply.setUserName("TravelEase team");
                 reply.setRole("ADMIN");
                 reply.setText(REPLIES[stars <= 2 ? 1 : rnd.nextInt(2) * 2]);
                 reply.setCreatedAt(when.plusDays(1 + rnd.nextInt(3)).toString());

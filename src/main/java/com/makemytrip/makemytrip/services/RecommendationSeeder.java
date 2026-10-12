@@ -91,7 +91,7 @@ public class RecommendationSeeder {
 
     /** Gives the demo customer a beach-and-hills history so the first screen already looks personal. */
     public synchronized void seedDemoUser() {
-        Users demo = userRepository.findByEmail("user@makemytrip.com");
+        Users demo = userRepository.findByEmail("user@travelease.com");
         if (demo == null) return;
         if (!interactionRepository.findTop300ByUserIdOrderByAtDesc(demo.getId()).isEmpty()) return;
         recommendationService.refresh();

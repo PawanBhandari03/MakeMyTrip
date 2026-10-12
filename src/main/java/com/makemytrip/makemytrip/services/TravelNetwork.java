@@ -424,7 +424,7 @@ final class TravelNetwork {
                 for (int i = 0; i < 3; i++) {
                     Listing l = base("CAB", types[i].split(" \\(")[0] + " cab", roundTo(450 + roadKm * perKm[i], 50), "per cab", 10 + rnd.nextInt(20));
                     l.setType(types[i]);
-                    l.setProvider("MakeMyTrip Cabs");
+                    l.setProvider("TravelEase Cabs");
                     l.setFrom(from.name);
                     l.setTo(to.name);
                     l.setDuration(durationText(minutes));

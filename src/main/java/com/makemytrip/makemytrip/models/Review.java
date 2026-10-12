@@ -54,7 +54,7 @@ public class Review {
         private String id;
         private String userId;
         private String userName;
-        /** ADMIN replies are shown as coming from the MakeMyTrip team. */
+        /** ADMIN replies are shown as coming from the TravelEase team. */
         private String role;
         private String text;
         private String createdAt;

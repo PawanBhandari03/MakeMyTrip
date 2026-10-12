@@ -27,21 +27,24 @@ public class DataSeeder {
                                    RecommendationSeeder recommendationSeeder) {
         return args -> {
             dummyData.load(false);
-            if (users.findByEmail("admin@makemytrip.com") == null) {
+            // the built-in accounts were renamed with the product: move existing ones over instead of creating duplicates
+            renameAccount(users, "admin@makemytrip.com", "admin@travelease.com");
+            renameAccount(users, "user@makemytrip.com", "user@travelease.com");
+            if (users.findByEmail("admin@travelease.com") == null) {
                 Users admin = new Users();
                 admin.setFirstName("Admin");
                 admin.setLastName("User");
-                admin.setEmail("admin@makemytrip.com");
+                admin.setEmail("admin@travelease.com");
                 admin.setPhoneNumber("9999999999");
                 admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setRole("ADMIN");
                 users.save(admin);
             }
-            if (users.findByEmail("user@makemytrip.com") == null) {
+            if (users.findByEmail("user@travelease.com") == null) {
                 Users demo = new Users();
                 demo.setFirstName("Demo");
                 demo.setLastName("User");
-                demo.setEmail("user@makemytrip.com");
+                demo.setEmail("user@travelease.com");
                 demo.setPhoneNumber("9999999998");
                 demo.setPassword(passwordEncoder.encode("user123"));
                 demo.setRole("USER");
@@ -54,5 +57,14 @@ public class DataSeeder {
                 flightStatusService.syncFromFlights();
             }
         };
+    }
+
+    /** Gives an existing account its new address, unless an account with the new address already exists. */
+    private static void renameAccount(UserRepository users, String from, String to) {
+        Users old = users.findByEmail(from);
+        if (old != null && users.findByEmail(to) == null) {
+            old.setEmail(to);
+            users.save(old);
+        }
     }
 }
