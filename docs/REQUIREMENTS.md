@@ -14,7 +14,7 @@ Paths in the *Code* column are relative to `src/main/java/com/makemytrip/makemyt
 
 | # | Requirement | Status | Where to see it | Code |
 |---|---|---|---|---|
-| 1.1 | A mock API that provides delay and boarding updates | Done | Open `https://makemytrip-qgai.onrender.com/mock-api/flights/board`; trigger events with `POST /mock-api/flights/{no}/events`; or use **Admin → Flight Ops** | `controllers/MockFlightApiController`, `services/MockFlightFeedService` |
+| 1.1 | A mock API that provides delay and boarding updates | Done | Call `GET /mock-api/flights/board` on the back end; trigger events with `POST /mock-api/flights/{no}/events`; or use **Admin → Flight Ops** | `controllers/MockFlightApiController`, `services/MockFlightFeedService` |
 | 1.2 | Push notifications for time changes, delays and ETAs | Done | Follow a flight, then press **+1h** in **Admin → Flight Ops**. A pop-up, the bell badge and a browser notification arrive within seconds | `services/FlightEventService`, `services/NotificationService`; `components/NotificationBell` |
 | 1.3 | Delay reasons and revised schedules | Done | **My Flights** (`/tracker`) or **Live Flight Status**: each flight shows the delay reason, the new departure and arrival, gate and terminal, and a timeline of changes | `services/FlightStatusService`, `models/FlightEvent`; `components/FlightStatusCard` |
 | 1.4 | Tracking multiple flights | Done | **My Flights** lists every followed flight. Booking a flight follows it automatically; any flight number can be followed from **Live Flight Status** | `services/FlightTrackingService`; `pages/tracker.tsx`, `pages/flight-status` |

@@ -42,7 +42,7 @@ flowchart LR
 
    | Setting | Value |
    |---|---|
-   | Name | anything, for example `makemytrip-api` |
+   | Name | anything, for example `voyago-api` |
    | Language | **Docker** (the `Dockerfile` in the project root does the whole build) |
    | Branch | `main` |
    | Region | the one closest to you |
@@ -57,8 +57,8 @@ flowchart LR
 
    Render supplies the `PORT` itself and the app reads it.
 5. Press **Create Web Service**. The first build takes about **5 to 10 minutes** (it builds the Java project). Watch the **Logs** tab. It is finished when you see `Started MakemytripApplication` and the service shows **Live**.
-6. Copy the address at the top, for example `https://makemytrip-api.onrender.com`.
-7. **Test it:** open `https://makemytrip-api.onrender.com/flight` in a browser. A long list of flights means the back end and database work.
+6. Copy the address at the top, for example `https://voyago-api.onrender.com`.
+7. **Test it:** open `https://voyago-api.onrender.com/flight` in a browser. A long list of flights means the back end and database work.
 
 > **Free plan sleep:** Render stops a free service after about 15 minutes without visitors, and the next visit takes around a minute to wake it. This is normal. Open the back end link a few minutes before anyone looks at the project.
 
