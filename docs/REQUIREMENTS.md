@@ -2,7 +2,7 @@
 
 Every requirement of the five internship tasks, whether it is done, where to see it working on the live site, and where it is implemented in the code.
 
-- **Live site:** https://make-my-trip-theta.vercel.app
+- **Live site:** https://voyago-trips.vercel.app
 - **Logins:** customer `user` / `user123`, admin `admin` / `admin123`
 - **Status:** all 25 requirements below are implemented and working.
 

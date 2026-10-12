@@ -9,13 +9,13 @@ All data is demo data and no real payment is ever taken.
 
 | | |
 |---|---|
-| **Live site (front end)** | https://make-my-trip-theta.vercel.app |
+| **Live site (front end)** | https://voyago-trips.vercel.app |
 | **Live API (back end)** | https://makemytrip-qgai.onrender.com |
 | **Source** | this repository |
 
 > The back end runs on a free Render plan, which sleeps when idle. The first request after a pause can take about a minute; please wait for it.
 >
-> **A note on names:** the product is called Voyago. A few internal names keep the project's original working name so that nothing that is already deployed breaks: the Java package `com.makemytrip`, the database name, the front-end folder `makemytrip-clone`, the repository name and the hosted web addresses above.
+> **A note on names:** the product is called Voyago. A few internal names keep the project's original working name so that nothing that is already deployed breaks: the Java package `com.makemytrip`, the database name, the front-end folder `makemytrip-clone` and the back-end web address above.
 
 ---
 

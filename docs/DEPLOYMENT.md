@@ -37,7 +37,7 @@ flowchart LR
 ## Part 2: Back end on Render
 
 1. Go to **render.com** and sign in with GitHub.
-2. **New → Web Service**, choose **Build and deploy from a Git repository**, and pick your `MakeMyTrip` repository.
+2. **New → Web Service**, choose **Build and deploy from a Git repository**, and pick your `Voyago` repository.
 3. Fill in the form:
 
    | Setting | Value |
@@ -69,7 +69,7 @@ If the build fails, open the **Logs** and see [Troubleshooting](#troubleshooting
 ## Part 3: Front end on Vercel
 
 1. Go to **vercel.com** and sign in with GitHub.
-2. **Add New → Project**, then **Import** the `MakeMyTrip` repository.
+2. **Add New → Project**, then **Import** the `Voyago` repository.
 3. Set up the project:
 
    | Setting | Value |
@@ -148,7 +148,7 @@ Do these on the **live site**, in this order, close to the moment you submit.
 
 ### F. What to send
 1. The **Vercel link** (the live website).
-2. The **GitHub link** (`https://github.com/PawanBhandari03/MakeMyTrip`).
+2. The **GitHub link** (`https://github.com/PawanBhandari03/Voyago`).
 3. A line telling the reviewer: *"Log in as `user` / `user123`, or `admin` / `admin123` for the admin area. The README has a two-minute tour and the docs folder explains every feature with diagrams. The first load may take a minute because the free back end sleeps."*
 
 ---

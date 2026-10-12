@@ -2,7 +2,7 @@
 export const SITE_NAME = "Voyago";
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 export const AUTHOR = "Pawan Bhandari";
-export const GITHUB_URL = "https://github.com/PawanBhandari03/MakeMyTrip";
+export const GITHUB_URL = "https://github.com/PawanBhandari03/Voyago";
 
 export const DEFAULT_TITLE = `${SITE_NAME} – Full-Stack Travel Booking Platform`;
 export const DEFAULT_DESCRIPTION =
